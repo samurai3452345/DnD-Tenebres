@@ -6,8 +6,7 @@ public final class StatMathUtils {
     }
 
     public static int calculateModifier(int value) {
-        int divident = value - 10;
-        return Math.floorDiv(divident, 2);
+        return Math.floorDiv(value-10, 2);
     }
 
 
