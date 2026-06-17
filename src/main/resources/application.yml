@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/rpg_db
     username: postgres
-    password: 1
+    password:
   jpa:
     hibernate:
       ddl-auto: validate
