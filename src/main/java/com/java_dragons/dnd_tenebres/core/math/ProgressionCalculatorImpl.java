@@ -24,6 +24,25 @@ public class ProgressionCalculatorImpl implements ProgressionCalculator {
             4965181
     };
 
+    private static final int[] HERO_BASE_HP = {
+            20,
+            28,
+            38,
+            48,
+            60,
+            72,
+            86,
+            100,
+            116,
+            132,
+            150,
+            168,
+            188,
+            208,
+            242,
+            279
+    };
+
 
     @Override
     public long getRequiredXpForLevel(int level) {
@@ -38,5 +57,17 @@ public class ProgressionCalculatorImpl implements ProgressionCalculator {
 
 
         return REQUIRED_XP_PER_LEVEL[level - 1];
+    }
+
+    @Override
+    public int getHeroBaseHp(int level) {
+        if (level < 1) {
+            throw new IllegalArgumentException("Уровень не должен быть меньше 1");
+        }
+
+        if (level >HERO_BASE_HP.length) {
+            throw new IllegalArgumentException("Уровень не должен быть больше 16");
+        }
+        return HERO_BASE_HP[level - 1];
     }
 }
