@@ -34,6 +34,35 @@ public class Player {
 
 
 
+    public void addExperience(long xp) {
+        if(xp < 0){
+            throw new  IllegalArgumentException("Опыт не может быть отрицательным!");
+        }
+        this.experience += xp;
+    }
+
+    public void addGold(long amount){
+        if(amount < 0){
+            throw new IllegalArgumentException("Нельзя добавить отрицательное золото!");
+        }
+
+        this.gold += amount;
+    }
+
+    public boolean spendGold(long amount){
+        if(amount < 0){
+            throw new IllegalArgumentException("stupid!");
+        }
+        if(this.gold < amount){
+            return false;
+        }
+        this.gold -= amount;
+        return true;
+    }
+
+
+
+
 
 
 }
