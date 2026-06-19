@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dnd_postgres_v4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "31415926535"
+      POSTGRES_DB: dnd_tenebres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_v4:/var/lib/postgresql/data
+volumes:
+  postgres_data_v4:
