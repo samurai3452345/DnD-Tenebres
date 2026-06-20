@@ -2,9 +2,11 @@ package com.java_dragons.dnd_tenebres.player.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 @Table(name = "players")
@@ -14,17 +16,17 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "level")
-    private int level;
+    private int level = 1;
 
     @Column(name = "experience")
-    private long experience;
+    private long experience = 0;
 
     @Column(name = "gold")
-    private long gold;
+    private long gold = 0;
 
     @Column(name = "current_hp")
     private int currentHp;
@@ -52,7 +54,7 @@ public class Player {
 
     public boolean spendGold(long amount){
         if(amount < 0){
-            throw new IllegalArgumentException("stupid!");
+            throw new IllegalArgumentException("Сумма не может быть отрицательной!");
         }
         if(this.gold < amount){
             return false;

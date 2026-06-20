@@ -6,6 +6,11 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="001-create-players-table" author="java_dragons">
+        <rollback>
+            <sql>
+                DROP TABLE players;
+            </sql>
+        </rollback>
         <sql>
             CREATE TABLE players (
                                      id BIGSERIAL PRIMARY KEY,
