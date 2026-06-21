@@ -6,6 +6,11 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="001-create-players-table" author="java_dragons">
+        <rollback>
+            <sql>
+                DROP TABLE players;
+            </sql>
+        </rollback>
         <sql>
             CREATE TABLE players (
                                      id BIGSERIAL PRIMARY KEY,
@@ -13,6 +18,7 @@
                                      level INTEGER NOT NULL DEFAULT 1,
                                      experience BIGINT NOT NULL DEFAULT 0,
                                      gold BIGINT NOT NULL DEFAULT 0,
+                                     current_hp INTEGER NOT NULL,
 
                                      stat_str INTEGER NOT NULL DEFAULT 8,
                                      stat_dex INTEGER NOT NULL DEFAULT 8,

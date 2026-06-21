@@ -1,8 +1,11 @@
+server:
+  port: 8081
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/rpg_db
+    url: jdbc:postgresql://localhost:5433/dnd_tenebres
     username: postgres
-    password:
+    password: "31415926535"
   jpa:
     hibernate:
       ddl-auto: validate
