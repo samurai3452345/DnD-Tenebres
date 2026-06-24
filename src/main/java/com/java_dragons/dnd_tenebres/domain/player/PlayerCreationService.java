@@ -44,7 +44,7 @@ public class PlayerCreationService {
         int totalPointSpend = abilities.stream().mapToInt(stat -> priceUpgrade.get(stat)).sum();
 
         if(totalPointSpend != 27){
-            throw new IllegalArgumentException("Неверно распределены очки!: " + totalPointSpend + " а нужно 27!");
+            throw new IllegalArgumentException("Неверно распределены очки: " + totalPointSpend + " а нужно 27!");
         }
 
 
