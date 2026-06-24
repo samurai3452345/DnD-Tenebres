@@ -1,6 +1,6 @@
-package com.java_dragons.dnd_tenebres.player;
+package com.java_dragons.dnd_tenebres.domain.player;
 
-import com.java_dragons.dnd_tenebres.player.entity.Player;
+import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

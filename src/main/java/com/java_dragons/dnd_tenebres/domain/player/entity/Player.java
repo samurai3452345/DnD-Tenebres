@@ -1,4 +1,4 @@
-package com.java_dragons.dnd_tenebres.player.entity;
+package com.java_dragons.dnd_tenebres.domain.player.entity;
 
 
 import jakarta.persistence.*;

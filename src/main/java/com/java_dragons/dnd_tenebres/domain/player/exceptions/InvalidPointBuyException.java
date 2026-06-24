@@ -1,4 +1,4 @@
-package com.java_dragons.dnd_tenebres.player.exceptions;
+package com.java_dragons.dnd_tenebres.domain.player.exceptions;
 
 public class InvalidPointBuyException extends RuntimeException {
 
