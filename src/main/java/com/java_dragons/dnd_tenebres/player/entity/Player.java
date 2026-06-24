@@ -19,12 +19,15 @@ public class Player {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Builder.Default
     @Column(name = "level")
     private int level = 1;
 
+    @Builder.Default
     @Column(name = "experience")
     private long experience = 0;
 
+    @Builder.Default
     @Column(name = "gold")
     private long gold = 0;
 

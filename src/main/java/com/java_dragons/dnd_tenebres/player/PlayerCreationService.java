@@ -1,6 +1,7 @@
 package com.java_dragons.dnd_tenebres.player;
 
 
+import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculatorImpl;
 import com.java_dragons.dnd_tenebres.player.dto.PlayerCreationRequest;
 import com.java_dragons.dnd_tenebres.player.entity.Player;
 import com.java_dragons.dnd_tenebres.player.entity.PlayerStats;
@@ -15,7 +16,8 @@ import java.util.Map;
 @Service
 public class PlayerCreationService {
     private final PlayerRepository playerRepository;
-    private final Map<Integer, Integer> priceUpgrade = Map.of(
+    private final ProgressionCalculatorImpl progressionCalculator;
+    private static final Map<Integer, Integer> POINT_BUY_COSTS = Map.of(
             8,0,
             9,1,
             10,2,
@@ -41,7 +43,7 @@ public class PlayerCreationService {
             throw new IllegalArgumentException("Характеристики должны быть от 8 до 15!");
         }
 
-        int totalPointSpend = abilities.stream().mapToInt(stat -> priceUpgrade.get(stat)).sum();
+        int totalPointSpend = abilities.stream().mapToInt(stat -> POINT_BUY_COSTS.get(stat)).sum();
 
         if(totalPointSpend != 27){
             throw new IllegalArgumentException("Неверно распределены очки!: " + totalPointSpend + " а нужно 27!");
@@ -58,6 +60,7 @@ public class PlayerCreationService {
         Player player = Player.builder()
                 .name(request.name())
                 .stats(stats)
+                .currentHp(progressionCalculator.getHeroBaseHp(1))
                 .build();
 
 
