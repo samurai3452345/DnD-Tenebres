@@ -1,5 +1,10 @@
 package com.java_dragons.dnd_tenebres.domain.combat.model;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum DamageType {
     PHYSICAL("Физический"),
     FIRE("Огонь"),
@@ -13,12 +18,4 @@ public enum DamageType {
     DARK("Тьма");
 
     private final String displayName;
-
-    DamageType(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-    }
+}

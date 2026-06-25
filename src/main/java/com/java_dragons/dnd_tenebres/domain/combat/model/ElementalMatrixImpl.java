@@ -45,13 +45,13 @@ public class ElementalMatrixImpl implements ElementalMatrix {
         setRule(DamageType.EARTH, DamageType.NATURE, 0.5);
 
         setRule(DamageType.NATURE, DamageType.EARTH, 2.0);
-        setRule(DamageType.NATURE, DamageType.EARTH, 2.0);
+        setRule(DamageType.NATURE, DamageType.ELECTRICITY, 2.0);
         setRule(DamageType.NATURE, DamageType.FIRE, 0.5);
         setRule(DamageType.NATURE, DamageType.ICE, 0.5);
 
         setRule(DamageType.ICE, DamageType.WATER, 2.0);
         setRule(DamageType.ICE, DamageType.NATURE, 2.0);
-        setRule(DamageType.ICE, DamageType.WATER, 0.5);
+        setRule(DamageType.ICE, DamageType.AIR, 0.5);
         setRule(DamageType.ICE, DamageType.FIRE, 0.5);
 
         setRule(DamageType.AIR, DamageType.ICE, 2.0);
