@@ -32,4 +32,6 @@
         </sql>
     </changeSet>
 
+    <include file="db/changelog/create-items-table.xml"/>
+
 </databaseChangeLog>
