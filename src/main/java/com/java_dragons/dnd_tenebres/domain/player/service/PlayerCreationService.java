@@ -1,7 +1,8 @@
-package com.java_dragons.dnd_tenebres.domain.player;
+package com.java_dragons.dnd_tenebres.domain.player.service;
 
 
 import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculatorImpl;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats;

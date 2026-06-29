@@ -2,9 +2,6 @@ package com.java_dragons.dnd_tenebres.domain.item.entity;
 
 
 import com.java_dragons.dnd_tenebres.core.math.ItemProgressionCalculator;
-import com.java_dragons.dnd_tenebres.core.math.ItemProgressionCalculatorImpl;
-import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculator;
-import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculatorImpl;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemRarity;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
@@ -25,7 +22,7 @@ public abstract class Item {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
     private Player player;
 
@@ -52,11 +49,14 @@ public abstract class Item {
     private ItemStats stats;
 
     public void addXp(int xp) {
+        if(xp <= 0){
+            throw new IllegalArgumentException("Опыт не может быть отрицательным");
+        }
         this.currentXp += xp;
     }
 
     @Transient
-    public int getCurrentTier(ItemProgressionCalculatorImpl calc){
+    public int getCurrentTier(ItemProgressionCalculator calc){
        return calc.getTierByXp(currentXp);
     }
     public abstract ItemType getItemType();

@@ -5,6 +5,7 @@ package com.java_dragons.dnd_tenebres.domain.item.service;
 import com.java_dragons.dnd_tenebres.core.math.ItemProgressionCalculator;
 import com.java_dragons.dnd_tenebres.domain.item.entity.Artifact;
 import com.java_dragons.dnd_tenebres.domain.item.entity.Item;
+import com.java_dragons.dnd_tenebres.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,10 @@ public class ItemUpgradeService {
         }
 
         List<Item> foodItems = itemRepository.findAllById(foodItemIds);
+
+        if(foodItems.size() != foodItemIds.size()){
+            throw new IllegalArgumentException("Один или несколько предметов из списка корма не найдены в базе данных!");
+        }
 
         if(!foodItems.stream().allMatch(foodItem -> foodItem.getPlayer().getId().equals(playerId))){
             throw new  IllegalArgumentException("Это не твой предмет!");
