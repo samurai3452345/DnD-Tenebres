@@ -59,4 +59,5 @@ public abstract class Item {
     public int getCurrentTier(ItemProgressionCalculatorImpl calc){
        return calc.getTierByXp(currentXp);
     }
+    public abstract ItemType getItemType();
 }
