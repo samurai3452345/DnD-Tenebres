@@ -1,35 +1,33 @@
-package com.java_dragons.dnd_tenebres.player.entity;
+package com.java_dragons.dnd_tenebres.domain.item.entity;
 
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
-//Базовые характеристики:
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Embeddable
-public class PlayerStats {
+public class ItemStats {
 
     @Column(name = "stat_str", nullable = false)
-    private int strength;       //Сила (STR)
+    private int strength;
 
     @Column(name = "stat_dex", nullable = false)
-    private int dexterity;      //Ловкость (DEX)
+    private int dexterity;
 
     @Column(name = "stat_con", nullable = false)
-    private int constitution;   //Телосложение (CON)
+    private int constitution;
 
     @Column(name = "stat_int", nullable = false)
-    private int intelligence;   //Интеллект (INT)
+    private int intelligence;
 
     @Column(name = "stat_wis", nullable = false)
-    private int wisdom;         //Мудрость (WIS)
+    private int wisdom;
 
     @Column(name = "stat_cha", nullable = false)
-    private int charisma;       //Харизма (CHA)
+    private int charisma;
 
 }

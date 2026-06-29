@@ -1,10 +1,11 @@
-package com.java_dragons.dnd_tenebres.player;
+package com.java_dragons.dnd_tenebres.domain.player.service;
 
 
 import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculatorImpl;
-import com.java_dragons.dnd_tenebres.player.dto.PlayerCreationRequest;
-import com.java_dragons.dnd_tenebres.player.entity.Player;
-import com.java_dragons.dnd_tenebres.player.entity.PlayerStats;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
+import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
+import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
+import com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
