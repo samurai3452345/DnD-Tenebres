@@ -1,5 +1,9 @@
 package com.java_dragons.dnd_tenebres.domain.item.model;
 
+
+import lombok.Getter;
+
+@Getter
 public enum DiceType {
     D4(4),
     D6(6),
