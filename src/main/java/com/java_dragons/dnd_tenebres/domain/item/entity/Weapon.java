@@ -6,8 +6,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Getter;
+import lombok.Setter;
 
 @DiscriminatorValue("WEAPON")
+@Getter
+@Setter
 public class Weapon extends Item{
 
     @Column(name = "base_dice_type")
