@@ -11,8 +11,6 @@ import java.util.Set;
 @Entity
 @Table(name = "monsters")
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class Monster {
 
@@ -27,6 +25,7 @@ public class Monster {
     private int maxHp;
 
     @Column(name = "current_hp", nullable = false)
+    @Setter(AccessLevel.NONE)
     private int currentHp;
 
     @Column(name = "armor_class", nullable = false)
@@ -44,8 +43,15 @@ public class Monster {
     @Column(name = "element")
     private Set<DamageType> elements = new HashSet<>();
 
-
-
+    public Monster(String name, int maxHp,int armorClass, int xpReward, int goldReward, Set<DamageType> elements) {
+        this.name = name;
+        this.maxHp = maxHp;
+        this.currentHp = maxHp;
+        this.armorClass = armorClass;
+        this.xpReward = xpReward;
+        this.goldReward = goldReward;
+        this.elements = elements;
+    }
 
     public void takeDamage(int damage){
         this.currentHp = Math.max(0, this.currentHp - damage);
@@ -55,6 +61,14 @@ public class Monster {
     public  boolean isDead(){
         return currentHp <= 0;
     }
+
+    @PrePersist
+    public void initHp() {
+        if (this.currentHp == 0) {
+            this.currentHp = this.maxHp;
+        }
+    }
+
 
 
 }
