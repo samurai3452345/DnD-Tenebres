@@ -3,8 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +12,8 @@ import java.util.Set;
 @Table(name = "monsters")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Monster {
 
     @Id
@@ -44,6 +45,8 @@ public class Monster {
     private Set<DamageType> elements = new HashSet<>();
 
 
+
+
     public void takeDamage(int damage){
         this.currentHp = Math.max(0, this.currentHp - damage);
 
@@ -52,4 +55,6 @@ public class Monster {
     public  boolean isDead(){
         return currentHp <= 0;
     }
+
+
 }
