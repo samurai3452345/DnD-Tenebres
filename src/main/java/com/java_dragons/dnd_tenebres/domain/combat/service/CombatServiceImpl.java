@@ -6,7 +6,7 @@ import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageCalculator;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
-import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterMock;
+import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class CombatServiceImpl implements CombatService {
     private final ItemProgressionCalculator itemProgressionCalculator;
 
     @Override
-    public String executeAttack(Player attacker, Weapon weapon, MonsterMock defender) {
+    public String executeAttack(Player attacker, Weapon weapon, Monster defender) {
         int d20 = DiceRoller.rollD20();
 
         if (d20 == 1) {
@@ -60,7 +60,7 @@ public class CombatServiceImpl implements CombatService {
         }
 
         log.append(String.format("%s наносит %d урона по %s. Осталось ХП: %d.",
-                attacker.getName(), defender.getName(), finalDamage, Math.max(0, defender.getHp())));
+                attacker.getName(), defender.getName(), finalDamage, Math.max(0, defender.getCurrentHp())));
 
         if (defender.isDead()) {
             log.append("Враг повержен!");
