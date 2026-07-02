@@ -33,5 +33,6 @@
     </changeSet>
 
     <include file="db/changelog/create-items-table.xml"/>
+    <include file="/db/changelog/v5-create-monsters-table.xml"/>
 
 </databaseChangeLog>

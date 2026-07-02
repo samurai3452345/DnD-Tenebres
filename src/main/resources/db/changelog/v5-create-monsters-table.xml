@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260702-create-monsters" author="shamil">
+        <createTable tableName="monsters">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_hp" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_hp" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armor_class" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="xp_reward" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gold_reward" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20260702-create-monster-elements" author="shamil">
+        <createTable tableName="monster_elements">
+            <column name="monster_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_monster_elements_monster" referencedTableName="monsters" referencedColumnNames="id"/>
+            </column>
+            <column name="element" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="monster_elements"
+                             columnNames="monster_id, element"
+                             constraintName="uq_monster_id_element"/>
+    </changeSet>
+
+</databaseChangeLog>
