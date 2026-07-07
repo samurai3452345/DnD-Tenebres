@@ -1,23 +1,22 @@
 package com.java_dragons.dnd_tenebres.domain.player.service;
 
 
-import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculatorImpl;
+import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculator;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
 public class PlayerCreationService {
-    private final PlayerRepository playerRepository;
-    private final ProgressionCalculatorImpl progressionCalculator;
+
+    private final ProgressionCalculator progressionCalculator;
+
     private static final Map<Integer, Integer> POINT_BUY_COSTS = Map.of(
             8,0,
             9,1,
@@ -28,7 +27,7 @@ public class PlayerCreationService {
             14,7,
             15,9
     );
-    @Transactional
+
     public Player createCharacter(PlayerCreationRequest request){
         List<Integer> abilities = List.of(request.strength(),
                 request.dexterity(),
@@ -44,30 +43,27 @@ public class PlayerCreationService {
             throw new IllegalArgumentException("Характеристики должны быть от 8 до 15!");
         }
 
-        int totalPointSpend = abilities.stream().mapToInt(stat -> POINT_BUY_COSTS.get(stat)).sum();
+        int totalPointSpend = abilities.stream()
+                .mapToInt(POINT_BUY_COSTS::get)
+                .sum();
 
         if(totalPointSpend != 27){
             throw new IllegalArgumentException("Неверно распределены очки!: " + totalPointSpend + " а нужно 27!");
         }
 
 
-        PlayerStats stats = new PlayerStats(request.strength(),
+        PlayerStats stats = new PlayerStats(
+                request.strength(),
                 request.dexterity(),
                 request.constitution(),
                 request.intelligence(),
                 request.wisdom(),
                 request.charisma());
 
-        Player player = Player.builder()
+        return Player.builder()
                 .name(request.name())
                 .stats(stats)
                 .currentHp(progressionCalculator.getHeroBaseHp(1))
                 .build();
-
-
-
-
-        return playerRepository.save(player);
     }
-
 }
