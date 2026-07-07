@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1783457558003-11" author="Sawaron">
+        <dropForeignKeyConstraint baseTableName="items" constraintName="fk_items_parent"/>
+    </changeSet>
+    <changeSet id="1783457558003-8" author="Sawaron">
+        <createTable tableName="monster_elements">
+            <column name="monster_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="element" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1783457558003-9" author="Sawaron">
+        <createTable tableName="monsters">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_monsters"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_hp" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_hp" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armor_class" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="xp_reward" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gold_reward" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1783457558003-10" author="Sawaron">
+        <addForeignKeyConstraint baseColumnNames="monster_id" baseTableName="monster_elements"
+                                 constraintName="fk_monster_elements_on_monster" referencedColumnNames="id"
+                                 referencedTableName="monsters"/>
+    </changeSet>
+    <changeSet id="1783457558003-13" author="Sawaron">
+        <dropColumn columnName="base_dice_type" tableName="items"/>
+    </changeSet>
+    <changeSet id="1783457558003-14" author="Sawaron">
+        <dropColumn columnName="created_at" tableName="players"/>
+    </changeSet>
+    <changeSet id="1783457558003-1" author="Sawaron">
+        <dropNotNullConstraint columnDataType="int" columnName="current_hp" tableName="players"/>
+    </changeSet>
+    <changeSet id="1783457558003-2" author="Sawaron">
+        <modifyDataType columnName="equip_slot" newDataType="VARCHAR(255)" tableName="items"/>
+    </changeSet>
+    <changeSet id="1783457558003-3" author="Sawaron">
+        <dropNotNullConstraint columnDataType="bigint" columnName="experience" tableName="players"/>
+    </changeSet>
+    <changeSet id="1783457558003-4" author="Sawaron">
+        <dropNotNullConstraint columnDataType="bigint" columnName="gold" tableName="players"/>
+    </changeSet>
+    <changeSet id="1783457558003-5" author="Sawaron">
+        <dropNotNullConstraint columnDataType="int" columnName="level" tableName="players"/>
+    </changeSet>
+    <changeSet id="1783457558003-6" author="Sawaron">
+        <modifyDataType columnName="name" newDataType="VARCHAR(255)" tableName="players"/>
+    </changeSet>
+    <changeSet id="1783457558003-7" author="Sawaron">
+        <modifyDataType columnName="rarity" newDataType="VARCHAR(255)" tableName="items"/>
+    </changeSet>
+
+</databaseChangeLog>
