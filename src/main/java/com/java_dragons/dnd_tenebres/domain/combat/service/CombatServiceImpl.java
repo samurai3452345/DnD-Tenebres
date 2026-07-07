@@ -60,7 +60,7 @@ public class CombatServiceImpl implements CombatService {
         }
 
         log.append(String.format("%s наносит %d урона по %s. Осталось ХП: %d.",
-                attacker.getName(), defender.getName(), finalDamage, Math.max(0, defender.getCurrentHp())));
+                attacker.getName(), finalDamage, defender.getName(), Math.max(0, defender.getCurrentHp())));
 
         if (defender.isDead()) {
             log.append("Враг повержен!");
