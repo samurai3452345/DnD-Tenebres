@@ -34,6 +34,9 @@ public class Player {
     @Column(name = "current_hp")
     private int currentHp;
 
+    @Column(name = "max_hp", nullable = false)
+    private  int maxHp;
+
     @Embedded
     private PlayerStats stats;
 
@@ -66,6 +69,15 @@ public class Player {
         return true;
     }
 
+    public void healToFull() {
+        this.currentHp = this.maxHp;
+    }
+
+    public void buffMaxHp(int percent) {
+        int bonus = (this.maxHp * percent) / 100;
+        this.maxHp += bonus;
+        this.currentHp += bonus;
+    }
 
 
 

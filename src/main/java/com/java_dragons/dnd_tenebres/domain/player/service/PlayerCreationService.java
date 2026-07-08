@@ -60,10 +60,13 @@ public class PlayerCreationService {
                 request.wisdom(),
                 request.charisma());
 
+        int initialHp = progressionCalculator.getHeroBaseHp(1);
+
         return Player.builder()
                 .name(request.name())
                 .stats(stats)
-                .currentHp(progressionCalculator.getHeroBaseHp(1))
+                .maxHp(initialHp)
+                .currentHp(initialHp)
                 .build();
     }
 }
