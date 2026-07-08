@@ -8,23 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
-/*
-•	id (BIGSERIAL)
-•	name (VARCHAR)
-•	biome (VARCHAR) - (например, "FOREST", "DUNGEON")
-•	level (INTEGER)
-•	base_hp (INTEGER)
-•	armor_class (INTEGER)
-•	xp_reward (INTEGER)
-•	gold_reward (INTEGER)
-•	elements (В идеале отдельная таблица связка template_elements, как ты делал для монстров). Напиши SQL-скрипт INSERT, который добавит 3-4 монстров (Гоблин 1 уровня для Леса, Волк 1 уровня для Леса, Скелет 1 уровня для Подземелья).
- */
 
 
 
 @Getter
 @Entity
 @NoArgsConstructor
+@Table(name = "monster_templates")
 public class MonsterTemplate {
 
     @Id
@@ -32,7 +22,7 @@ public class MonsterTemplate {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "biome")
