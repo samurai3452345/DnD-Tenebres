@@ -1,0 +1,24 @@
+package com.java_dragons.dnd_tenebres.domain.effect.model;
+
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Embeddable
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "type")
+public class ActiveEffect {
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "effect_type",nullable=false)
+    private EffectType type;
+
+    @Column(name = "duration")
+    private int duration; // сколько ходов еще весит эффект
+
+}

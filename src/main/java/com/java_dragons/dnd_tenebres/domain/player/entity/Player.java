@@ -1,8 +1,13 @@
 package com.java_dragons.dnd_tenebres.domain.player.entity;
 
 
+import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
+import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,8 +45,9 @@ public class Player {
     @Embedded
     private PlayerStats stats;
 
-
-
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
+    private Set<ActiveEffect> activeEffects = new HashSet<>();
 
     public void addExperience(long xp) {
         if(xp < 0){
@@ -79,7 +85,21 @@ public class Player {
         this.currentHp += bonus;
     }
 
+    public void addEffect(ActiveEffect effect) {
+        this.activeEffects.add(effect);
+    }
 
+    public void removeEffect(EffectType type) {
+        this.activeEffects.removeIf(e -> e.getType() == type);
+    }
+
+    public void clearEffects() {
+        this.activeEffects.clear();
+    }
+
+    public boolean hasEffect(EffectType type) {
+        return this.activeEffects.stream().anyMatch(e -> e.getType() == type);
+    }
 
 
 

@@ -35,5 +35,7 @@
     <include file="db/changelog/create-items-table.xml"/>
     <include file="/db/changelog/v5-create-monsters-table.xml"/>
     <include file="/db/changelog/v6-create-monster-templates.xml"/>
+    <include file="db/changelog/create-player-effects.xml"/>
+    <include file="db/changelog/add-max-hp-to-players.xml"/>
 
 </databaseChangeLog>
