@@ -5,37 +5,9 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <changeSet id="001-create-players-table" author="java_dragons">
-        <rollback>
-            <sql>
-                DROP TABLE players;
-            </sql>
-        </rollback>
-        <sql>
-            CREATE TABLE players (
-                                     id BIGSERIAL PRIMARY KEY,
-                                     name VARCHAR(50) NOT NULL UNIQUE,
-                                     level INTEGER NOT NULL DEFAULT 1,
-                                     experience BIGINT NOT NULL DEFAULT 0,
-                                     gold BIGINT NOT NULL DEFAULT 0,
-                                     current_hp INTEGER NOT NULL,
-
-                                     stat_str INTEGER NOT NULL DEFAULT 8,
-                                     stat_dex INTEGER NOT NULL DEFAULT 8,
-                                     stat_con INTEGER NOT NULL DEFAULT 8,
-                                     stat_int INTEGER NOT NULL DEFAULT 8,
-                                     stat_wis INTEGER NOT NULL DEFAULT 8,
-                                     stat_cha INTEGER NOT NULL DEFAULT 8,
-
-                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        </sql>
-    </changeSet>
-
-    <include file="db/changelog/create-items-table.xml"/>
-    <include file="/db/changelog/v5-create-monsters-table.xml"/>
-    <include file="/db/changelog/v6-create-monster-templates.xml"/>
-    <include file="db/changelog/create-player-effects.xml"/>
-    <include file="db/changelog/add-max-hp-to-players.xml"/>
-
+    <include file="db/changelog/001-create-players-table.xml"/>
+    <include file="/db/changelog/002-create-player-effects.xml"/>
+    <include file="/db/changelog/003-create-items-table.xml"/>
+    <include file="/db/changelog/004-create-monsters-table.xml"/>
+    <include file="/db/changelog/005-create-monster-templates.xml"/>
 </databaseChangeLog>

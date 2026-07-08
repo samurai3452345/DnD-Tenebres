@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="create-player-effects" author="SAMURAI3452345">
+    <changeSet id="002-create-player-effects" author="samurai3452345">
 
         <createTable tableName="player_effects">
             <column name="player_id" type="BIGINT">
