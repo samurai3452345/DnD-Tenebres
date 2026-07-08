@@ -14,7 +14,7 @@ public enum LocationEffect {
     private final boolean isDebuff;
 
     LocationEffect(boolean isBuff, boolean isDebuff) {
-        this.isBuff = false;
-        this.isDebuff = false;
+        this.isBuff = isBuff;
+        this.isDebuff = isDebuff;
     }
 }

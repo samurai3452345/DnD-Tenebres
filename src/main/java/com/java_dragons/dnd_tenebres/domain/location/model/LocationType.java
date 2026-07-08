@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum LocationType {
     DANGEROUS(true,false),
     NEUTRAL(true,false),
-    SAFE_ZONE(true,true),;
+    SAFE_ZONE(true,true);
 
     private final boolean shortRest;
     private final boolean longRest;
