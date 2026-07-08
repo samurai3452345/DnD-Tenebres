@@ -4,6 +4,7 @@ import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemRarity;
+import com.java_dragons.dnd_tenebres.domain.location.model.BiomeType;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
@@ -52,7 +53,7 @@ public class GameSimulationRunner implements CommandLineRunner {
         dagger.setBaseDiceType(DiceType.D4);
 
 
-        Monster monster = monsterSpawnerService.spawnRandomMonster(1);
+        Monster monster = monsterSpawnerService.spawnRandomMonster(BiomeType.FOREST.name(),1);
         System.out.println("На пути появляется: " + monster.getName() +
                 " [ХП: " + monster.getCurrentHp() +
                 ", Броня (AC): " + monster.getArmorClass() + "]");
