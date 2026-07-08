@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-players-table" author="samurai3452345">
+
+        <createTable tableName="players">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="level" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="experience" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="gold" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="max_hp" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="current_hp" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stat_str" type="INTEGER" defaultValueNumeric="8">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stat_dex" type="INTEGER" defaultValueNumeric="8">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stat_con" type="INTEGER" defaultValueNumeric="8">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stat_int" type="INTEGER" defaultValueNumeric="8">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stat_wis" type="INTEGER" defaultValueNumeric="8">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="stat_cha" type="INTEGER" defaultValueNumeric="8">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>
