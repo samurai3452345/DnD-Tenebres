@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="004-create-monster-templates" author="Sawaron">
+
+        <createTable tableName="monster_templates">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="biome" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_hp" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armor_class" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="xp_reward" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gold_reward" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="template_elements">
+            <column name="template_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_template_elements_template" referencedTableName="monster_templates" referencedColumnNames="id"/>
+            </column>
+            <column name="element" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <insert tableName="monster_templates">
+            <column name="name" value="Гоблин-разведчик"/>
+            <column name="biome" value="FOREST"/>
+            <column name="level" valueNumeric="1"/>
+            <column name="base_hp" valueNumeric="25"/>
+            <column name="armor_class" valueNumeric="11"/>
+            <column name="xp_reward" valueNumeric="15"/>
+            <column name="gold_reward" valueNumeric="5"/>
+        </insert>
+        <insert tableName="template_elements">
+            <column name="template_id" valueNumeric="1"/>
+            <column name="element" value="PHYSICAL"/>
+        </insert>
+
+        <insert tableName="monster_templates">
+            <column name="name" value="Скелет-страж"/>
+            <column name="biome" value="DUNGEON"/>
+            <column name="level" valueNumeric="1"/>
+            <column name="base_hp" valueNumeric="30"/>
+            <column name="armor_class" valueNumeric="13"/>
+            <column name="xp_reward" valueNumeric="20"/>
+            <column name="gold_reward" valueNumeric="8"/>
+        </insert>
+        <insert tableName="template_elements">
+            <column name="template_id" valueNumeric="2"/>
+            <column name="element" value="PHYSICAL"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>
+
+
