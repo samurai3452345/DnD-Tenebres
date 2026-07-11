@@ -3,6 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.player.entity;
 
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
+import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,6 +45,10 @@ public class Player {
 
     @Embedded
     private PlayerStats stats;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_location_id")
+    private Location currentLocation;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
