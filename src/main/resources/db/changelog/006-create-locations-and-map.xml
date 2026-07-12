@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-create-locations-schema" author="Sawaron">
+        <createTable tableName="locations">
+            <column name="id" type="VARCHAR(100)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="zone_id" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="biome" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="effect" type="VARCHAR(50)" defaultValue="NONE"/>
+        </createTable>
+
+
+        <createTable tableName="location_connections">
+            <column name="from_location_id" type="VARCHAR(100)">
+                <constraints nullable="false" foreignKeyName="fk_conn_from_location" referencedTableName="locations" referencedColumnNames="id"/>
+            </column>
+            <column name="to_location_id" type="VARCHAR(100)">
+                <constraints nullable="false" foreignKeyName="fk_conn_to_location" referencedTableName="locations" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="location_connections"
+                             columnNames="from_location_id, to_location_id"
+                             constraintName="uq_from_to_connection"/>
+
+
+        <createTable tableName="location_fixed_monsters">
+            <column name="location_id" type="VARCHAR(100)">
+                <constraints nullable="false" foreignKeyName="fk_fixed_monster_location" referencedTableName="locations" referencedColumnNames="id"/>
+            </column>
+            <column name="monster_template_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="count" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="006-populate-locations" author="Sawaron">
+        <!-- Зона 1: talmiria (Город) -->
+        <insert tableName="locations"><column name="id" value="city_square"/><column name="name" value="Центральная площадь"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/></insert>
+        <insert tableName="locations"><column name="id" value="city_gates"/><column name="name" value="Главные ворота"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/></insert>
+        <insert tableName="locations"><column name="id" value="city_tavern"/><column name="name" value="Таверна 'Очаг Севера'"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/><column name="effect" value="COZY_TAVERN"/></insert>
+        <insert tableName="locations"><column name="id" value="city_adv_guild"/><column name="name" value="Гильдия Авантюристов"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/></insert>
+        <insert tableName="locations"><column name="id" value="city_merch_guild"/><column name="name" value="Гильдия Торговцев"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/></insert>
+
+        <!-- Зона 2: green_forest (Лес) -->
+        <insert tableName="locations"><column name="id" value="forest_edge"/><column name="name" value="Тихая опушка"/><column name="level" valueNumeric="1"/><column name="zone_id" value="green_forest"/><column name="type" value="NEUTRAL"/><column name="biome" value="FOREST"/></insert>
+        <insert tableName="locations"><column name="id" value="forest_wolf_trail"/><column name="name" value="Волчья тропа"/><column name="level" valueNumeric="1"/><column name="zone_id" value="green_forest"/><column name="type" value="NEUTRAL"/><column name="biome" value="FOREST"/></insert>
+        <insert tableName="locations"><column name="id" value="forest_goblin_camp"/><column name="name" value="Гоблинский лагерь"/><column name="level" valueNumeric="1"/><column name="zone_id" value="green_forest"/><column name="type" value="NEUTRAL"/><column name="biome" value="FOREST"/></insert>
+
+        <!-- Зона 3: forgotten_crypt (Данж) -->
+        <insert tableName="locations"><column name="id" value="crypt_entrance"/><column name="name" value="Вход в склеп"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/></insert>
+        <insert tableName="locations"><column name="id" value="crypt_corridor"/><column name="name" value="Коридор с ловушками"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/></insert>
+        <insert tableName="locations"><column name="id" value="crypt_central"/><column name="name" value="Центральная комната"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/></insert>
+        <insert tableName="locations"><column name="id" value="crypt_library"/><column name="name" value="Библиотека"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/></insert>
+        <insert tableName="locations"><column name="id" value="crypt_training"/><column name="name" value="Комната тренировок"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/></insert>
+        <insert tableName="locations"><column name="id" value="crypt_armory"/><column name="name" value="Оружейная комната"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/></insert>
+        <insert tableName="locations"><column name="id" value="crypt_boss_room"/><column name="name" value="Тронный зал павшего рыцаря"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/><column name="effect" value="DARKNESS"/></insert>
+    </changeSet>
+
+    <changeSet id="006-populate-connections" author="Sawaron">
+        <!-- city_square <-> city_gates, city_tavern, city_adv_guild, city_merch_guild -->
+        <insert tableName="location_connections"><column name="from_location_id" value="city_square"/><column name="to_location_id" value="city_gates"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_gates"/><column name="to_location_id" value="city_square"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_square"/><column name="to_location_id" value="city_tavern"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_tavern"/><column name="to_location_id" value="city_square"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_square"/><column name="to_location_id" value="city_adv_guild"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_adv_guild"/><column name="to_location_id" value="city_square"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_square"/><column name="to_location_id" value="city_merch_guild"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="city_merch_guild"/><column name="to_location_id" value="city_square"/></insert>
+
+        <!-- city_gates <-> forest_edge -->
+        <insert tableName="location_connections"><column name="from_location_id" value="city_gates"/><column name="to_location_id" value="forest_edge"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_edge"/><column name="to_location_id" value="city_gates"/></insert>
+
+        <!-- forest_edge <-> forest_wolf_trail и forest_goblin_camp -->
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_edge"/><column name="to_location_id" value="forest_wolf_trail"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_wolf_trail"/><column name="to_location_id" value="forest_edge"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_edge"/><column name="to_location_id" value="forest_goblin_camp"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_goblin_camp"/><column name="to_location_id" value="forest_edge"/></insert>
+
+        <!-- forest_wolf_trail <-> forest_goblin_camp -->
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_wolf_trail"/><column name="to_location_id" value="forest_goblin_camp"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_goblin_camp"/><column name="to_location_id" value="forest_wolf_trail"/></insert>
+
+        <!-- forest_goblin_camp <-> crypt_entrance -->
+        <insert tableName="location_connections"><column name="from_location_id" value="forest_goblin_camp"/><column name="to_location_id" value="crypt_entrance"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_entrance"/><column name="to_location_id" value="forest_goblin_camp"/></insert>
+
+        <!-- Данж: crypt_entrance <-> crypt_corridor <-> crypt_central -->
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_entrance"/><column name="to_location_id" value="crypt_corridor"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_corridor"/><column name="to_location_id" value="crypt_entrance"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_corridor"/><column name="to_location_id" value="crypt_central"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_central"/><column name="to_location_id" value="crypt_corridor"/></insert>
+
+        <!-- Из crypt_central в library, training, boss_room -->
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_central"/><column name="to_location_id" value="crypt_library"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_library"/><column name="to_location_id" value="crypt_central"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_central"/><column name="to_location_id" value="crypt_training"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_training"/><column name="to_location_id" value="crypt_central"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_central"/><column name="to_location_id" value="crypt_boss_room"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_boss_room"/><column name="to_location_id" value="crypt_central"/></insert>
+
+        <!-- Из crypt_training в crypt_armory -->
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_training"/><column name="to_location_id" value="crypt_armory"/></insert>
+        <insert tableName="location_connections"><column name="from_location_id" value="crypt_armory"/><column name="to_location_id" value="crypt_training"/></insert>
+    </changeSet>
+</databaseChangeLog>
