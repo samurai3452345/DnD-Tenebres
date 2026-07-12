@@ -28,6 +28,17 @@
             <column name="gold_reward" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
+            <column name="damage_dice" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="damage_bonus" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="attack_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 

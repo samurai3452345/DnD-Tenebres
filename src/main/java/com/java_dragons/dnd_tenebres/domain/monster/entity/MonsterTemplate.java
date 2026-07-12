@@ -2,6 +2,7 @@ package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
 
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
+import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,16 @@ public class MonsterTemplate {
 
     @Column(name = "gold_reward")
     private int goldReward;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "damage_dice", nullable = false)
+    private DiceType damageDice; // Твой Enum, где лежат D4, D6 и т.д.
+
+    @Column(name = "damage_bonus", nullable = false)
+    private int damageBonus;
+
+    @Column(name = "attack_name", nullable = false)
+    private String attackName;
 
 
     @ElementCollection(fetch = FetchType.EAGER) // EAGER здесь допустим, так как стихий мало (1-3)

@@ -90,6 +90,10 @@ public class Player {
         this.currentHp += bonus;
     }
 
+    public void takeDamage(int damage){
+        this.currentHp = Math.max(0, this.currentHp - damage);
+    }
+
     public void addEffect(ActiveEffect effect) {
         this.activeEffects.add(effect);
     }
