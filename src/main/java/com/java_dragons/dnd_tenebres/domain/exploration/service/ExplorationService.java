@@ -4,11 +4,11 @@ import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationActiom;
+import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.parsing.Location;
 import org.springframework.stereotype.Service;
 
 @Service
