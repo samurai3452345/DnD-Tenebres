@@ -10,5 +10,8 @@
     <include file="/db/changelog/003-create-items-table.xml"/>
     <include file="/db/changelog/004-create-monsters-table.xml"/>
     <include file="/db/changelog/005-create-monster-templates.xml"/>
+
+
+
     <include file="/db/changelog/008-insert-fixed-encounters.xml"/>
 </databaseChangeLog>
