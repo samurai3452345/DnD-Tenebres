@@ -38,7 +38,7 @@ public class Location {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "effect")
-    private LocationEffect effect;
+    private LocationEffect effect = LocationEffect.NONE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "biome", nullable = false)
@@ -53,7 +53,17 @@ public class Location {
     private Set<Location> connectedLocations = new HashSet<>();
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Location)) return false; Location location = (Location) o;
+        return id != null && id.equals(location.getId());
+    }
 
+    @Override
+    public int hashCode(){
+        return getClass().hashCode();
+    }
 
 
 
