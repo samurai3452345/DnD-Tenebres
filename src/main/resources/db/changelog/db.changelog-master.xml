@@ -12,4 +12,5 @@
     <include file="/db/changelog/005-create-monster-templates.xml"/>
     <include file="/db/changelog/006-create-locations-and-map.xml"/>
     <include file="/db/changelog/007-add-player-location.xml"/>
+    <include file="/db/changelog/008-insert-fixed-encounters.xml"/>
 </databaseChangeLog>
