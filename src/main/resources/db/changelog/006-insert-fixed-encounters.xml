@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-insert-fixed-encounters" author="samurai3452345">
+
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_entrance"/>
+            <column name="monster_template_name" value="Скелет"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_central"/>
+            <column name="monster_template_name" value="Скелет"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_library"/>
+            <column name="monster_template_name" value="Скелет-воин"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_training"/>
+            <column name="monster_template_name" value="Скелет"/>
+            <column name="count" valueNumeric="2"/>
+        </insert>
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_training"/>
+            <column name="monster_template_name" value="Скелет-воин"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_armory"/>
+            <column name="monster_template_name" value="Скелет"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_armory"/>
+            <column name="monster_template_name" value="Скелет-лучник"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="location_fixed_monsters">
+            <column name="location_id" value="crypt_boss_room"/>
+            <column name="monster_template_name" value="Скелет-страж"/>
+            <column name="count" valueNumeric="1"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>
