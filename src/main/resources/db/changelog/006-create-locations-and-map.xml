@@ -5,8 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="006-create-locations-schema" author="shamil">
-        <!-- 1. Таблица локаций -->
+    <changeSet id="006-create-locations-schema" author="Sawaron">
         <createTable tableName="locations">
             <column name="id" type="VARCHAR(100)">
                 <constraints primaryKey="true" nullable="false"/>
@@ -26,10 +25,10 @@
             <column name="biome" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="effect" type="VARCHAR(50)"/>
+            <column name="effect" type="VARCHAR(50)" defaultValue="NONE"/>
         </createTable>
 
-        <!-- 2. Таблица связей (Граф дорог) -->
+
         <createTable tableName="location_connections">
             <column name="from_location_id" type="VARCHAR(100)">
                 <constraints nullable="false" foreignKeyName="fk_conn_from_location" referencedTableName="locations" referencedColumnNames="id"/>
@@ -43,7 +42,7 @@
                              columnNames="from_location_id, to_location_id"
                              constraintName="uq_from_to_connection"/>
 
-        <!-- 3. Таблица для будущих фиксированных монстров -->
+
         <createTable tableName="location_fixed_monsters">
             <column name="location_id" type="VARCHAR(100)">
                 <constraints nullable="false" foreignKeyName="fk_fixed_monster_location" referencedTableName="locations" referencedColumnNames="id"/>
@@ -57,7 +56,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="006-populate-locations" author="shamil">
+    <changeSet id="006-populate-locations" author="Sawaron">
         <!-- Зона 1: talmiria (Город) -->
         <insert tableName="locations"><column name="id" value="city_square"/><column name="name" value="Центральная площадь"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/></insert>
         <insert tableName="locations"><column name="id" value="city_gates"/><column name="name" value="Главные ворота"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/></insert>
@@ -80,7 +79,7 @@
         <insert tableName="locations"><column name="id" value="crypt_boss_room"/><column name="name" value="Тронный зал павшего рыцаря"/><column name="level" valueNumeric="2"/><column name="zone_id" value="forgotten_crypt"/><column name="type" value="DANGEROUS"/><column name="biome" value="RUINS"/><column name="effect" value="DARKNESS"/></insert>
     </changeSet>
 
-    <changeSet id="006-populate-connections" author="shamil">
+    <changeSet id="006-populate-connections" author="Sawaron">
         <!-- city_square <-> city_gates, city_tavern, city_adv_guild, city_merch_guild -->
         <insert tableName="location_connections"><column name="from_location_id" value="city_square"/><column name="to_location_id" value="city_gates"/></insert>
         <insert tableName="location_connections"><column name="from_location_id" value="city_gates"/><column name="to_location_id" value="city_square"/></insert>
