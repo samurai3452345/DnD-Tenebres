@@ -12,6 +12,8 @@ import java.util.Set;
 @Entity
 @Table(name = "monsters")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Monster {
 
@@ -55,21 +57,8 @@ public class Monster {
     @CollectionTable(name = "monster_elements", joinColumns = @JoinColumn(name = "monster_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
+    @Builder.Default
     private Set<DamageType> elements = new HashSet<>();
-
-    public Monster(String name, int level, int maxHp,int armorClass, int xpReward, int goldReward, DiceType damageDice, int damageBonus, String attackName, Set<DamageType> elements) {
-        this.name = name;
-        this.level = level;
-        this.maxHp = maxHp;
-        this.currentHp = maxHp;
-        this.armorClass = armorClass;
-        this.xpReward = xpReward;
-        this.goldReward = goldReward;
-        this.elements = elements;
-        this.damageDice = damageDice;
-        this.damageBonus = damageBonus;
-        this.attackName = attackName;
-    }
 
     public void takeDamage(int damage){
         this.currentHp = Math.max(0, this.currentHp - damage);

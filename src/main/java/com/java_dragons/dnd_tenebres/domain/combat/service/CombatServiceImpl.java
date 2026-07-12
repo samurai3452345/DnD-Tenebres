@@ -73,10 +73,9 @@ public class CombatServiceImpl implements CombatService {
             int totalDamage = baseDamage + monster.getDamageBonus();
             String attackName = monster.getAttackName();
 
-            // 🧠 ЛОГИКА УМНОГО БОССА
             if (monster.getName().equals("Скелет-страж") && round % 3 == 0) {
                 totalDamage = (int) (totalDamage * 1.5);
-                attackName = "ТЯЖЕЛЫЙ РАЗМАХ ☄️";
+                attackName = "КРУГОВОЙ УДАР";
             }
 
             player.takeDamage(totalDamage);

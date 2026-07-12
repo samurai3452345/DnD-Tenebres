@@ -1,6 +1,5 @@
 package com.java_dragons.dnd_tenebres.domain.monster.service;
 
-
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
@@ -23,20 +22,25 @@ public class MonsterSpawnerService {
     public Monster spawnRandomMonster(String biome, int locationLevel) {
         List<MonsterTemplate> templates =
                 monsterTemplateRepository.findAllByBiomeAndLevel(biome, locationLevel);
-        if(templates.isEmpty()) {
-            throw new IllegalArgumentException("Нет шаблонов монстров для данного биома и уровня!");
+
+        if (templates.isEmpty()) {
+            throw new IllegalArgumentException("Нет шаблонов монстров для биома: " + biome + " и уровня: " + locationLevel);
         }
 
-       MonsterTemplate monsterTemplate = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
+        MonsterTemplate template = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
 
-        Monster monster = new  Monster(
-                monsterTemplate.getName(),
-                monsterTemplate.getBaseHp(),
-                monsterTemplate.getArmorClass(),
-                monsterTemplate.getXpReward(),
-                monsterTemplate.getGoldReward(),
-                new HashSet<>(monsterTemplate.getElements())
-        );
+        Monster monster = Monster.builder()
+                .name(template.getName())
+                .level(template.getLevel())
+                .currentHp(template.getBaseHp())
+                .armorClass(template.getArmorClass())
+                .xpReward(template.getXpReward())
+                .goldReward(template.getGoldReward())
+                .damageDice(template.getDamageDice())
+                .damageBonus(template.getDamageBonus())
+                .attackName(template.getAttackName())
+                .elements(new HashSet<>(template.getElements()))
+                .build();
 
         return monsterRepository.save(monster);
     }

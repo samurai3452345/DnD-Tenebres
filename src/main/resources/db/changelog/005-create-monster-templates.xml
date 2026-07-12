@@ -32,6 +32,15 @@
             <column name="gold_reward" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
+            <column name="damage_dice" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="damage_bonus" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attack_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <createTable tableName="template_elements">
@@ -45,6 +54,7 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="1" />
             <column name="name" value="Гоблин"/>
             <column name="biome" value="FOREST"/>
             <column name="level" valueNumeric="1"/>
@@ -64,6 +74,7 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="2" />
             <column name="name" value="Гоблин-воин"/>
             <column name="biome" value="FOREST"/>
             <column name="level" valueNumeric="1"/>
@@ -83,6 +94,7 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="3" />
             <column name="name" value="Гоблин-лучник"/>
             <column name="biome" value="FOREST"/>
             <column name="level" valueNumeric="1"/>
@@ -102,6 +114,7 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="4" />
             <column name="name" value="Гоблин-шаман-огня"/>
             <column name="biome" value="FOREST"/>
             <column name="level" valueNumeric="1"/>
@@ -121,8 +134,9 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="5" />
             <column name="name" value="Скелет"/>
-            <column name="biome" value="FOREST"/>
+            <column name="biome" value="DUNGEON"/>
             <column name="level" valueNumeric="1"/>
             <column name="base_hp" valueNumeric="10"/>
             <column name="armor_class" valueNumeric="6"/>
@@ -140,8 +154,9 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="6" />
             <column name="name" value="Скелет-воин"/>
-            <column name="biome" value="FOREST"/>
+            <column name="biome" value="DUNGEON"/>
             <column name="level" valueNumeric="1"/>
             <column name="base_hp" valueNumeric="14"/>
             <column name="armor_class" valueNumeric="12"/>
@@ -159,8 +174,9 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="7" />
             <column name="name" value="Скелет-лучник"/>
-            <column name="biome" value="FOREST"/>
+            <column name="biome" value="DUNGEON"/>
             <column name="level" valueNumeric="1"/>
             <column name="base_hp" valueNumeric="6"/>
             <column name="armor_class" valueNumeric="6"/>
@@ -178,6 +194,7 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="8" />
             <column name="name" value="Скелет-страж"/>
             <column name="biome" value="DUNGEON"/>
             <column name="level" valueNumeric="1"/>
@@ -197,6 +214,7 @@
 
 
         <insert tableName="monster_templates">
+            <column name="id" valueNumeric="9" />
             <column name="name" value="Волк"/>
             <column name="biome" value="FOREST"/>
             <column name="level" valueNumeric="1"/>
@@ -211,6 +229,25 @@
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="9"/>
+            <column name="element" value="PHYSICAL"/>
+        </insert>
+
+        <insert tableName="monster_templates">
+            <column name="id" valueNumeric="10" />
+            <column name="name" value="Варг"/>
+            <column name="biome" value="FOREST"/>
+            <column name="level" valueNumeric="1"/>
+            <column name="base_hp" valueNumeric="15"/>
+            <column name="armor_class" valueNumeric="9"/>
+            <column name="xp_reward" valueNumeric="30"/>
+            <column name="gold_reward" valueNumeric="10"/>
+
+            <column name="damage_dice" value="D6"/>
+            <column name="damage_bonus" valueNumeric="2"/>
+            <column name="attack_name" value="Укус"/>
+        </insert>
+        <insert tableName="template_elements">
+            <column name="template_id" valueNumeric="10"/>
             <column name="element" value="PHYSICAL"/>
         </insert>
 
