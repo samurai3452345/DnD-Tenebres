@@ -8,9 +8,8 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
-@Table(name = "location_fixed_monster")
+@Table(name = "location_fixed_monsters")
 public class LocationFixedMonster {
 
     @Id
