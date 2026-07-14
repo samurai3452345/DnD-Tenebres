@@ -54,6 +54,10 @@ public class Player {
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
     private Set<ActiveEffect> activeEffects = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_location_id")
+    private Location currentLocation;
+
     public void addExperience(long xp) {
         if(xp < 0){
             throw new  IllegalArgumentException("Опыт не может быть отрицательным!");
@@ -110,6 +114,12 @@ public class Player {
         return this.activeEffects.stream().anyMatch(e -> e.getType() == type);
     }
 
+    public void moveTo(Location newLocation) {
+        if (newLocation == null) {
+            throw new IllegalArgumentException("Локация не может быть пустой!");
+        }
+        this.currentLocation = newLocation;
+    }
 
 
 }
