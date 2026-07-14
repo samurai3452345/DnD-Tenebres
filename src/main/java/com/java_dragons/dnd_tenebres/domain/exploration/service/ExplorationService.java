@@ -3,7 +3,8 @@ package com.java_dragons.dnd_tenebres.domain.exploration.service;
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
-import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationActiom;
+import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
+import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
@@ -11,17 +12,19 @@ import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class ExplorationService {
     private final MonsterSpawnerService monsterSpawnerService;
     private final CombatService combatService;
 
-    public void explore(Player player, Location location, ExplorationActiom actiom) {
+    public void explore(Player player, Location location, ExplorationAction actiom) {
         System.out.println("\n Вы выбрали: " + actiom);
 
         switch (actiom){
-            case HANT -> handleHunt(player, location);
+            case HUNT -> handleHunt(player, location);
             case SEARCH -> handleSearch(player, location);
             case TRAVEL -> handleTravel(player, location);
             default -> System.out.println("Вы стоите в раздумиях.");
@@ -44,9 +47,10 @@ public class ExplorationService {
                 Monster monster = monsterSpawnerService.spawnRandomMonster("FOREST", location.getLevel());
                 System.out.println("На вас нападает: " + monster.getName());
 
-                // TODO: Вызов combatService.executeRound(...) в цикле
-            } else {
-                System.out.println("Вы не нашли ни одноги врага");
+
+                Weapon tempWeapon = new Weapon();
+                startCombatLoop(player, tempWeapon, monster);            } else {
+                System.out.println("Вы не нашли ни одного врага");
             }
 
         } else if ("forgotten_crypt".equals(zoneId)) {
@@ -55,6 +59,13 @@ public class ExplorationService {
             // TODO: Вызвать метод спавна фиксированных врагов (напишем его позже)
             // List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
             // System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
+            // ВРЕМЕННАЯ ЗАГЛУШКА (Просто создаем одного Скелета-стража, чтобы не ломать компиляцию)
+            Monster dummyBoss = monsterSpawnerService.spawnRandomMonster("RUINS", 2);
+            System.out.println("Перед вами враг: " + dummyBoss.getName());
+
+            Weapon weapon = new Weapon();
+
+            startCombatLoop(player, weapon, dummyBoss);
 
         } else {
             System.out.println("Здесь не на кого охотиться. Это безопасная зона.");
@@ -71,7 +82,44 @@ public class ExplorationService {
     }
 
     private void handleTravel(Player player, Location location) {
-        // TODO: Логика вывода доступных дорог и перемещения по графу
-        System.out.println(" Вы изучаете карту, чтобы выбрать следующий путь...");
+        System.out.println("Вы находитесь в: " + location.getName());
+        System.out.println("Вы осматриваетесь в поисках путей...");
+
+        // Set<Location> paths = locationService.getAvailableConnections(location.getId());
+        Set<Location> paths = location.getConnectedLocations();
+
+        if (paths == null || paths.isEmpty()) {
+            System.out.println("Тупик. от сюда нет выхода. ");
+            return;
+        }
+
+        System.out.println("Доступные пути: ");
+        for (Location path : paths) {
+            System.out.println("- " + path.getName());
+        }
+
+        // Авто выбор пути патом надо поменять
+        Location nextLocation = paths.iterator().next();
+        player.moveTo(nextLocation);
+        System.out.println("🗺️ Вы отправились в: " + nextLocation.getName());
+    }
+
+    private void startCombatLoop(Player player, Weapon weapon, Monster monster) {
+        System.out.println("\n⚔️ БОЙ НАЧИНАЕТСЯ: " + player.getName() + " против " + monster.getName() + "!");
+
+        int round = 1;
+        while (player.getCurrentHp() > 0 && monster.getCurrentHp() > 0) {
+            System.out.println("--- Раунд " + round + " ---");
+
+            combatService.executeRound(player, weapon, monster, round);
+
+            round++;
+        }
+
+        if (player.getCurrentHp() <= 0) {
+            System.out.println("💀 " + player.getName() + " пал в бою... Игра окончена.");
+        } else {
+            System.out.println("🏆 " + monster.getName() + " повержен! Вы победили.");
+        }
     }
 }
