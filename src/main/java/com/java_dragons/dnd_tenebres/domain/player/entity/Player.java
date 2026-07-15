@@ -54,10 +54,6 @@ public class Player {
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
     private Set<ActiveEffect> activeEffects = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_location_id")
-    private Location currentLocation;
-
     public void addExperience(long xp) {
         if(xp < 0){
             throw new  IllegalArgumentException("Опыт не может быть отрицательным!");

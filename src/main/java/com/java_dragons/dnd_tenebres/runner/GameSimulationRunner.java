@@ -1,12 +1,9 @@
 package com.java_dragons.dnd_tenebres.runner;
 
-import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
-import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
-import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
-import com.java_dragons.dnd_tenebres.domain.item.model.ItemRarity;
-import com.java_dragons.dnd_tenebres.domain.location.model.BiomeType;
-import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
-import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
+import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
+import com.java_dragons.dnd_tenebres.domain.exploration.service.ExplorationService;
+import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
+import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats;
 import lombok.RequiredArgsConstructor;
@@ -17,63 +14,53 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GameSimulationRunner implements CommandLineRunner {
 
-    private final MonsterSpawnerService monsterSpawnerService;
-    private final CombatService combatService;
+    private final ExplorationService explorationService;
+    private final LocationService locationService;
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("\n=== ⚔️ СТАРТ СИМУЛЯЦИИ ⚔️ ===");
+        System.out.println("=================================================");
 
-        PlayerStats stats = PlayerStats.builder()
-                .strength(16)
-                .dexterity(14)
-                .constitution(14)
-                .intelligence(10)
-                .wisdom(10)
-                .charisma(10)
-                .build();
+        PlayerStats alaricStats = new PlayerStats(16, 14, 15, 10, 10, 10);
 
         Player player = Player.builder()
-                .name("Артур")
+                .name("Аларик Роуэн")
                 .level(1)
-                .experience(0L)
-                .gold(100L)
-                .currentHp(14)
-                .stats(stats)
+                .maxHp(100)
+                .currentHp(100)
+                .gold(50)
+                .experience(0)
+                .stats(alaricStats)
                 .build();
 
-        Weapon sword = new Weapon();
-        sword.setName("Железный Длинный Меч");
-        sword.setRarity(ItemRarity.UNCOMMON);
-        sword.setBaseDiceType(DiceType.D8);
+        System.out.println("Герой " + player.getName() + " готов к бою! (HP: " + player.getCurrentHp() + ")");
 
-        Weapon dagger = new Weapon();
-        dagger.setName("Ржавый кинжал");
-        dagger.setRarity(ItemRarity.COMMON);
-        dagger.setBaseDiceType(DiceType.D4);
+        try {
+            Location startLocation = locationService.getLocationById("crypt_entrance");
+            player.moveTo(startLocation);
 
+            System.out.println("\n---  СЦЕНА 1: ВХОД В СКЛЕП ---");
+            explorationService.explore(player, player.getCurrentLocation(), ExplorationAction.HUNT);
 
-        Monster monster = monsterSpawnerService.spawnRandomMonster(BiomeType.FOREST.name(),1);
-        System.out.println("На пути появляется: " + monster.getName() +
-                " [ХП: " + monster.getCurrentHp() +
-                ", Броня (AC): " + monster.getArmorClass() + "]");
+            if (player.getCurrentHp() <= 0) {
+                System.out.println(" Аларик погиб слишком рано. Симуляция прервана.");
+                return;
+            }
 
-        System.out.println("--- БОЙ НАЧИНАЕТСЯ ---\n");
+            System.out.println("\n---  СЦЕНА 2: ПРОДВИЖЕНИЕ ВГЛУБЬ ---");
+            explorationService.explore(player, player.getCurrentLocation(), ExplorationAction.TRAVEL);
 
-        int round = 1;
-        while (monster.getCurrentHp() > 0) {
-            System.out.println("====== Раунд " + round + " ======");
+            System.out.println("\n---  СЦЕНА 3: НОВАЯ БИТВА ---");
+            explorationService.explore(player, player.getCurrentLocation(), ExplorationAction.HUNT);
 
-            String attackLog = combatService.executeAttack(player, sword, monster);
-            System.out.println(attackLog);
+            System.out.println("\n=================================================");
+            System.out.println(" СИМУЛЯЦИЯ УСПЕШНО ЗАВЕРШЕНА ");
+            System.out.println("Остаток ХП героя: " + player.getCurrentHp());
+            System.out.println("=================================================");
 
-
-
-            round++;
-
-            Thread.sleep(1500);
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка во время симуляции: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        System.out.println("\n=== 🏆 СИМУЛЯЦИЯ ОКОНЧЕНА. 🏆 ===");
     }
 }

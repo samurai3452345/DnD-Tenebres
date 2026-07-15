@@ -1,5 +1,7 @@
 package com.java_dragons.dnd_tenebres.domain.monster.service;
 
+import com.java_dragons.dnd_tenebres.domain.location.entity.LocationFixedMonster;
+import com.java_dragons.dnd_tenebres.domain.location.repository.LocationFixedMonsterRepository;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
@@ -18,6 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MonsterSpawnerService {
     private final MonsterRepository monsterRepository;
     private final MonsterTemplateRepository monsterTemplateRepository;
+    private final LocationFixedMonsterRepository locationFixedMonsterRepository;
 
     @Transactional
     public Monster spawnRandomMonster(String biome, int locationLevel) {
@@ -64,7 +67,7 @@ public class MonsterSpawnerService {
                         .name(template.getName() + (fm.getCount() > 1 ? " #" + (i+1) : ""))
                         .level(template.getLevel())
                         .maxHp(template.getBaseHp())
-                        .currentHp(template.getBaseHp()) // Не забываем установить текущее ХП
+                        .currentHp(template.getBaseHp())
                         .armorClass(template.getArmorClass())
                         .xpReward(template.getXpReward())
                         .goldReward(template.getGoldReward())

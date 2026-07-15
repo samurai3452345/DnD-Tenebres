@@ -205,7 +205,7 @@
 
             <column name="damage_dice" value="D8"/>
             <column name="damage_bonus" valueNumeric="0"/>
-            <column name="attack_name" value="Взмах длынным мечем"/>
+            <column name="attack_name" value="Взмах длинным мечем"/>
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="8"/>
@@ -248,6 +248,25 @@
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="10"/>
+            <column name="element" value="PHYSICAL"/>
+        </insert>
+
+        <insert tableName="monster_templates">
+            <column name="id" valueNumeric="11" />
+            <column name="name" value="Бандит"/>
+            <column name="biome" value="FOREST"/>
+            <column name="level" valueNumeric="1"/>
+            <column name="base_hp" valueNumeric="8"/>
+            <column name="armor_class" valueNumeric="8"/>
+            <column name="xp_reward" valueNumeric="20"/>
+            <column name="gold_reward" valueNumeric="9"/>
+
+            <column name="damage_dice" value="D4"/>
+            <column name="damage_bonus" valueNumeric="3"/>
+            <column name="attack_name" value="Удар кинжалом"/>
+        </insert>
+        <insert tableName="template_elements">
+            <column name="template_id" valueNumeric="11"/>
             <column name="element" value="PHYSICAL"/>
         </insert>
 

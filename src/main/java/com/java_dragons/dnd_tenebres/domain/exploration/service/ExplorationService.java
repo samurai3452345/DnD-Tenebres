@@ -6,12 +6,14 @@ import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
 import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
+import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -19,6 +21,7 @@ import java.util.Set;
 public class ExplorationService {
     private final MonsterSpawnerService monsterSpawnerService;
     private final CombatService combatService;
+    private final LocationService locationService;
 
     public void explore(Player player, Location location, ExplorationAction actiom) {
         System.out.println("\n Вы выбрали: " + actiom);
@@ -56,17 +59,24 @@ public class ExplorationService {
         } else if ("forgotten_crypt".equals(zoneId)) {
             System.out.println("Вы входите в комнату подземелья, враги уже ждут вас!");
 
-            // TODO: Вызвать метод спавна фиксированных врагов (напишем его позже)
-            // List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
-            // System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
-            // ВРЕМЕННАЯ ЗАГЛУШКА (Просто создаем одного Скелета-стража, чтобы не ломать компиляцию)
-            Monster dummyBoss = monsterSpawnerService.spawnRandomMonster("RUINS", 2);
-            System.out.println("Перед вами враг: " + dummyBoss.getName());
+             List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
+             System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
 
+            if (squad.isEmpty()) {
+                System.out.println("Здесь тихо... Врагов нет.");
+                return;
+            }
+
+            System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
             Weapon weapon = new Weapon();
 
-            startCombatLoop(player, weapon, dummyBoss);
+            for (Monster m : squad) {
+                if (player.getCurrentHp() <= 0) {
+                    break;
+                }
 
+                startCombatLoop(player, weapon, m);
+            }
         } else {
             System.out.println("Здесь не на кого охотиться. Это безопасная зона.");
         }
@@ -85,8 +95,7 @@ public class ExplorationService {
         System.out.println("Вы находитесь в: " + location.getName());
         System.out.println("Вы осматриваетесь в поисках путей...");
 
-        // Set<Location> paths = locationService.getAvailableConnections(location.getId());
-        Set<Location> paths = location.getConnectedLocations();
+         Set<Location> paths = locationService.getAvailableConnections(location.getId());
 
         if (paths == null || paths.isEmpty()) {
             System.out.println("Тупик. от сюда нет выхода. ");

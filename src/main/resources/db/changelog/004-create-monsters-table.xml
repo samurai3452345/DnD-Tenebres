@@ -13,6 +13,9 @@
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="level" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
             <column name="max_hp" type="INTEGER">
                 <constraints nullable="false"/>
             </column>

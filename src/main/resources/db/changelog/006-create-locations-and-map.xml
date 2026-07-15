@@ -57,18 +57,6 @@
                              columnNames="from_location_id, to_location_id"
                              constraintName="uq_from_to_connection"/>
 
-
-        <createTable tableName="location_fixed_monsters">
-            <column name="location_id" type="VARCHAR(100)">
-                <constraints nullable="false" foreignKeyName="fk_fixed_monster_location" referencedTableName="locations" referencedColumnNames="id"/>
-            </column>
-            <column name="monster_template_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="count" type="INTEGER">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
     </changeSet>
 
     <changeSet id="006-populate-locations" author="Sawaron">
