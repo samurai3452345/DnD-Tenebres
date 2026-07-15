@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="009-create-inventory-schema" author="Sawaron">
+        <createTable tableName="item_templates">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rarity" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armor_type" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armor_class" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_strength" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="damage_dice" type="VARCHAR(20)"/>
+            <column name="stat_budget" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="player_items">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="player_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_player_item_player" referencedTableName="players" referencedColumnNames="id"/>
+            </column>
+            <column name="template_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_player_item_template" referencedTableName="item_templates" referencedColumnNames="id"/>
+            </column>
+            <column name="amount" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_equipped" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bonus_strength" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bonus_dexterity" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bonus_constitution" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bonus_intelligence" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bonus_wisdom" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bonus_charisma" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="009-populate-item-templates" author="Sawaron">
+        <insert tableName="item_templates">
+            <column name="name" value="Ржавый меч"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="damage_dice" value="1d6"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Кожаный доспех"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" valueNumeric="11"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Кровоцвет"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="COMMON"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Кольцо Всевластия"/>
+            <column name="type" value="ARTIFACT"/>
+            <column name="slot" value="RING"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="stat_budget" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
