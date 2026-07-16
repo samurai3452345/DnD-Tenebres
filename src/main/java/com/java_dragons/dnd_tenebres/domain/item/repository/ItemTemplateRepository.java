@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ItemTemplateRepository extends JpaRepository<ItemTemplate, Long> {
+interface ItemTemplateRepository extends JpaRepository<ItemTemplate, Long> {
     Optional<ItemTemplate> findByName(String name);
 }
