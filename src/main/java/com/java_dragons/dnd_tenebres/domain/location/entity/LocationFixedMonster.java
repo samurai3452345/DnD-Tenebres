@@ -4,7 +4,6 @@ package com.java_dragons.dnd_tenebres.domain.location.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter

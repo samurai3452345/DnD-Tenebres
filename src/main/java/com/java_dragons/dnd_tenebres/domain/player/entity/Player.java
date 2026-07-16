@@ -7,6 +7,7 @@ import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,6 +54,9 @@ public class Player {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
     private Set<ActiveEffect> activeEffects = new HashSet<>();
+
+    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlayerItem> inventory = new ArrayList<>();
 
     public void addExperience(long xp) {
         if(xp < 0){
