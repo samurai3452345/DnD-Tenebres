@@ -19,15 +19,19 @@ public class ItemTemplate {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private ItemType type;
 
+//    @Enumerated(EnumType.STRING)
 //    @Column(name = "slot", nullable = false)
 //    private EquipmentSlot slot;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "rarity", nullable = false)
     private ItemRarity rarity;
 
+//    @Enumerated(EnumType.STRING)
 //    @Column(name = "armor_type", nullable = false)
 //    private ArmorType armorType;
 
