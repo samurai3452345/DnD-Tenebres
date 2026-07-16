@@ -4,29 +4,41 @@ import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageCalculator;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
+import com.java_dragons.dnd_tenebres.domain.combat.strategy.ItemPassiveStrategy;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CombatServiceImpl implements CombatService {
+
     private final DamageCalculator damageCalculator;
+    private final Map<ItemPassive, ItemPassiveStrategy> passiveStrategies;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public CombatServiceImpl(DamageCalculator damageCalculator, List<ItemPassiveStrategy> strategies) {
+        this.damageCalculator = damageCalculator;
+        this.passiveStrategies = strategies.stream()
+                .collect(Collectors.toMap(ItemPassiveStrategy::getTargetPassive, s -> s));
+    }
 
     @Override
-    public String executeRound(Player player, Monster monster, int round) {
+    public String executeRound(Player player, Monster monster, int aliveEnemyCount, int round) {
         StringBuilder log = new StringBuilder();
 
 
         int d20 = DiceRoller.rollD20();
         boolean isCrit = (d20 == 20);
-        int strModifier = StatMathUtils.calculateModifier(player.getStats().getStrength());
-        int attackRoll = d20 + strModifier;
+        int strModifier = StatMathUtils.calculateModifier(player.getTotalStrength());        int attackRoll = d20 + strModifier;
 
         log.append(String.format("Ход Игрока (%s): Бросок атаки [d20: %d] + [Сила: %d] = %d против AC %d. ",
                 player.getName(), d20, strModifier, attackRoll, monster.getArmorClass()));
@@ -61,6 +73,17 @@ public class CombatServiceImpl implements CombatService {
             }
 
             int totalBaseDamage = baseWeaponDamage + rarityBonus + strModifier;
+
+            for (PlayerItem item : player.getInventory()) {
+                if (item.isEquipped()) {
+                    ItemPassive passive = item.getTemplate().getPassiveEffect();
+                    if (passive != ItemPassive.NONE && passiveStrategies.containsKey(passive)) {
+                        totalBaseDamage = passiveStrategies.get(passive)
+                                .modifyOutgoingDamage(player, monster, aliveEnemyCount, totalBaseDamage, log);
+                    }
+                }
+            }
+
             int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, DamageType.PHYSICAL, monster.getElements());
 
             monster.takeDamage(finalDamage);
@@ -74,8 +97,7 @@ public class CombatServiceImpl implements CombatService {
             return log.toString();
         }
 
-        int dexMod = StatMathUtils.calculateModifier(player.getStats().getDexterity());
-        int playerAc = 10 + dexMod; // Базовый AC без брони
+        int playerAc = player.getArmorClass();
 
         int monsterD20 = DiceRoller.rollD20();
         int monsterAttackRoll = monsterD20 + monster.getLevel(); // Чем выше уровень монстра, тем точнее он бьет

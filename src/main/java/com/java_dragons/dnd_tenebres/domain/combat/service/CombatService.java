@@ -5,5 +5,5 @@ import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 
 public interface CombatService {
-    String executeRound(Player attacker,  Monster defender, int round);
+    String executeRound(Player attacker,  Monster defender, int aliveEnemyCount, int round);
 }
