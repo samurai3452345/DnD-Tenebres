@@ -5,6 +5,7 @@ import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
 import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
+import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
@@ -22,6 +23,7 @@ public class ExplorationService {
     private final MonsterSpawnerService monsterSpawnerService;
     private final CombatService combatService;
     private final LocationService locationService;
+    private final InventoryService inventoryService;
 
     public void explore(Player player, Location location, ExplorationAction actiom) {
         System.out.println("\n Вы выбрали: " + actiom);
@@ -129,6 +131,10 @@ public class ExplorationService {
             System.out.println("💀 " + player.getName() + " пал в бою... Игра окончена.");
         } else {
             System.out.println("🏆 " + monster.getName() + " повержен! Вы победили.");
+
+            System.out.println("🎁 Вы обыскали врага...");
+            inventoryService.addItemToPlayer(player, "Кровоцвет", 3);
+            inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
         }
     }
 }
