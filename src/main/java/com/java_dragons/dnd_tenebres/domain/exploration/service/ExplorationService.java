@@ -4,7 +4,6 @@ import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
-import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
@@ -24,6 +23,7 @@ public class ExplorationService {
     private final CombatService combatService;
     private final LocationService locationService;
     private final InventoryService inventoryService;
+
 
     public void explore(Player player, Location location, ExplorationAction actiom) {
         System.out.println("\n Вы выбрали: " + actiom);
@@ -52,17 +52,15 @@ public class ExplorationService {
                 Monster monster = monsterSpawnerService.spawnRandomMonster("FOREST", location.getLevel());
                 System.out.println("На вас нападает: " + monster.getName());
 
-
-                Weapon tempWeapon = new Weapon();
-                startCombatLoop(player, tempWeapon, monster);            } else {
+                startCombatLoop(player, monster, 1);
+            } else {
                 System.out.println("Вы не нашли ни одного врага");
             }
 
         } else if ("forgotten_crypt".equals(zoneId)) {
             System.out.println("Вы входите в комнату подземелья, враги уже ждут вас!");
 
-             List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
-             System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
+            List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
 
             if (squad.isEmpty()) {
                 System.out.println("Здесь тихо... Врагов нет.");
@@ -70,14 +68,16 @@ public class ExplorationService {
             }
 
             System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
-            Weapon weapon = new Weapon();
+
+            int aliveCount = squad.size();
 
             for (Monster m : squad) {
                 if (player.getCurrentHp() <= 0) {
                     break;
                 }
 
-                startCombatLoop(player, weapon, m);
+                startCombatLoop(player, m, aliveCount);
+                aliveCount--;
             }
         } else {
             System.out.println("Здесь не на кого охотиться. Это безопасная зона.");
@@ -86,8 +86,16 @@ public class ExplorationService {
 
     private void handleSearch(Player player, Location location) {
         if ("crypt_armory".equals(location.getId())) {
-            System.out.println("⚔️ Вы обыскали пыльные стойки и нашли Оружие!");
-            // TODO: Сгенерировать предмет и положить в инвентарь (Следующий этап)
+            System.out.println(" Вы обыскали пыльные стойки...");
+
+            inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
+            inventoryService.addItemToPlayer(player, "Кровоцвет", 2);
+
+            System.out.println("Найденные предметы успешно добавлены в ваш инвентарь!");
+
+            // TODO: в будущем здесь нужно будет помечать в базе данных,
+            // что игрок УЖЕ обыскал эту комнату, чтобы он не фармил мечи бесконечно.
+
         } else {
             System.out.println(" Вы тщательно всё обыскали, но нашли только пыль и паутину.");
         }
@@ -109,20 +117,21 @@ public class ExplorationService {
             System.out.println("- " + path.getName());
         }
 
-        // Авто выбор пути патом надо поменять
+        //TODO: авто выбор пути, патом поменять
         Location nextLocation = paths.iterator().next();
         player.moveTo(nextLocation);
         System.out.println("🗺️ Вы отправились в: " + nextLocation.getName());
     }
 
-    private void startCombatLoop(Player player, Weapon weapon, Monster monster) {
+    private void startCombatLoop(Player player, Monster monster, int aliveEnemyCount) {
         System.out.println("\n⚔️ БОЙ НАЧИНАЕТСЯ: " + player.getName() + " против " + monster.getName() + "!");
 
         int round = 1;
         while (player.getCurrentHp() > 0 && monster.getCurrentHp() > 0) {
             System.out.println("--- Раунд " + round + " ---");
 
-            combatService.executeRound(player, weapon, monster, round);
+            String roundLog = combatService.executeRound(player, monster, aliveEnemyCount, round);
+            System.out.println(roundLog);
 
             round++;
         }

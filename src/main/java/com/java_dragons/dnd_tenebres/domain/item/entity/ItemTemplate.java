@@ -1,8 +1,8 @@
 package com.java_dragons.dnd_tenebres.domain.item.entity;
 
-import com.java_dragons.dnd_tenebres.domain.item.model.ItemRarity;
-import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
+import com.java_dragons.dnd_tenebres.domain.item.model.*;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "item_templates")
 @Getter
 @NoArgsConstructor
+@Data
 public class ItemTemplate {
 
     @Id
@@ -23,17 +24,17 @@ public class ItemTemplate {
     @Column(name = "type", nullable = false)
     private ItemType type;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "slot", nullable = false)
-//    private EquipmentSlot slot;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "slot", nullable = false)
+    private EquipmentSlot slot;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rarity", nullable = false)
     private ItemRarity rarity;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "armor_type", nullable = false)
-//    private ArmorType armorType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "armor_type", nullable = false)
+    private ArmorType armorType;
 
     @Column(name = "armor_class", nullable = false)
     private int armorClass;
@@ -46,4 +47,8 @@ public class ItemTemplate {
 
     @Column(name = "stat_budget", nullable = false)
     private int statBudget;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "passive_effect", nullable = false)
+    private ItemPassive passiveEffect = ItemPassive.NONE;
 }

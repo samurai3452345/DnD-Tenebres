@@ -14,4 +14,6 @@
     <include file="/db/changelog/007-add-player-location.xml"/>
     <include file="/db/changelog/008-insert-fixed-encounters.xml"/>
     <include file="/db/changelog/009-create-inventory-system.xml"/>
+    <include file="/db/changelog/010-add-equipped-slot.xml"/>
+
 </databaseChangeLog>

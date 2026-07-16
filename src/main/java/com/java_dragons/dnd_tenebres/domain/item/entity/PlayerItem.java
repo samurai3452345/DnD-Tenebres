@@ -1,5 +1,6 @@
 package com.java_dragons.dnd_tenebres.domain.item.entity;
 
+import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,11 @@ public class PlayerItem {
 
     @Column(name = "is_equipped", nullable = false)
     private boolean isEquipped;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "equipped_slot", nullable = false)
+    @Builder.Default
+    private EquipmentSlot equippedSlot = EquipmentSlot.NONE;
 
     @Column(name = "bonus_strength", nullable = false)
     private int bonusStrength;

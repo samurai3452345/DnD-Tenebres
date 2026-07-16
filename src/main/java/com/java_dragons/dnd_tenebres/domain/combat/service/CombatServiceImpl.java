@@ -1,90 +1,131 @@
 package com.java_dragons.dnd_tenebres.domain.combat.service;
 
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
-import com.java_dragons.dnd_tenebres.core.math.ItemProgressionCalculator;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageCalculator;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
-import com.java_dragons.dnd_tenebres.domain.item.entity.Weapon;
+import com.java_dragons.dnd_tenebres.domain.combat.strategy.ItemPassiveStrategy;
+import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
+import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
-@RequiredArgsConstructor
 public class CombatServiceImpl implements CombatService {
+
     private final DamageCalculator damageCalculator;
-    private final ItemProgressionCalculator itemProgressionCalculator;
+    private final Map<ItemPassive, ItemPassiveStrategy> passiveStrategies;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public CombatServiceImpl(DamageCalculator damageCalculator, List<ItemPassiveStrategy> strategies) {
+        this.damageCalculator = damageCalculator;
+        this.passiveStrategies = strategies.stream()
+                .collect(Collectors.toMap(ItemPassiveStrategy::getTargetPassive, s -> s));
+    }
 
     @Override
-    public String executeRound(Player player, Weapon weapon, Monster monster, int round) {
+    public String executeRound(Player player, Monster monster, int aliveEnemyCount, int round) {
         StringBuilder log = new StringBuilder();
 
-        log.append("Ход Игрока: ");
+
         int d20 = DiceRoller.rollD20();
+        boolean isCrit = (d20 == 20);
+        int strModifier = StatMathUtils.calculateModifier(player.getTotalStrength());        int attackRoll = d20 + strModifier;
+
+        log.append(String.format("Ход Игрока (%s): Бросок атаки [d20: %d] + [Сила: %d] = %d против AC %d. ",
+                player.getName(), d20, strModifier, attackRoll, monster.getArmorClass()));
 
         if (d20 == 1) {
-            log.append(String.format("Критический промах! %s спотыкается.\n", player.getName()));
+            log.append("Критический промах! Спотыкается и теряет равновесие.\n");
+        } else if (!isCrit && attackRoll < monster.getArmorClass()) {
+            log.append("Промах! Оружие скользнуло по броне врага.\n");
         } else {
-            boolean isCrit = (d20 == 20);
-            int strModifier = StatMathUtils.calculateModifier(player.getStats().getStrength());
-            int attackRoll = d20 + strModifier;
+            if (isCrit) log.append("КРИТИЧЕСКОЕ ПОПАДАНИЕ! ");
+            else log.append("Попадание! ");
 
-            if (!isCrit && attackRoll < monster.getArmorClass()) {
-                log.append(String.format("Промах! %s уклонился.\n", monster.getName()));
+            Optional<PlayerItem> weaponOpt = player.getMainHandWeapon();
+            int baseWeaponDamage = 0;
+            int rarityBonus = 0;
+            String weaponName = "Голые кулаки";
+
+            if (weaponOpt.isPresent()) {
+                ItemTemplate weaponTemplate = weaponOpt.get().getTemplate();
+                weaponName = weaponTemplate.getName();
+                rarityBonus = weaponTemplate.getRarity().getFlatModifier();
+
+                String[] diceParts = weaponTemplate.getDamageDice().toLowerCase().split("d");
+                int diceCount = Integer.parseInt(diceParts[0]);
+                int diceSides = Integer.parseInt(diceParts[1]);
+
+                if (isCrit) diceCount *= 2;
+
+                baseWeaponDamage = DiceRoller.roll(diceCount, diceSides);
             } else {
-                int tier = weapon.getCurrentTier(itemProgressionCalculator);
-                int sides = weapon.getBaseDiceType().getSides();
-                int rollCount = isCrit ? tier * 2 : tier;
-
-                int baseWeaponDamage = DiceRoller.roll(rollCount, sides);
-                int rarityBonus = weapon.getRarity().getFlatModifier();
-                int totalBaseDamage = baseWeaponDamage + rarityBonus + strModifier;
-
-                int finalDamage = damageCalculator.calculateFinalDamage(
-                        totalBaseDamage, DamageType.PHYSICAL, monster.getElements()
-                );
-
-                monster.takeDamage(finalDamage);
-
-                if (isCrit) log.append("Критический удар! ");
-                log.append(String.format("%s наносит %d урона по %s. Осталось ХП: %d.\n",
-                        player.getName(), finalDamage, monster.getName(), Math.max(0, monster.getCurrentHp())));
+                baseWeaponDamage = isCrit ? 2 : 1; // Урон голыми руками
             }
+
+            int totalBaseDamage = baseWeaponDamage + rarityBonus + strModifier;
+
+            for (PlayerItem item : player.getInventory()) {
+                if (item.isEquipped()) {
+                    ItemPassive passive = item.getTemplate().getPassiveEffect();
+                    if (passive != ItemPassive.NONE && passiveStrategies.containsKey(passive)) {
+                        totalBaseDamage = passiveStrategies.get(passive)
+                                .modifyOutgoingDamage(player, monster, aliveEnemyCount, totalBaseDamage, log);
+                    }
+                }
+            }
+
+            int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, DamageType.PHYSICAL, monster.getElements());
+
+            monster.takeDamage(finalDamage);
+
+            log.append(String.format("Оружие: %s. [Урон на дайсах: %d] + [Модификаторы: %d]. Итого: %d урона. ХП врага: %d/%d\n",
+                    weaponName, baseWeaponDamage, (rarityBonus + strModifier), finalDamage, Math.max(0, monster.getCurrentHp()), monster.getMaxHp()));
         }
 
         if (monster.isDead()) {
-            log.append("🏆 Враг повержен!\n");
+            log.append(String.format("🏆 Враг %s рассыпается в пыль!\n", monster.getName()));
             return log.toString();
         }
 
-        log.append("Ход Врага: ");
+        int playerAc = player.getArmorClass();
 
-        int dexMod = StatMathUtils.calculateModifier(player.getStats().getDexterity());
-        int playerAc = 10 + dexMod;
+        int monsterD20 = DiceRoller.rollD20();
+        int monsterAttackRoll = monsterD20 + monster.getLevel(); // Чем выше уровень монстра, тем точнее он бьет
 
-        int monsterAttackRoll = DiceRoller.rollD20() + monster.getLevel();
+        log.append(String.format("Ход Врага (%s): Бросок атаки [d20: %d] + [Ур: %d] = %d против AC %d. ",
+                monster.getName(), monsterD20, monster.getLevel(), monsterAttackRoll, playerAc));
 
         if (monsterAttackRoll < playerAc) {
-            log.append(String.format("%s атакует, но %s ловко уворачивается!\n", monster.getName(), player.getName()));
+            log.append(String.format("Промах! %s ловко уворачивается!\n", player.getName()));
         } else {
-            int baseDamage = DiceRoller.roll(1, monster.getDamageDice().getSides());
-            int totalDamage = baseDamage + monster.getDamageBonus();
+            log.append("Попадание! ");
+
+            int monsterDiceDamage = DiceRoller.roll(1, monster.getDamageDice().getSides());
+            int totalMonsterDamage = monsterDiceDamage + monster.getDamageBonus();
             String attackName = monster.getAttackName();
 
             if (monster.getName().equals("Скелет-страж") && round % 3 == 0) {
-                totalDamage = (int) (totalDamage * 1.5);
+                totalMonsterDamage = (int) (totalMonsterDamage * 1.5);
                 attackName = "КРУГОВОЙ УДАР";
             }
 
-            player.takeDamage(totalDamage);
+            player.takeDamage(totalMonsterDamage);
 
-            log.append(String.format("%s использует '%s' и наносит %d урона! У вас осталось %d ХП.\n",
-                    monster.getName(), attackName, totalDamage, Math.max(0, player.getCurrentHp())));
+            log.append(String.format("Атака: %s. [Урон на дайсе: %d] + [Бонус: %d]. Итого: %d урона. Ваше ХП: %d/%d\n",
+                    attackName, monsterDiceDamage, monster.getDamageBonus(), totalMonsterDamage, Math.max(0, player.getCurrentHp()), player.getMaxHp()));
 
             if (player.getCurrentHp() <= 0) {
-                log.append("☠️ ВЫ ПОГИБЛИ...\n");
+                log.append("☠️ ТЬМА ПОГЛОЩАЕТ ВАС... ВЫ ПОГИБЛИ.\n");
             }
         }
 
