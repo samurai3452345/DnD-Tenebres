@@ -24,6 +24,8 @@ public class ExplorationService {
     private final CombatService combatService;
     private final LocationService locationService;
     private final InventoryService inventoryService;
+    private final InventoryService inventoryService2;
+
 
     public void explore(Player player, Location location, ExplorationAction actiom) {
         System.out.println("\n Вы выбрали: " + actiom);
@@ -86,8 +88,16 @@ public class ExplorationService {
 
     private void handleSearch(Player player, Location location) {
         if ("crypt_armory".equals(location.getId())) {
-            System.out.println("⚔️ Вы обыскали пыльные стойки и нашли Оружие!");
-            // TODO: Сгенерировать предмет и положить в инвентарь (Следующий этап)
+            System.out.println(" Вы обыскали пыльные стойки...");
+
+            inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
+            inventoryService.addItemToPlayer(player, "Кровоцвет", 2);
+
+            System.out.println("Найденные предметы успешно добавлены в ваш инвентарь!");
+
+            // TODO: в будущем здесь нужно будет помечать в базе данных,
+            // что игрок УЖЕ обыскал эту комнату, чтобы он не фармил мечи бесконечно.
+
         } else {
             System.out.println(" Вы тщательно всё обыскали, но нашли только пыль и паутину.");
         }
@@ -122,7 +132,8 @@ public class ExplorationService {
         while (player.getCurrentHp() > 0 && monster.getCurrentHp() > 0) {
             System.out.println("--- Раунд " + round + " ---");
 
-            combatService.executeRound(player, weapon, monster, round);
+            String roundLog = combatService.executeRound(player, monster, round);
+            System.out.println(roundLog);
 
             round++;
         }

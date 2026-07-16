@@ -3,13 +3,13 @@ package com.java_dragons.dnd_tenebres.domain.player.entity;
 
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
+import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
+
 import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -121,6 +121,13 @@ public class Player {
             throw new IllegalArgumentException("Локация не может быть пустой!");
         }
         this.currentLocation = newLocation;
+    }
+
+    public Optional<PlayerItem> getMainHandWeapon() {
+        return this.inventory.stream()
+                .filter(PlayerItem::isEquipped) // Только надетые вещи
+                .filter(item -> item.getEquippedSlot() == EquipmentSlot.MAIN_HAND)
+                .findFirst();
     }
 
 
