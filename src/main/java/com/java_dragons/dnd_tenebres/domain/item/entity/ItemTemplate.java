@@ -22,14 +22,14 @@ public class ItemTemplate {
     @Column(name = "type", nullable = false)
     private ItemType type;
 
-    @Column(name = "slot", nullable = false)
-    private String slot; // Или Enum SlotType
+//    @Column(name = "slot", nullable = false)
+//    private EquipmentSlot slot;
 
     @Column(name = "rarity", nullable = false)
     private ItemRarity rarity;
 
-    @Column(name = "armor_type", nullable = false)
-    private String armorType; // Или Enum ArmorType
+//    @Column(name = "armor_type", nullable = false)
+//    private ArmorType armorType;
 
     @Column(name = "armor_class", nullable = false)
     private int armorClass;
