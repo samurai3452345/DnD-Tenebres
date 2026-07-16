@@ -4,12 +4,13 @@ package com.java_dragons.dnd_tenebres.domain.player.entity;
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
+import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -42,7 +43,7 @@ public class Player {
     private int currentHp;
 
     @Column(name = "max_hp", nullable = false)
-    private  int maxHp;
+    private int maxHp;
 
     @Embedded
     private PlayerStats stats;
@@ -55,29 +56,30 @@ public class Player {
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
     private Set<ActiveEffect> activeEffects = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerItem> inventory = new ArrayList<>();
 
     public void addExperience(long xp) {
-        if(xp < 0){
-            throw new  IllegalArgumentException("Опыт не может быть отрицательным!");
+        if (xp < 0) {
+            throw new IllegalArgumentException("Опыт не может быть отрицательным!");
         }
         this.experience += xp;
     }
 
-    public void addGold(long amount){
-        if(amount < 0){
+    public void addGold(long amount) {
+        if (amount < 0) {
             throw new IllegalArgumentException("Нельзя добавить отрицательное золото!");
         }
 
         this.gold += amount;
     }
 
-    public boolean spendGold(long amount){
-        if(amount < 0){
+    public boolean spendGold(long amount) {
+        if (amount < 0) {
             throw new IllegalArgumentException("Сумма не может быть отрицательной!");
         }
-        if(this.gold < amount){
+        if (this.gold < amount) {
             return false;
         }
         this.gold -= amount;
@@ -94,7 +96,7 @@ public class Player {
         this.currentHp += bonus;
     }
 
-    public void takeDamage(int damage){
+    public void takeDamage(int damage) {
         this.currentHp = Math.max(0, this.currentHp - damage);
     }
 

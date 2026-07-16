@@ -2,10 +2,12 @@ package com.java_dragons.dnd_tenebres.runner;
 
 import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
 import com.java_dragons.dnd_tenebres.domain.exploration.service.ExplorationService;
+import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
-import com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -16,12 +18,19 @@ public class GameSimulationRunner implements CommandLineRunner {
 
     private final ExplorationService explorationService;
     private final LocationService locationService;
+    private final InventoryService inventoryService;
+    private final PlayerRepository playerRepository;
 
     @Override
     public void run(String... args) throws Exception {
         System.out.println("=================================================");
+        System.out.println("🔥 ТЕСТ СИСТЕМЫ ИНВЕНТАРЯ 🔥");
+        System.out.println("=================================================\n");
 
-        PlayerStats alaricStats = new PlayerStats(16, 14, 15, 10, 10, 10);
+        playerRepository.deleteAll();
+
+        com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats alaricStats =
+                new com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats(16, 14, 15, 10, 10, 10);
 
         Player player = Player.builder()
                 .name("Аларик Роуэн")
@@ -33,34 +42,42 @@ public class GameSimulationRunner implements CommandLineRunner {
                 .stats(alaricStats)
                 .build();
 
-        System.out.println("Герой " + player.getName() + " готов к бою! (HP: " + player.getCurrentHp() + ")");
+        player = playerRepository.save(player);
+        System.out.println("✅ Герой " + player.getName() + " создан и сохранен в БД.");
 
         try {
-            Location startLocation = locationService.getLocationById("crypt_entrance");
-            player.moveTo(startLocation);
+            System.out.println("\n🎁 Боги посылают Аларику дары...");
 
-            System.out.println("\n---  СЦЕНА 1: ВХОД В СКЛЕП ---");
-            explorationService.explore(player, player.getCurrentLocation(), ExplorationAction.HUNT);
+            inventoryService.addItemToPlayer(player, "Кровоцвет", 3);
+            inventoryService.addItemToPlayer(player, "Кровоцвет", 2); // Должно стать 5
 
-            if (player.getCurrentHp() <= 0) {
-                System.out.println(" Аларик погиб слишком рано. Симуляция прервана.");
-                return;
+            inventoryService.addItemToPlayer(player, "Кольцо Всевластия", 1);
+
+            playerRepository.save(player);
+
+            System.out.println("\n🎒 ЗАГЛЯДЫВАЕМ В РЮКЗАК АЛАРИКА:");
+            for (PlayerItem item : player.getInventory()) {
+                System.out.print("- " + item.getTemplate().getName() + " (Количество: " + item.getAmount() + ")");
+
+                if (item.getTemplate().getStatBudget() > 0) {
+                    System.out.println("\n    [Артефакт опознан! СИЛ+" + item.getBonusStrength() +
+                            " | ЛОВ+" + item.getBonusDexterity() +
+                            " | ТЕЛ+" + item.getBonusConstitution() +
+                            " | ИНТ+" + item.getBonusIntelligence() +
+                            " | МУД+" + item.getBonusWisdom() +
+                            " | ХАР+" + item.getBonusCharisma() + "]");
+                } else {
+                    System.out.println();
+                }
             }
 
-            System.out.println("\n---  СЦЕНА 2: ПРОДВИЖЕНИЕ ВГЛУБЬ ---");
-            explorationService.explore(player, player.getCurrentLocation(), ExplorationAction.TRAVEL);
-
-            System.out.println("\n---  СЦЕНА 3: НОВАЯ БИТВА ---");
-            explorationService.explore(player, player.getCurrentLocation(), ExplorationAction.HUNT);
-
-            System.out.println("\n=================================================");
-            System.out.println(" СИМУЛЯЦИЯ УСПЕШНО ЗАВЕРШЕНА ");
-            System.out.println("Остаток ХП героя: " + player.getCurrentHp());
-            System.out.println("=================================================");
+            System.out.println("\n--- 🎬 СЦЕНА 1: ВХОД В СКЛЕП ---");
+            Location startLocation = locationService.getLocationById("crypt_entrance"); // Убедись что ID локации совпадает с твоим
+            player.moveTo(startLocation);
+            explorationService.explore(player, startLocation, ExplorationAction.HUNT);
 
         } catch (Exception e) {
-            System.err.println("❌ Ошибка во время симуляции: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("\n❌ Симуляция прервана: " + e.getMessage());
         }
     }
 }
