@@ -1,5 +1,9 @@
 package com.java_dragons.dnd_tenebres.domain.item.service;
 
+import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
+import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
+import com.java_dragons.dnd_tenebres.domain.item.repository.ItemTemplateRepository;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,6 @@ public class InventoryService {
             throw new IllegalArgumentException("Количество добавляемых предметов должно быть больше нуля!");
         }
 
-        // 1. Ищем шаблон предмета в базе данных (Википедии игры)
         ItemTemplate template = itemTemplateRepository.findByName(templateName)
                 .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
                         "Справочник игры не содержит предмета с именем: " + templateName));

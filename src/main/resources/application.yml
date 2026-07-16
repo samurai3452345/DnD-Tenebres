@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/dnd_tenebres
+    url: jdbc:postgresql://localhost:5432/dnd_tenebres
     username: postgres
-    password: "31415926535"
+    password: 1
   jpa:
     hibernate:
       ddl-auto: validate
