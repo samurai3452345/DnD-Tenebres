@@ -15,5 +15,9 @@
     <include file="/db/changelog/008-insert-fixed-encounters.xml"/>
     <include file="/db/changelog/009-create-inventory-system.xml"/>
     <include file="/db/changelog/010-add-equipped-slot.xml"/>
+    <include file="/db/changelog/011-populate-armors.xml"/>
+    <include file="/db/changelog/012-populate-weapons.xml"/>
+    <include file="/db/changelog/013-populate-artifacts.xml"/>
+
 
 </databaseChangeLog>

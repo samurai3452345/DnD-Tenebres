@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="011-populate-armors" author="samurai3452345">
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кожаный шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="2"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кожаная куртка"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кожаные поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="2"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Железный шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="2"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Железный нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Железные поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Мифриловый шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Мифриловый нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Мифриловые поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Орихалковый шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Орихалковый нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Орихалковые поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Легкий шлем из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Легкий нагрудник из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Легкие поножи из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Шлем из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Нагрудник из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Поножи из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="5"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штурмовой шлем из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штурмовой нагрудник из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штурмовые поножи из драконьей чешуи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Капюшон Светоносца"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="LIGHTBRINGER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Мантия Светоносца"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="LIGHTBRINGER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штаны Светоносца"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="5"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="LIGHTBRINGER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Шлем Берсерка"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="14"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="BERSERKER_RAGE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Латы Берсерка"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="14"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="BERSERKER_RAGE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Поножи Берсерка"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="14"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="BERSERKER_RAGE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Капюшон палача"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="EXECUTIONER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кираса палача"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="EXECUTIONER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штаны Палача"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="5"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="EXECUTIONER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Легкий шлем воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="8"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кольчуга воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="8"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штаны воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="LIGHT"/>
+            <column name="armor_class" value="3"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Шлем воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кираса воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Поножи воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="5"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штурмовой шлем воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штурмовая кираса воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Штурмовые поножи воина"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="SWARM_BREAKER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Шлем тьмы"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="4"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="DARK_PACT"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кираса тьмы"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="6"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="DARK_PACT"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Поножи тьмы"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" value="5"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="DARK_PACT"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

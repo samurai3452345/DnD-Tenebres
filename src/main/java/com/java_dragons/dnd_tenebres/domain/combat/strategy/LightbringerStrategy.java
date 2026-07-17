@@ -17,7 +17,7 @@ public class LightbringerStrategy implements ItemPassiveStrategy {
     }
 
     @Override
-    public int modifyOutgoingDamage(Player player, Monster monster, int aliveEnemyCount, int currentDamage, StringBuilder log) {
+    public int modifyOutgoingDamage(Player player, Monster monster, int aliveEnemyCount, DamageType damageType, int currentDamage, StringBuilder log) {
 
         boolean isDarknessSpawn = monster.getElements().contains(DamageType.DARK);
 

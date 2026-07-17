@@ -6,5 +6,7 @@ public enum ItemPassive {
     DARK_PACT,          // Жертвует ХП ради огромного урона
     LIGHTBRINGER,       // Доп. урон по монстрам тьмы
     EXECUTIONER,         // Добивает монстров с низким ХП
-    SWARM_BREAKER
+    SWARM_BREAKER,
+    ORICHALCUM,
+    DRAGON_SCALES
 }
