@@ -75,13 +75,10 @@ public class CombatServiceImpl implements CombatService {
             int totalBaseDamage = baseWeaponDamage + rarityBonus + strModifier;
 
             DamageType playerDamageType = DamageType.PHYSICAL;
-            for (PlayerItem item : player.getInventory()) {
-                if (item.isEquipped()) {
-                    ItemPassive passive = item.getTemplate().getPassiveEffect();
-                    if (passive != ItemPassive.NONE && passiveStrategies.containsKey(passive)) {
-                        totalBaseDamage = passiveStrategies.get(passive)
-                                .modifyOutgoingDamage(player, monster, aliveEnemyCount, playerDamageType,  totalBaseDamage, log);
-                    }
+            for (ItemPassive passive : player.getActivePassives()) {
+                if (passiveStrategies.containsKey(passive)) {
+                    totalBaseDamage = passiveStrategies.get(passive)
+                            .modifyOutgoingDamage(player, monster, aliveEnemyCount, playerDamageType, totalBaseDamage, log);
                 }
             }
 
@@ -122,13 +119,10 @@ public class CombatServiceImpl implements CombatService {
                 attackName = "КРУГОВОЙ УДАР";
             }
 
-            for (PlayerItem item : player.getInventory()) {
-                if (item.isEquipped()) {
-                    ItemPassive passive = item.getTemplate().getPassiveEffect();
-                    if (passive != ItemPassive.NONE && passiveStrategies.containsKey(passive)) {
-                        totalMonsterDamage = passiveStrategies.get(passive)
-                                .modifyIncomingDamage(player, monster, monsterDamageType, totalMonsterDamage, log);
-                    }
+            for (ItemPassive passive : player.getActivePassives()) {
+                if (passiveStrategies.containsKey(passive)) {
+                    totalMonsterDamage = passiveStrategies.get(passive)
+                            .modifyIncomingDamage(player, monster, monsterDamageType, totalMonsterDamage, log);
                 }
             }
 

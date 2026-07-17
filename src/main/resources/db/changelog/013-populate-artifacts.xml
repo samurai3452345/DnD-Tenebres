@@ -7,6 +7,72 @@
 
     <changeSet id="013-populate-artifacts" author="samurai3452345">
 
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кольцо веры"/>
+            <column name="type" value="ARTIFACT"/>
+            <column name="slot" value="RING_2"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="1"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Амулет странника"/>
+            <column name="type" value="ARTIFACT"/>
+            <column name="slot" value="AMULET"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="1"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Маска заблудшего"/>
+            <column name="type" value="ARTIFACT"/>
+            <column name="slot" value="MASK"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="1"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Перчатки охотника"/>
+            <column name="type" value="ARTIFACT"/>
+            <column name="slot" value="GLOVES"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="1"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Амулет Ауреи"/>
+            <column name="type" value="ARTIFACT"/>
+            <column name="slot" value="AMULET"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="5"/>
+            <column name="passive_effect" value="LIGHTBRINGER"/>
+        </insert>
+
         <insert tableName="item_templates">
             <column name="name" value="Кольцо Всевластия"/>
             <column name="type" value="ARTIFACT"/>
