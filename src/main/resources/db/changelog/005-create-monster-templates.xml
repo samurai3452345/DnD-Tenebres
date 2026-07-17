@@ -85,7 +85,7 @@
 
             <column name="damage_dice" value="D6"/>
             <column name="damage_bonus" valueNumeric="0"/>
-            <column name="attack_name" value="Взмах коротким мечем"/>
+            <column name="attack_name" value="Взмах мечем"/>
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="2"/>
@@ -145,7 +145,7 @@
 
             <column name="damage_dice" value="D6"/>
             <column name="damage_bonus" valueNumeric="0"/>
-            <column name="attack_name" value="Взмах коротким мечем"/>
+            <column name="attack_name" value="Взмах мечем"/>
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="5"/>
@@ -165,7 +165,7 @@
 
             <column name="damage_dice" value="D6"/>
             <column name="damage_bonus" valueNumeric="0"/>
-            <column name="attack_name" value="Взмах коротким мечем"/>
+            <column name="attack_name" value="Взмах мечем"/>
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="6"/>
@@ -185,7 +185,7 @@
 
             <column name="damage_dice" value="D6"/>
             <column name="damage_bonus" valueNumeric="0"/>
-            <column name="attack_name" value="Взмах коротким мечем"/>
+            <column name="attack_name" value="Взмах мечем"/>
         </insert>
         <insert tableName="template_elements">
             <column name="template_id" valueNumeric="7"/>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="012-populate-weapons" author="samurai3452345">
+
+        <insert tableName="item_templates">
+            <column name="name" value="Кинжал"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="1d4"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Серп"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="1d4"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Меч"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="1d6"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Парные мечи"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="2d6"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Одноручный топор"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="1d6"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Лук"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="1d6"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Длинный меч"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="13"/>
+            <column name="damage_dice" value="1d8"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Топор"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value="1d8"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Длинный лук"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value="1d8"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Копье"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="13"/>
+            <column name="damage_dice" value="1d8"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Щит"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="OFF_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="2"/>
+            <column name="required_strength" value="10"/>
+            <column name="damage_dice" value="1d4"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Алебарда"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value="1d10"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелый арбалет"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value="1d10"/>
+            <column name="stat_budget" value="4"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Теневой меч"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="8"/>
+            <column name="damage_dice" value="1d6"/>
+            <column name="stat_budget" value="3"/>
+            <column name="passive_effect" value="DARK_PACT"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Топор Палача"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="12"/>
+            <column name="damage_dice" value="1d8"/>
+            <column name="stat_budget" value="2"/>
+            <column name="passive_effect" value="EXECUTIONER"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Драконьи кинжалы"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value="2d6"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="DRAGON_SCALES"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Ангельское копье"/>
+            <column name="type" value="WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="15"/>
+            <column name="damage_dice" value="2d12"/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="LIGHTBRINGER"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

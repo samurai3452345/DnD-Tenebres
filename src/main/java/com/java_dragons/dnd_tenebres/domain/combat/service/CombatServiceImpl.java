@@ -74,17 +74,15 @@ public class CombatServiceImpl implements CombatService {
 
             int totalBaseDamage = baseWeaponDamage + rarityBonus + strModifier;
 
-            for (PlayerItem item : player.getInventory()) {
-                if (item.isEquipped()) {
-                    ItemPassive passive = item.getTemplate().getPassiveEffect();
-                    if (passive != ItemPassive.NONE && passiveStrategies.containsKey(passive)) {
-                        totalBaseDamage = passiveStrategies.get(passive)
-                                .modifyOutgoingDamage(player, monster, aliveEnemyCount, totalBaseDamage, log);
-                    }
+            DamageType playerDamageType = DamageType.PHYSICAL;
+            for (ItemPassive passive : player.getActivePassives()) {
+                if (passiveStrategies.containsKey(passive)) {
+                    totalBaseDamage = passiveStrategies.get(passive)
+                            .modifyOutgoingDamage(player, monster, aliveEnemyCount, playerDamageType, totalBaseDamage, log);
                 }
             }
 
-            int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, DamageType.PHYSICAL, monster.getElements());
+            int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, playerDamageType, monster.getElements());
 
             monster.takeDamage(finalDamage);
 
@@ -114,9 +112,18 @@ public class CombatServiceImpl implements CombatService {
             int totalMonsterDamage = monsterDiceDamage + monster.getDamageBonus();
             String attackName = monster.getAttackName();
 
+            DamageType monsterDamageType = DamageType.PHYSICAL;
+
             if (monster.getName().equals("Скелет-страж") && round % 3 == 0) {
                 totalMonsterDamage = (int) (totalMonsterDamage * 1.5);
                 attackName = "КРУГОВОЙ УДАР";
+            }
+
+            for (ItemPassive passive : player.getActivePassives()) {
+                if (passiveStrategies.containsKey(passive)) {
+                    totalMonsterDamage = passiveStrategies.get(passive)
+                            .modifyIncomingDamage(player, monster, monsterDamageType, totalMonsterDamage, log);
+                }
             }
 
             player.takeDamage(totalMonsterDamage);
