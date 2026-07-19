@@ -1,6 +1,7 @@
 package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
 
+import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import jakarta.persistence.*;
@@ -77,5 +78,20 @@ public class Monster {
     }
 
 
+    public record MonsterAttackResult(String attackName, int totalDamage) {} // Удобная DTO для возврата двух значений
+
+    public MonsterAttackResult performAttack(int round) {
+        int diceDamage = DiceRoller.roll(1, this.damageDice.getSides());
+        int totalDamage = diceDamage + this.damageBonus;
+        String attackName = this.attackName;
+
+        // Вся специфика монстров хранится внутри монстра! Сервис об этом не знает.
+        if ("Скелет-страж".equals(this.name) && round % 3 == 0) {
+            totalDamage = (int) (totalDamage * 1.5);
+            attackName = "КРУГОВОЙ УДАР";
+        }
+
+        return new MonsterAttackResult(attackName, totalDamage);
+    }
 
 }

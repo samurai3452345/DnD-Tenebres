@@ -19,6 +19,14 @@ public class ActiveEffect {
     private EffectType type;
 
     @Column(name = "duration")
-    private int duration; // сколько ходов еще весит эффект
+    private int duration;
 
+    @Column(name = "power")
+    private int power;
+
+    public void decrementDuration() {
+        if (this.duration > 0) {
+            this.duration--;
+        }
+    }
 }
