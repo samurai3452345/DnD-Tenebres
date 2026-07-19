@@ -1,25 +1,27 @@
 package com.java_dragons.dnd_tenebres.domain.player.entity;
 
-
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
-import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
-import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
+import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import jakarta.persistence.*;
-
-import java.util.*;
-
 import lombok.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@Getter
+import java.util.*;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+
 @Entity
 @Table(name = "players")
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Player {
 
     @Id
@@ -47,6 +49,13 @@ public class Player {
     @Column(name = "max_hp", nullable = false)
     private int maxHp;
 
+    @Column(name = "current_mp")
+    private int currentMp;
+
+    @Builder.Default
+    @Column(name = "max_mp", nullable = false)
+    private int maxMp = 100;
+
     @Embedded
     private PlayerStats stats;
 
@@ -54,13 +63,16 @@ public class Player {
     @JoinColumn(name = "current_location_id")
     private Location currentLocation;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    // ✅ ИСПРАВЛЕНО: Заменено на LAZY. Защищает от проблемы N+1 при выборке списков игроков.
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
+    @Builder.Default
     private Set<ActiveEffect> activeEffects = new HashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerItem> inventory = new ArrayList<>();
+
 
     public void addExperience(long xp) {
         if (xp < 0) {
@@ -73,7 +85,6 @@ public class Player {
         if (amount < 0) {
             throw new IllegalArgumentException("Нельзя добавить отрицательное золото!");
         }
-
         this.gold += amount;
     }
 
@@ -102,10 +113,6 @@ public class Player {
         this.currentHp = Math.max(0, this.currentHp - damage);
     }
 
-    public void addEffect(ActiveEffect effect) {
-        this.activeEffects.add(effect);
-    }
-
     public void removeEffect(EffectType type) {
         this.activeEffects.removeIf(e -> e.getType() == type);
     }
@@ -127,30 +134,30 @@ public class Player {
 
     public Optional<PlayerItem> getMainHandWeapon() {
         return this.inventory.stream()
-                .filter(PlayerItem::isEquipped) // Только надетые вещи
+                .filter(PlayerItem::isEquipped)
                 .filter(item -> item.getEquippedSlot() == EquipmentSlot.MAIN_HAND)
                 .findFirst();
     }
 
-    public int getTotalStrength() {
-        int baseStrength = this.stats.getStrength();
-        int bonusStrength = this.inventory.stream()
-                .filter(PlayerItem::isEquipped) // Берем только то, что надето
-                .mapToInt(PlayerItem::getBonusStrength) // Извлекаем бонус силы
+    private int getBonusFromEquipment(ToIntFunction<PlayerItem> statExtractor) {
+        return this.inventory.stream()
+                .filter(PlayerItem::isEquipped)
+                .mapToInt(statExtractor)
                 .sum();
-        return baseStrength + bonusStrength;
+    }
+
+    public int getTotalStrength() {
+        return this.stats.getStrength() + getBonusFromEquipment(PlayerItem::getBonusStrength);
     }
 
     public int getTotalDexterity() {
-        int baseDex = this.stats.getDexterity();
-        int bonusDex = this.inventory.stream()
-                .filter(PlayerItem::isEquipped)
-                .mapToInt(PlayerItem::getBonusDexterity)
-                .sum();
-        return baseDex + bonusDex;
+        return this.stats.getDexterity() + getBonusFromEquipment(PlayerItem::getBonusDexterity);
     }
 
-    //TODO: такие же методы для остальных статов
+    public int getTotalIntelligence() { return this.stats.getIntelligence() + getBonusFromEquipment(PlayerItem::getBonusIntelligence); }
+    public int getTotalWisdom() { return this.stats.getWisdom() + getBonusFromEquipment(PlayerItem::getBonusWisdom); }
+    public int getTotalCharisma() { return this.stats.getCharisma() + getBonusFromEquipment(PlayerItem::getBonusCharisma); }
+    public int getTotalConstitution() { return this.stats.getConstitution() + getBonusFromEquipment(PlayerItem::getBonusConstitution); }
 
     public int getArmorClass() {
         int totalDex = getTotalDexterity();
@@ -162,7 +169,7 @@ public class Player {
                 .mapToInt(item -> item.getTemplate().getArmorClass())
                 .sum();
 
-        java.util.Optional<PlayerItem> chestArmor = this.inventory.stream()
+        Optional<PlayerItem> chestArmor = this.inventory.stream()
                 .filter(PlayerItem::isEquipped)
                 .filter(item -> item.getEquippedSlot() == EquipmentSlot.CHEST)
                 .findFirst();
@@ -175,10 +182,10 @@ public class Player {
         int armorBaseAc = armorTemplate.getArmorClass();
 
         int coreAc = switch (armorTemplate.getArmorType()) {
-            case LIGHT -> armorBaseAc + dexMod;              // Легкая: полный бонус ловкости
-            case MEDIUM -> armorBaseAc + Math.min(dexMod, 2); // Средняя: максимум +2 от ловкости
-            case HEAVY -> armorBaseAc;                        // Тяжелая: ловкость игнорируется
-            case NONE -> 7 + dexMod;                          // Защита от багов
+            case LIGHT -> armorBaseAc + dexMod;
+            case MEDIUM -> armorBaseAc + Math.min(dexMod, 2);
+            case HEAVY -> armorBaseAc;
+            case NONE -> 7 + dexMod;
         };
 
         return coreAc + offHandAc;
@@ -186,30 +193,29 @@ public class Player {
 
     public int getMaxHp() {
         int calculatedMaxHp = this.maxHp;
+        Set<ItemPassive> passives = getActivePassives();
 
-        java.util.Set<com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive> passives = getActivePassives();
-
-        if (passives.contains(com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive.DARK_PACT)) {
+        if (passives.contains(ItemPassive.DARK_PACT)) {
             calculatedMaxHp = (int) (calculatedMaxHp * 0.70);
         }
 
         return calculatedMaxHp;
     }
 
-    public java.util.Set<com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive> getActivePassives() {
-        java.util.Set<com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive> activePassives = new java.util.HashSet<>();
+    public Set<ItemPassive> getActivePassives() {
+        Set<ItemPassive> activePassives = new HashSet<>();
 
-        java.util.Map<com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive, java.util.List<PlayerItem>> equippedByPassive = this.inventory.stream()
+        Map<ItemPassive, List<PlayerItem>> equippedByPassive = this.inventory.stream()
                 .filter(PlayerItem::isEquipped)
-                .filter(item -> item.getTemplate().getPassiveEffect() != com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive.NONE)
-                .collect(java.util.stream.Collectors.groupingBy(item -> item.getTemplate().getPassiveEffect()));
+                .filter(item -> item.getTemplate().getPassiveEffect() != ItemPassive.NONE)
+                .collect(Collectors.groupingBy(item -> item.getTemplate().getPassiveEffect()));
 
-        for (java.util.Map.Entry<com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive, java.util.List<PlayerItem>> entry : equippedByPassive.entrySet()) {
-            com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive passive = entry.getKey();
-            java.util.List<PlayerItem> itemsWithPassive = entry.getValue();
+        for (Map.Entry<ItemPassive, List<PlayerItem>> entry : equippedByPassive.entrySet()) {
+            ItemPassive passive = entry.getKey();
+            List<PlayerItem> itemsWithPassive = entry.getValue();
 
             long armorCount = itemsWithPassive.stream()
-                    .filter(i -> i.getTemplate().getType() == com.java_dragons.dnd_tenebres.domain.item.model.ItemType.ARMOR)
+                    .filter(i -> i.getTemplate().getType() == ItemType.ARMOR)
                     .count();
 
             if (itemsWithPassive.size() > armorCount || armorCount >= 3) {
@@ -219,4 +225,58 @@ public class Player {
         return activePassives;
     }
 
+    public void heal(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("Количество исцеления не может быть отрицательным");
+        this.currentHp = Math.min(this.getMaxHp(), this.currentHp + amount);
+    }
+
+    public void restoreMp(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("Количество маны не может быть отрицательным");
+        this.currentMp = Math.min(this.maxMp, this.currentMp + amount);
+    }
+
+    public boolean spendMp(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("Затраты маны не могут быть отрицательными");
+        if (this.currentMp >= amount) {
+            this.currentMp -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    public void addEffect(ActiveEffect effect) {
+        if (effect == null) throw new IllegalArgumentException("Эффект не может быть null");
+        this.activeEffects.add(effect);
+    }
+
+    public void processTurnEffects(StringBuilder log) {
+        Iterator<ActiveEffect> iterator = this.activeEffects.iterator();
+        while (iterator.hasNext()) {
+            ActiveEffect effect = iterator.next();
+
+            if (effect.getType() == EffectType.REGENERATION) {
+                int oldHp = this.currentHp;
+                this.heal(effect.getPower());
+                int healed = this.currentHp - oldHp;
+
+                effect.decrementDuration();
+
+                log.append(String.format("✨ Эффект [Регенерация] исцеляет вас на %d ХП (Стало: %d/%d). ",
+                        healed, this.currentHp, this.getMaxHp()));
+
+                if (effect.getDuration() <= 0) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    public void consumeItem(PlayerItem item) {
+        if (item.getAmount() > 0) {
+            item.setAmount(item.getAmount() - 1);
+        }
+        if (item.getAmount() <= 0) {
+            this.inventory.remove(item);
+        }
+    }
 }

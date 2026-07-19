@@ -10,6 +10,10 @@ public enum EffectType {
     STUN(EffectCategory.NEUTRAL), // оглушение 1 ход пропускается
     MAGIC_SICKNESS(EffectCategory.DEBUFF), // Дебафф от локации ANTI_MAGIC_FIELD стоимость закленаний x2 маны
 
+    HEAL_INSTANT(EffectCategory.BUFF),
+    MANA_RESTORE(EffectCategory.BUFF),
+    POISON(EffectCategory.BUFF),
+    REGENERATION(EffectCategory.BUFF),
     PROTECTION_UP(EffectCategory.BUFF), // защита: АС увеличивается +10%
     TREATMENT(EffectCategory.BUFF), // лечение: каждый раунд востанавливает часть хп
     DAMAGE_UP(EffectCategory.BUFF), // увеличивает урон на +10%
