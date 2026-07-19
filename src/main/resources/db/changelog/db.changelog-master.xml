@@ -18,6 +18,7 @@
     <include file="/db/changelog/011-populate-armors.xml"/>
     <include file="/db/changelog/012-populate-weapons.xml"/>
     <include file="/db/changelog/013-populate-artifacts.xml"/>
+    <include file="/db/changelog/014-populate-resources.xml"/>
 
 
 </databaseChangeLog>

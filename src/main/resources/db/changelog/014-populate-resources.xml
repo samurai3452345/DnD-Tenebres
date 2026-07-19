@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="015-populate-resources" author="хияр">
+        <insert tableName="item_templates">
+            <column name="name" value="Кровоцвет"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Кожа"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Железо"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Мифрил"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Орихалк"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Драконья чешуя"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Древесина"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" value="0"/>
+            <column name="required_strength" value="0"/>
+            <column name="damage_dice" value=""/>
+            <column name="stat_budget" value="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

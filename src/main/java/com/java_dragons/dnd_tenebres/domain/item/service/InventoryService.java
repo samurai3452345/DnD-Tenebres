@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -35,20 +36,43 @@ public class InventoryService {
     }
 
     private void handleStackableItem(Player player, ItemTemplate template, int amount) {
-        player.getInventory().stream()
-                .filter(item -> item.getTemplate().getId().equals(template.getId()))
-                .findFirst()
-                .ifPresentOrElse(
-                        existingItem -> existingItem.setAmount(existingItem.getAmount() + amount),
+        int maxStackSize = (template.getType() == ItemType.RESOURCE) ? 100 : 16;
 
-                        () -> {
-                            PlayerItem newItem = new PlayerItem();
-                            newItem.setPlayer(player);
-                            newItem.setTemplate(template);
-                            newItem.setAmount(amount);
-                            player.getInventory().add(newItem);
-                        }
-                );
+        while ( amount > 0 ){
+            Optional<PlayerItem> incompleteStack = player.getInventory().stream()
+                    .filter(item -> item.getTemplate().getId().equals(template.getId()))
+                    .filter(item -> item.getAmount() < maxStackSize)
+                    .findFirst();
+
+            if(incompleteStack.isPresent()){
+                PlayerItem existingItem = incompleteStack.get();
+                int currentAmount = existingItem.getAmount();
+                int spaceLeft = maxStackSize - currentAmount;
+
+                int toAdd = Math.min(amount, spaceLeft);
+                existingItem.setAmount(currentAmount+ toAdd);
+                amount -= toAdd;
+            }else{
+                int toAdd = Math.min(amount, maxStackSize);
+
+                PlayerItem newItem = new PlayerItem();
+                newItem.setPlayer(player);
+                newItem.setTemplate(template);
+                newItem.setAmount(toAdd);
+                newItem.setEquipped(false);
+
+                newItem.setBonusStrength(0);
+                newItem.setBonusDexterity(0);
+                newItem.setBonusIntelligence(0);
+                newItem.setBonusWisdom(0);
+                newItem.setBonusCharisma(0);
+                newItem.setBonusConstitution(0);
+
+                player.getInventory().add(newItem);
+                amount -= toAdd;
+            }
+        }
+
     }
 
     private void handleUniqueItem(Player player, ItemTemplate template, int amount) {
