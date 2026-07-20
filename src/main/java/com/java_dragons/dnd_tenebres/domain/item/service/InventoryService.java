@@ -6,16 +6,21 @@ import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.item.repository.ItemTemplateRepository;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InventoryService {
+
     private final ItemTemplateRepository itemTemplateRepository;
+    private static final int MAX_RESOURCE_STACK = 100;
+    private static final int MAX_CONSUMABLE_STACK = 16;
 
     @Transactional
     public void addItemToPlayer(Player player, String templateName, int amount) {
@@ -27,7 +32,6 @@ public class InventoryService {
                 .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
                         "Справочник игры не содержит предмета с именем: " + templateName));
 
-        // 2. Определяем поведение в зависимости от типа (Enum ItemType)
         if (template.getType() == ItemType.RESOURCE || template.getType() == ItemType.CONSUMABLE) {
             handleStackableItem(player, template, amount);
         } else {
@@ -36,63 +40,56 @@ public class InventoryService {
     }
 
     private void handleStackableItem(Player player, ItemTemplate template, int amount) {
-        int maxStackSize = (template.getType() == ItemType.RESOURCE) ? 100 : 16;
+        int maxStackSize = (template.getType() == ItemType.RESOURCE) ? MAX_RESOURCE_STACK : MAX_CONSUMABLE_STACK;
 
-        while ( amount > 0 ){
-            Optional<PlayerItem> incompleteStack = player.getInventory().stream()
-                    .filter(item -> item.getTemplate().getId().equals(template.getId()))
-                    .filter(item -> item.getAmount() < maxStackSize)
-                    .findFirst();
+        // Ищем все неполные стаки ОДИН раз
+        List<PlayerItem> incompleteStacks = player.getInventory().stream()
+                .filter(item -> item.getTemplate().getId().equals(template.getId()))
+                .filter(item -> item.getAmount() < maxStackSize)
+                .toList();
 
-            if(incompleteStack.isPresent()){
-                PlayerItem existingItem = incompleteStack.get();
-                int currentAmount = existingItem.getAmount();
-                int spaceLeft = maxStackSize - currentAmount;
+        int remainingAmount = amount;
 
-                int toAdd = Math.min(amount, spaceLeft);
-                existingItem.setAmount(currentAmount+ toAdd);
-                amount -= toAdd;
-            }else{
-                int toAdd = Math.min(amount, maxStackSize);
+        for (PlayerItem existingItem : incompleteStacks) {
+            if (remainingAmount <= 0) break;
 
-                PlayerItem newItem = new PlayerItem();
-                newItem.setPlayer(player);
-                newItem.setTemplate(template);
-                newItem.setAmount(toAdd);
-                newItem.setEquipped(false);
+            int spaceLeft = maxStackSize - existingItem.getAmount();
+            int toAdd = Math.min(remainingAmount, spaceLeft);
 
-                newItem.setBonusStrength(0);
-                newItem.setBonusDexterity(0);
-                newItem.setBonusIntelligence(0);
-                newItem.setBonusWisdom(0);
-                newItem.setBonusCharisma(0);
-                newItem.setBonusConstitution(0);
-
-                player.getInventory().add(newItem);
-                amount -= toAdd;
-            }
+            existingItem.setAmount(existingItem.getAmount() + toAdd);
+            remainingAmount -= toAdd;
         }
 
+        // Если остались предметы, создаем новые полные/частичные стаки
+        while (remainingAmount > 0) {
+            int toAdd = Math.min(remainingAmount, maxStackSize);
+            player.getInventory().add(createBaseItem(player, template, toAdd));
+            remainingAmount -= toAdd;
+        }
     }
 
     private void handleUniqueItem(Player player, ItemTemplate template, int amount) {
         for (int i = 0; i < amount; i++) {
-            PlayerItem newItem = new PlayerItem();
-            newItem.setPlayer(player);
-            newItem.setTemplate(template);
-            newItem.setAmount(1);
-            newItem.setEquipped(false);
-
-            newItem.setBonusStrength(0);
-            newItem.setBonusDexterity(0);
-            newItem.setBonusConstitution(0);
-            newItem.setBonusIntelligence(0);
-            newItem.setBonusWisdom(0);
-            newItem.setBonusCharisma(0);
-
+            PlayerItem newItem = createBaseItem(player, template, 1);
             applyRandomStats(newItem, template.getStatBudget());
             player.getInventory().add(newItem);
         }
+    }
+
+    // Вынесли создание базового предмета, чтобы избавиться от дублирования
+    private PlayerItem createBaseItem(Player player, ItemTemplate template, int amount) {
+        PlayerItem item = new PlayerItem();
+        item.setPlayer(player);
+        item.setTemplate(template);
+        item.setAmount(amount);
+        item.setEquipped(false);
+        item.setBonusStrength(0);
+        item.setBonusDexterity(0);
+        item.setBonusConstitution(0);
+        item.setBonusIntelligence(0);
+        item.setBonusWisdom(0);
+        item.setBonusCharisma(0);
+        return item;
     }
 
     private void applyRandomStats(PlayerItem item, int budget) {
@@ -100,11 +97,10 @@ public class InventoryService {
             return;
         }
 
-        System.out.println("✨ Идет идентификация артефакта... Распределение " + budget + " очков статов:");
+        log.debug("✨ Идет идентификация артефакта... Распределение {} очков статов", budget);
 
         for (int i = 0; i < budget; i++) {
             int randomStat = ThreadLocalRandom.current().nextInt(6);
-
             switch (randomStat) {
                 case 0 -> item.setBonusStrength(item.getBonusStrength() + 1);
                 case 1 -> item.setBonusDexterity(item.getBonusDexterity() + 1);
@@ -115,9 +111,8 @@ public class InventoryService {
             }
         }
 
-
-        System.out.println(String.format("   -> Сила: +%d | Ловкость: +%d | Телосложение: +%d | Интеллект: +%d | Мудрость: +%d | Харизма: +%d",
+        log.debug("   -> Сила: +{} | Ловкость: +{} | Телосложение: +{} | Интеллект: +{} | Мудрость: +{} | Харизма: +{}",
                 item.getBonusStrength(), item.getBonusDexterity(), item.getBonusConstitution(),
-                item.getBonusIntelligence(), item.getBonusWisdom(), item.getBonusCharisma()));
+                item.getBonusIntelligence(), item.getBonusWisdom(), item.getBonusCharisma());
     }
 }

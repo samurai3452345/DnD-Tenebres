@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="016-populate-consumables" author="хияр">
+    <changeSet id="016-populate-consumables" author="samurai3452345">
         <insert tableName="item_templates">
             <column name="name" value="Малое зелье маны"/>
             <column name="type" value="CONSUMABLE"/>
@@ -15,8 +15,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="25"/>
+            <column name="passive_effect" value="MANA_RESTORE"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Зелье маны"/>
@@ -27,8 +27,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="50"/>
+            <column name="passive_effect" value="MANA_RESTORE"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Королевское зелье маны"/>
@@ -39,8 +39,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="100"/>
+            <column name="passive_effect" value="MANA_RESTORE"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Малое зелье лечения"/>
@@ -51,8 +51,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="10"/>
+            <column name="passive_effect" value="HEAL_INSTANT"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Зелье лечения"/>
@@ -63,8 +63,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="25"/>
+            <column name="passive_effect" value="HEAL_INSTANT"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Королевское зелье лечения"/>
@@ -75,8 +75,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="62"/>
+            <column name="passive_effect" value="HEAL_INSTANT"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Аурелиев эликсир"/>
@@ -87,8 +87,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="100"/>
+            <column name="passive_effect" value="HEAL_INSTANT"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Амброзия"/>
@@ -99,8 +99,8 @@
             <column name="armor_class" value="0"/>
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
-            <column name="stat_budget" value="0"/>
-            <column name="passive_effect" value="NONE"/>
+            <column name="stat_budget" value="200"/>
+            <column name="passive_effect" value="HEAL_INSTANT"/>
         </insert>
     </changeSet>
 </databaseChangeLog>
