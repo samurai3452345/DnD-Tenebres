@@ -1,6 +1,7 @@
 package com.java_dragons.dnd_tenebres.domain.player.entity;
 
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
+import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatEvent;
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
@@ -27,6 +28,10 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    @Column(name = "version")
+    private Integer version;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -63,7 +68,6 @@ public class Player {
     @JoinColumn(name = "current_location_id")
     private Location currentLocation;
 
-    // ✅ ИСПРАВЛЕНО: Заменено на LAZY. Защищает от проблемы N+1 при выборке списков игроков.
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
     @Builder.Default
@@ -73,28 +77,19 @@ public class Player {
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerItem> inventory = new ArrayList<>();
 
-
     public void addExperience(long xp) {
-        if (xp < 0) {
-            throw new IllegalArgumentException("Опыт не может быть отрицательным!");
-        }
+        if (xp < 0) throw new IllegalArgumentException();
         this.experience += xp;
     }
 
     public void addGold(long amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Нельзя добавить отрицательное золото!");
-        }
+        if (amount < 0) throw new IllegalArgumentException();
         this.gold += amount;
     }
 
     public boolean spendGold(long amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Сумма не может быть отрицательной!");
-        }
-        if (this.gold < amount) {
-            return false;
-        }
+        if (amount < 0) throw new IllegalArgumentException();
+        if (this.gold < amount) return false;
         this.gold -= amount;
         return true;
     }
@@ -126,10 +121,46 @@ public class Player {
     }
 
     public void moveTo(Location newLocation) {
-        if (newLocation == null) {
-            throw new IllegalArgumentException("Локация не может быть пустой!");
-        }
+        if (newLocation == null) throw new IllegalArgumentException();
         this.currentLocation = newLocation;
+    }
+
+    public void equipItem(Long playerItemId, EquipmentSlot targetSlot) {
+        PlayerItem itemToEquip = this.inventory.stream()
+                .filter(item -> Objects.equals(item.getId(), playerItemId))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+
+        ItemType type = itemToEquip.getTemplate().getType();
+        if (type == ItemType.RESOURCE || type == ItemType.CONSUMABLE) {
+            throw new IllegalStateException();
+        }
+
+        if (this.stats.getStrength() < itemToEquip.getTemplate().getRequiredStrength()) {
+            throw new IllegalStateException();
+        }
+
+        if (!isSlotCompatible(itemToEquip.getTemplate().getSlot(), targetSlot)) {
+            throw new IllegalArgumentException();
+        }
+
+        this.inventory.stream()
+                .filter(PlayerItem::isEquipped)
+                .filter(item -> item.getEquippedSlot() == targetSlot)
+                .findFirst()
+                .ifPresent(oldItem -> {
+                    oldItem.setEquipped(false);
+                    oldItem.setEquippedSlot(EquipmentSlot.NONE);
+                });
+
+        itemToEquip.setEquipped(true);
+        itemToEquip.setEquippedSlot(targetSlot);
+    }
+
+    private boolean isSlotCompatible(EquipmentSlot templateSlot, EquipmentSlot targetSlot) {
+        if (templateSlot == targetSlot) return true;
+        return templateSlot == EquipmentSlot.RING &&
+                (targetSlot == EquipmentSlot.RING_1 || targetSlot == EquipmentSlot.RING_2);
     }
 
     public Optional<PlayerItem> getMainHandWeapon() {
@@ -226,17 +257,17 @@ public class Player {
     }
 
     public void heal(int amount) {
-        if (amount < 0) throw new IllegalArgumentException("Количество исцеления не может быть отрицательным");
+        if (amount < 0) throw new IllegalArgumentException();
         this.currentHp = Math.min(this.getMaxHp(), this.currentHp + amount);
     }
 
     public void restoreMp(int amount) {
-        if (amount < 0) throw new IllegalArgumentException("Количество маны не может быть отрицательным");
+        if (amount < 0) throw new IllegalArgumentException();
         this.currentMp = Math.min(this.maxMp, this.currentMp + amount);
     }
 
     public boolean spendMp(int amount) {
-        if (amount < 0) throw new IllegalArgumentException("Затраты маны не могут быть отрицательными");
+        if (amount < 0) throw new IllegalArgumentException();
         if (this.currentMp >= amount) {
             this.currentMp -= amount;
             return true;
@@ -245,11 +276,11 @@ public class Player {
     }
 
     public void addEffect(ActiveEffect effect) {
-        if (effect == null) throw new IllegalArgumentException("Эффект не может быть null");
+        if (effect == null) throw new IllegalArgumentException();
         this.activeEffects.add(effect);
     }
 
-    public void processTurnEffects(StringBuilder log) {
+    public void processTurnEffects(List<CombatEvent> events) {
         Iterator<ActiveEffect> iterator = this.activeEffects.iterator();
         while (iterator.hasNext()) {
             ActiveEffect effect = iterator.next();
@@ -258,11 +289,9 @@ public class Player {
                 int oldHp = this.currentHp;
                 this.heal(effect.getPower());
                 int healed = this.currentHp - oldHp;
-
                 effect.decrementDuration();
 
-                log.append(String.format("✨ Эффект [Регенерация] исцеляет вас на %d ХП (Стало: %d/%d). ",
-                        healed, this.currentHp, this.getMaxHp()));
+                events.add(new CombatEvent(this.name, "EFFECT_HEAL", this.name, healed, "Регенерация"));
 
                 if (effect.getDuration() <= 0) {
                     iterator.remove();

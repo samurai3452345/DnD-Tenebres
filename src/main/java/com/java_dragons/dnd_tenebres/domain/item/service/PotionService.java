@@ -1,38 +1,41 @@
 package com.java_dragons.dnd_tenebres.domain.item.service;
 
+import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatEvent;
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
-import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static com.java_dragons.dnd_tenebres.domain.effect.model.EffectType.*;
 
 @Service
 public class PotionService {
 
-    // Принимаем не строку, а сам шаблон предмета
-    public boolean applyPotion(ItemTemplate potionTemplate, Player player, StringBuilder log) {
-        EffectType effectType = potionTemplate.getPassiveEffect(); // Например, HEAL_INSTANT
-        int power = potionTemplate.getStatBudget(); // Допустим, в БД там лежит 50
+    public boolean applyPotion(ItemTemplate potionTemplate, Player player, List<CombatEvent> events) {
+        ItemPassive potionEffect = potionTemplate.getPassiveEffect();
+        int power = potionTemplate.getStatBudget();
 
-        switch (effectType) {
+        switch (potionEffect) {
             case HEAL_INSTANT -> {
-                player.heal(power); // Метод внутри Player, который прибавляет ХП и не дает превысить MaxHP
-                log.append(String.format("Вы выпиваете %s и восстанавливаете %d ХП! ", potionTemplate.getName(), power));
+                player.heal(power);
+                events.add(new CombatEvent(player.getName(), "USE_POTION_HEAL", player.getName(), power, potionTemplate.getName()));
                 return true;
             }
             case MANA_RESTORE -> {
-                // Логика маны
-                log.append(String.format("Вы выпиваете %s и чувствуете прилив магических сил! ", potionTemplate.getName()));
+                player.restoreMp(power);
+                events.add(new CombatEvent(player.getName(), "USE_POTION_MANA", player.getName(), power, potionTemplate.getName()));
                 return true;
             }
             case REGENERATION -> {
-                // Вешаем бафф на 3 раунда (ActiveEffect)
-                player.getActiveEffects().add(new ActiveEffect(EffectType.REGENERATION, 3, power));
-                log.append("Мягкое тепло разливается по телу. Активирована регенерация! ");
+                player.addEffect(new ActiveEffect(REGENERATION, 3, power));
+                events.add(new CombatEvent(player.getName(), "USE_POTION_BUFF", player.getName(), 0, "Регенерация"));
                 return true;
             }
             default -> {
-                log.append("Вы выпили непонятную бурду. Ничего не произошло. ");
+                events.add(new CombatEvent(player.getName(), "USE_POTION_FAIL", player.getName(), 0, "Неизвестное зелье"));
                 return false;
             }
         }
