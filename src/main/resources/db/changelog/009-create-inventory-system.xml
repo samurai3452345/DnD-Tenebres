@@ -41,6 +41,11 @@
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+
+            <column name="version" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="player_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_player_item_player" referencedTableName="players" referencedColumnNames="id"/>
             </column>

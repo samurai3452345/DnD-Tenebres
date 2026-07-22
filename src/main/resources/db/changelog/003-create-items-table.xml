@@ -11,6 +11,10 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
+            <column name="version" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="player_id" type="BIGINT">
                 <constraints nullable="false" foreignKeyName="fk_items_player" referencedTableName="players" referencedColumnNames="id"/>
             </column>
@@ -22,17 +26,21 @@
             <column name="rarity" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
+
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+
             <column name="current_xp" type="BIGINT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
 
             <column name="base_dice_type" type="VARCHAR(10)"/>
+
             <column name="is_equipped" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
+
             <column name="equip_slot" type="VARCHAR(50)"/>
 
             <column name="parent_item_id" type="BIGINT">

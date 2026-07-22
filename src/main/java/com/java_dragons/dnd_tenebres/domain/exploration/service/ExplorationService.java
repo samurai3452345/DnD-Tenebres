@@ -2,6 +2,7 @@ package com.java_dragons.dnd_tenebres.domain.exploration.service;
 
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
+import com.java_dragons.dnd_tenebres.domain.combat.model.CombatAction;
 import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
@@ -11,137 +12,149 @@ import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExplorationService {
+
     private final MonsterSpawnerService monsterSpawnerService;
     private final CombatService combatService;
     private final LocationService locationService;
     private final InventoryService inventoryService;
 
+    @Transactional // Защищаем изменения состояния игрока и мира в БД
+    public void explore(Player player, Location location, ExplorationAction action) {
+        log.info("Вы выбрали действие: {}", action);
 
-    public void explore(Player player, Location location, ExplorationAction actiom) {
-        System.out.println("\n Вы выбрали: " + actiom);
-
-        switch (actiom){
+        switch (action) {
             case HUNT -> handleHunt(player, location);
             case SEARCH -> handleSearch(player, location);
             case TRAVEL -> handleTravel(player, location);
-            default -> System.out.println("Вы стоите в раздумиях.");
+            default -> log.info("Вы стоите в раздумиях.");
         }
     }
+
     private void handleHunt(Player player, Location location) {
         String zoneId = location.getZoneId();
 
         if ("green_forest".equals(zoneId)) {
-            System.out.println("Вы осматриваете заросли в поисках следов...");
+            log.info("Вы осматриваете заросли в поисках следов...");
 
             int roll = DiceRoller.rollD20();
             int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
             int totalCheck = roll + wisMod;
 
-            System.out.println("Бросок на Восприятие: " + roll + " + " + wisMod + " = " + totalCheck);
+            log.info("Бросок на Восприятие: {} + {} = {}", roll, wisMod, totalCheck);
 
             if (totalCheck >= 12) {
-                System.out.println("Вы выследили врага! Бой начинается!");
+                log.info("Вы выследили врага! Бой начинается!");
                 Monster monster = monsterSpawnerService.spawnRandomMonster("FOREST", location.getLevel());
-                System.out.println("На вас нападает: " + monster.getName());
+                log.info("На вас нападает: {}", monster.getName());
 
                 startCombatLoop(player, monster, 1);
             } else {
-                System.out.println("Вы не нашли ни одного врага");
+                log.info("Вы не нашли ни одного врага.");
             }
 
         } else if ("forgotten_crypt".equals(zoneId)) {
-            System.out.println("Вы входите в комнату подземелья, враги уже ждут вас!");
+            log.info("Вы входите в комнату подземелья, враги уже ждут вас!");
 
             List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
 
             if (squad.isEmpty()) {
-                System.out.println("Здесь тихо... Врагов нет.");
+                log.info("Здесь тихо... Врагов нет.");
                 return;
             }
 
-            System.out.println("Перед вами отряд из " + squad.size() + " врагов!");
+            log.info("Перед вами отряд из {} врагов!", squad.size());
 
             int aliveCount = squad.size();
-
             for (Monster m : squad) {
                 if (player.getCurrentHp() <= 0) {
                     break;
                 }
-
                 startCombatLoop(player, m, aliveCount);
                 aliveCount--;
             }
         } else {
-            System.out.println("Здесь не на кого охотиться. Это безопасная зона.");
+            log.info("Здесь не на кого охотиться. Это безопасная зона.");
         }
     }
 
     private void handleSearch(Player player, Location location) {
         if ("crypt_armory".equals(location.getId())) {
-            System.out.println(" Вы обыскали пыльные стойки...");
+            log.info("Вы обыскали пыльные стойки...");
 
             inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
             inventoryService.addItemToPlayer(player, "Кровоцвет", 2);
 
-            System.out.println("Найденные предметы успешно добавлены в ваш инвентарь!");
-
+            log.info("Найденные предметы успешно добавлены в ваш инвентарь!");
             // TODO: в будущем здесь нужно будет помечать в базе данных,
             // что игрок УЖЕ обыскал эту комнату, чтобы он не фармил мечи бесконечно.
-
         } else {
-            System.out.println(" Вы тщательно всё обыскали, но нашли только пыль и паутину.");
+            log.info("Вы тщательно всё обыскали, но нашли только пыль и паутину.");
         }
     }
 
     private void handleTravel(Player player, Location location) {
-        System.out.println("Вы находитесь в: " + location.getName());
-        System.out.println("Вы осматриваетесь в поисках путей...");
+        log.info("Вы находитесь в: {}", location.getName());
+        log.info("Вы осматриваетесь в поисках путей...");
 
-         Set<Location> paths = locationService.getAvailableConnections(location.getId());
+        Set<Location> paths = locationService.getAvailableConnections(location.getId());
 
         if (paths == null || paths.isEmpty()) {
-            System.out.println("Тупик. от сюда нет выхода. ");
+            log.info("Тупик. Отсюда нет выхода.");
             return;
         }
 
-        System.out.println("Доступные пути: ");
+        log.info("Доступные пути:");
         for (Location path : paths) {
-            System.out.println("- " + path.getName());
+            log.info("- {}", path.getName());
         }
 
-        //TODO: авто выбор пути, патом поменять
+        // TODO: автовыбор пути, потом поменять на выбор игрока
         Location nextLocation = paths.iterator().next();
         player.moveTo(nextLocation);
-        System.out.println("🗺️ Вы отправились в: " + nextLocation.getName());
+        log.info("🗺️ Вы отправились в: {}", nextLocation.getName());
     }
 
     private void startCombatLoop(Player player, Monster monster, int aliveEnemyCount) {
-        System.out.println("\n⚔️ БОЙ НАЧИНАЕТСЯ: " + player.getName() + " против " + monster.getName() + "!");
+        log.info("⚔️ БОЙ НАЧИНАЕТСЯ: {} против {}!", player.getName(), monster.getName());
 
         int round = 1;
         while (player.getCurrentHp() > 0 && monster.getCurrentHp() > 0) {
-            System.out.println("--- Раунд " + round + " ---");
+            log.info("--- Раунд {} ---", round);
 
-            String roundLog = combatService.executeRound(player, monster, aliveEnemyCount, round);
-            System.out.println(roundLog);
+            // ✅ ИСПРАВЛЕНО: Вызываем executeTurn по новому контракту боевой системы.
+            // Для консольного MVP эмулируем, что персонаж всегда атакует (CombatAction.ATTACK).
+            // Если у персонажа в инвентаре будут зелья, здесь можно будет временно захардкодить
+            // CombatAction.USE_POTION и передавать имя зелья для тестов.
+            String roundLog = combatService.executeTurn(
+                    player,
+                    monster,
+                    aliveEnemyCount,
+                    round,
+                    CombatAction.ATTACK,
+                    null
+            );
 
+            log.info(roundLog);
             round++;
         }
 
         if (player.getCurrentHp() <= 0) {
-            System.out.println("💀 " + player.getName() + " пал в бою... Игра окончена.");
+            log.info("💀 {} пал в бою... Игра окончена.", player.getName());
         } else {
-            System.out.println("🏆 " + monster.getName() + " повержен! Вы победили.");
+            log.info("🏆 {} повержен! Вы победили.", monster.getName());
+            log.info("🎁 Вы обыскали врага...");
 
-            System.out.println("🎁 Вы обыскали врага...");
             inventoryService.addItemToPlayer(player, "Кровоцвет", 3);
             inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
         }

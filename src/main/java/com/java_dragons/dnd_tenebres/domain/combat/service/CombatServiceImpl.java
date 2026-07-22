@@ -2,6 +2,8 @@ package com.java_dragons.dnd_tenebres.domain.combat.service;
 
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
+import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatEvent;
+import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatReport;
 import com.java_dragons.dnd_tenebres.domain.combat.model.CombatAction;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageCalculator;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,66 +43,57 @@ public class CombatServiceImpl implements CombatService {
     }
 
     @Override
-    @Transactional // ОШИБКА №4 ИСПРАВЛЕНА: Защищаем базу от сбоев
-    public String executeTurn(Player player, Monster monster, int aliveEnemyCount, int round, CombatAction action, String potionTargetName) {
-        StringBuilder log = new StringBuilder();
-        log.append(String.format("=== Раунд %d ===\n", round));
+    @Transactional
+    public CombatReport executeTurn(Player player, Monster monster, int aliveEnemyCount, int round, CombatAction action, String potionTargetName) {
+        List<CombatEvent> events = new ArrayList<>();
 
-        player.processTurnEffects(log);
-        if (log.length() > 20) log.append("\n");
+        player.processTurnEffects(events);
 
-        // ОШИБКА №3 ИСПРАВЛЕНА: Чистый и понятный распределитель ходов (OCP)
         switch (action) {
-            case ATTACK -> handlePlayerAttack(player, monster, aliveEnemyCount, log);
-            case USE_POTION -> handlePotionUse(player, potionTargetName, log);
-            case CAST_SPELL -> log.append("Вы пытаетесь сотворить заклинание, но магия пока недоступна!\n");
-            case FLEE -> log.append("Вы пытаетесь сбежать, но двери заперты!\n");
+            case ATTACK -> handlePlayerAttack(player, monster, aliveEnemyCount, events);
+            case USE_POTION -> handlePotionUse(player, potionTargetName, events);
+            case CAST_SPELL -> events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Магия недоступна"));
+            case FLEE -> events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Двери заперты"));
         }
 
         if (monster.isDead()) {
-            log.append(String.format("🏆 Враг %s рассыпается в пыль!\n", monster.getName()));
-            return log.toString();
+            events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, "Враг повержен"));
+            return new CombatReport(round, events, true, false);
         }
 
-        handleEnemyTurn(player, monster, round, log);
+        handleEnemyTurn(player, monster, round, events);
 
-        return log.toString();
+        boolean isPlayerDead = player.getCurrentHp() <= 0;
+        if (isPlayerDead) {
+            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли"));
+        }
+
+        return new CombatReport(round, events, false, isPlayerDead);
     }
 
-    // ================= PRIVATE METHODS =================
-
-    private void handlePlayerAttack(Player player, Monster monster, int aliveEnemyCount, StringBuilder log) {
+    private void handlePlayerAttack(Player player, Monster monster, int aliveEnemyCount, List<CombatEvent> events) {
         int d20 = DiceRoller.rollD20();
         boolean isCrit = (d20 == 20);
         int strModifier = StatMathUtils.calculateModifier(player.getTotalStrength());
         int attackRoll = d20 + strModifier;
 
-        log.append(String.format("Ход Игрока (%s): Бросок атаки [d20: %d] + [Сила: %d] = %d против AC %d. ",
-                player.getName(), d20, strModifier, attackRoll, monster.getArmorClass()));
-
         if (d20 == 1) {
-            log.append("Критический промах! Спотыкается и теряет равновесие.\n");
+            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Критический промах"));
             return;
         }
 
         if (!isCrit && attackRoll < monster.getArmorClass()) {
-            log.append("Промах! Оружие скользнуло по броне врага.\n");
+            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Промах"));
             return;
         }
-
-        if (isCrit) log.append("КРИТИЧЕСКОЕ ПОПАДАНИЕ! ");
-        else log.append("Попадание! ");
 
         Optional<PlayerItem> weaponOpt = player.getMainHandWeapon();
         int baseWeaponDamage = 0;
         int rarityBonus = 0;
-        String weaponName = "Голые кулаки";
 
         if (weaponOpt.isPresent()) {
             ItemTemplate weaponTemplate = weaponOpt.get().getTemplate();
-            weaponName = weaponTemplate.getName();
             rarityBonus = weaponTemplate.getRarity().getFlatModifier();
-
             String[] diceParts = weaponTemplate.getDamageDice().toLowerCase().split("d");
             int diceCount = Integer.parseInt(diceParts[0]);
             int diceSides = Integer.parseInt(diceParts[1]);
@@ -116,18 +110,17 @@ public class CombatServiceImpl implements CombatService {
         for (ItemPassive passive : player.getActivePassives()) {
             if (passiveStrategies.containsKey(passive)) {
                 totalBaseDamage = passiveStrategies.get(passive)
-                        .modifyOutgoingDamage(player, monster, aliveEnemyCount, playerDamageType, totalBaseDamage, log);
+                        .modifyOutgoingDamage(player, monster, aliveEnemyCount, playerDamageType, totalBaseDamage, events);
             }
         }
 
         int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, playerDamageType, monster.getElements());
         monster.takeDamage(finalDamage);
 
-        log.append(String.format("Оружие: %s. [Урон на дайсах: %d] + [Модификаторы: %d]. Итого: %d урона. ХП врага: %d/%d\n",
-                weaponName, baseWeaponDamage, (rarityBonus + strModifier), finalDamage, Math.max(0, monster.getCurrentHp()), monster.getMaxHp()));
+        events.add(new CombatEvent(player.getName(), isCrit ? "CRIT_ATTACK" : "ATTACK", monster.getName(), finalDamage, "Нанесение урона"));
     }
 
-    private void handlePotionUse(Player player, String potionTargetName, StringBuilder log) {
+    private void handlePotionUse(Player player, String potionTargetName, List<CombatEvent> events) {
         Optional<PlayerItem> potionOpt = player.getInventory().stream()
                 .filter(item -> item.getTemplate().getType() == ItemType.CONSUMABLE)
                 .filter(item -> item.getTemplate().getName().equalsIgnoreCase(potionTargetName))
@@ -136,57 +129,37 @@ public class CombatServiceImpl implements CombatService {
 
         if (potionOpt.isPresent()) {
             PlayerItem potionItem = potionOpt.get();
-            // ВАЖНО: Здесь мы передаем Template (по новой архитектуре из прошлого шага), а не строку!
-            boolean applied = potionService.applyPotion(potionItem.getTemplate(), player, log);
-
+            boolean applied = potionService.applyPotion(potionItem.getTemplate(), player, events);
             if (applied) {
-                // ОШИБКА №2 ИСПРАВЛЕНА: Инкапсуляция. Игрок сам расходует зелье.
                 player.consumeItem(potionItem);
-                log.append("\n");
-            } else {
-                log.append("Эффект этого зелья не сработал.\n");
             }
         } else {
-            log.append(String.format("Вы судорожно ищете '%s' в рюкзаке, но его там нет! Ход потрачен впустую!\n", potionTargetName));
+            events.add(new CombatEvent(player.getName(), "FAIL", player.getName(), 0, "Предмет не найден"));
         }
     }
 
-    private void handleEnemyTurn(Player player, Monster monster, int round, StringBuilder log) {
+    private void handleEnemyTurn(Player player, Monster monster, int round, List<CombatEvent> events) {
         int playerAc = player.getArmorClass();
         int monsterD20 = DiceRoller.rollD20();
         int monsterAttackRoll = monsterD20 + monster.getLevel();
 
-        log.append(String.format("Ход Врага (%s): Бросок атаки [d20: %d] + [Ур: %d] = %d против AC %d. ",
-                monster.getName(), monsterD20, monster.getLevel(), monsterAttackRoll, playerAc));
-
         if (monsterAttackRoll < playerAc) {
-            log.append(String.format("Промах! %s ловко уворачивается!\n", player.getName()));
+            events.add(new CombatEvent(monster.getName(), "MISS", player.getName(), 0, "Промах"));
             return;
         }
 
-        log.append("Попадание! ");
-
-        // ОШИБКА №1 ИСПРАВЛЕНА: Вызываем метод атаки у самого монстра (без хардкода имен)
         var attackResult = monster.performAttack(round);
-
         int totalMonsterDamage = attackResult.totalDamage();
-        String attackName = attackResult.attackName();
         DamageType monsterDamageType = DamageType.PHYSICAL;
 
         for (ItemPassive passive : player.getActivePassives()) {
             if (passiveStrategies.containsKey(passive)) {
                 totalMonsterDamage = passiveStrategies.get(passive)
-                        .modifyIncomingDamage(player, monster, monsterDamageType, totalMonsterDamage, log);
+                        .modifyIncomingDamage(player, monster, monsterDamageType, totalMonsterDamage, events);
             }
         }
 
         player.takeDamage(totalMonsterDamage);
-
-        log.append(String.format("Атака: %s. Итого: %d урона. Ваше ХП: %d/%d\n",
-                attackName, totalMonsterDamage, Math.max(0, player.getCurrentHp()), player.getMaxHp()));
-
-        if (player.getCurrentHp() <= 0) {
-            log.append("☠️ ТЬМА ПОГЛОЩАЕТ ВАС... ВЫ ПОГИБЛИ.\n");
-        }
+        events.add(new CombatEvent(monster.getName(), "ATTACK", player.getName(), totalMonsterDamage, attackResult.attackName()));
     }
 }

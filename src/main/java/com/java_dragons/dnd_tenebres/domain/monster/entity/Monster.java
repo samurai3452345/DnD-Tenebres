@@ -1,6 +1,5 @@
 package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
-
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
@@ -21,6 +20,10 @@ public class Monster {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    @Column(name = "version")
+    private Integer version;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -54,7 +57,7 @@ public class Monster {
     @Column(name = "attack_name", nullable = false)
     private String attackName;
 
-    @ElementCollection(fetch = FetchType.EAGER) // EAGER здесь допустим, так как стихий мало (1-3)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "monster_elements", joinColumns = @JoinColumn(name = "monster_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
@@ -63,10 +66,9 @@ public class Monster {
 
     public void takeDamage(int damage){
         this.currentHp = Math.max(0, this.currentHp - damage);
-
     }
 
-    public  boolean isDead(){
+    public boolean isDead(){
         return currentHp <= 0;
     }
 
@@ -77,21 +79,11 @@ public class Monster {
         }
     }
 
-
-    public record MonsterAttackResult(String attackName, int totalDamage) {} // Удобная DTO для возврата двух значений
+    public record MonsterAttackResult(String attackName, int totalDamage) {}
 
     public MonsterAttackResult performAttack(int round) {
         int diceDamage = DiceRoller.roll(1, this.damageDice.getSides());
         int totalDamage = diceDamage + this.damageBonus;
-        String attackName = this.attackName;
-
-        // Вся специфика монстров хранится внутри монстра! Сервис об этом не знает.
-        if ("Скелет-страж".equals(this.name) && round % 3 == 0) {
-            totalDamage = (int) (totalDamage * 1.5);
-            attackName = "КРУГОВОЙ УДАР";
-        }
-
-        return new MonsterAttackResult(attackName, totalDamage);
+        return new MonsterAttackResult(this.attackName, totalDamage);
     }
-
 }
