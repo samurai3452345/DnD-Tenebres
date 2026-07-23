@@ -70,4 +70,20 @@ public class ProgressionCalculatorImpl implements ProgressionCalculator {
         }
         return HERO_BASE_HP[level - 1];
     }
+
+    @Override
+    public int calculateMaxMp(int level, int intelligence) {
+        if (level < 1 || level > 16) {
+            throw new IllegalArgumentException("Уровень должен быть от 1 до 16");
+        }
+
+        double baseMp = 20.0 + 10.0 * (level - 1) + 0.5 * Math.pow(level - 1, 2);
+
+        int intModifier = StatMathUtils.calculateModifier(intelligence);
+        int bonusMp = intModifier * 3 * level;
+
+        int totalMp = (int) Math.floor(baseMp) + bonusMp;
+
+        return Math.max(10, totalMp);
+    }
 }

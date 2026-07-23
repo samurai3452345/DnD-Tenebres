@@ -45,6 +45,9 @@ public class MonsterSpawnerService {
                 .damageBonus(template.getDamageBonus())
                 .attackName(template.getAttackName())
                 .elements(new HashSet<>(template.getElements()))
+                .specialSkill(template.getSpecialSkill())
+                .skillFrequency(template.getSkillFrequency())
+                .resistances(new HashSet<>(template.getResistances()))
                 .build();
 
         return monsterRepository.save(monster);
@@ -52,11 +55,8 @@ public class MonsterSpawnerService {
 
     @Transactional
     public List<Monster> spawnFixedMonstersForLocation(String locationId) {
-
         List<Monster> squad = new ArrayList<>();
-
         List<LocationFixedMonster> fixedMonsters = locationFixedMonsterRepository.findByLocationId(locationId);
-
 
         for (LocationFixedMonster fm : fixedMonsters) {
             MonsterTemplate template = monsterTemplateRepository.findByName(fm.getMonsterTemplateName())
@@ -75,6 +75,9 @@ public class MonsterSpawnerService {
                         .damageBonus(template.getDamageBonus())
                         .attackName(template.getAttackName())
                         .elements(new HashSet<>(template.getElements()))
+                        .specialSkill(template.getSpecialSkill())
+                        .skillFrequency(template.getSkillFrequency())
+                        .resistances(new HashSet<>(template.getResistances()))
                         .build();
                 squad.add(monsterRepository.save(monster));
             }

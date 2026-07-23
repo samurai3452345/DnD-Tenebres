@@ -3,6 +3,8 @@ package com.java_dragons.dnd_tenebres.domain.monster.entity;
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
+import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
+import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -57,6 +59,15 @@ public class Monster {
     @Column(name = "attack_name", nullable = false)
     private String attackName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "special_skill", nullable = false)
+    @Builder.Default
+    private MonsterSkill specialSkill = MonsterSkill.NONE;
+
+    @Column(name = "skill_frequency", nullable = false)
+    @Builder.Default
+    private int skillFrequency = 0;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "monster_elements", joinColumns = @JoinColumn(name = "monster_id"))
     @Enumerated(EnumType.STRING)
@@ -64,8 +75,21 @@ public class Monster {
     @Builder.Default
     private Set<DamageType> elements = new HashSet<>();
 
-    public void takeDamage(int damage){
-        this.currentHp = Math.max(0, this.currentHp - damage);
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "monster_resistances", joinColumns = @JoinColumn(name = "monster_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "element")
+    @Builder.Default
+    private Set<DamageType> resistances = new HashSet<>();
+
+    public void takeDamage(int damage, DamageType type) {
+        int finalDamage = damage;
+
+        if (this.resistances.contains(type)) {
+            finalDamage = (int) (damage * 0.8);
+        }
+
+        this.currentHp = Math.max(0, this.currentHp - finalDamage);
     }
 
     public boolean isDead(){
@@ -81,7 +105,13 @@ public class Monster {
 
     public record MonsterAttackResult(String attackName, int totalDamage) {}
 
-    public MonsterAttackResult performAttack(int round) {
+    public MonsterAttackResult performAttack(int round, MonsterSkillStrategy skillStrategy) {
+        if (this.specialSkill != MonsterSkill.NONE && this.skillFrequency > 0 && round % this.skillFrequency == 0) {
+            if (skillStrategy != null) {
+                return skillStrategy.executeSkill(this);
+            }
+        }
+
         int diceDamage = DiceRoller.roll(1, this.damageDice.getSides());
         int totalDamage = diceDamage + this.damageBonus;
         return new MonsterAttackResult(this.attackName, totalDamage);
