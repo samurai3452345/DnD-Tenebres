@@ -39,6 +39,9 @@
             <column name="damage_dice" type="VARCHAR(20)">
                 <constraints nullable="false"/>
             </column>
+            <column name="dice_count" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
             <column name="damage_bonus" type="INTEGER" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>

@@ -4,14 +4,18 @@ import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatEvent;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatReport;
+import com.java_dragons.dnd_tenebres.domain.combat.entity.Spell;
 import com.java_dragons.dnd_tenebres.domain.combat.model.CombatAction;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageCalculator;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
+import com.java_dragons.dnd_tenebres.domain.combat.repository.SpellRepository;
 import com.java_dragons.dnd_tenebres.domain.combat.strategy.ItemPassiveStrategy;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
+import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.item.service.PotionService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
@@ -25,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,32 +39,34 @@ public class CombatServiceImpl implements CombatService {
     private final Map<ItemPassive, ItemPassiveStrategy> passiveStrategies;
     private final Map<MonsterSkill, MonsterSkillStrategy> monsterSkillStrategies;
     private final PotionService potionService;
+    private final SpellRepository spellRepository;
 
-    // ВАЖНО: Добавлен аргумент List<MonsterSkillStrategy> monsterStrategies
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
                              List<ItemPassiveStrategy> itemStrategies,
                              List<MonsterSkillStrategy> monsterStrategies,
-                             PotionService potionService) {
+                             PotionService potionService,
+                             SpellRepository spellRepository) {
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
                 .collect(Collectors.toMap(ItemPassiveStrategy::getTargetPassive, s -> s));
         this.monsterSkillStrategies = monsterStrategies.stream()
                 .collect(Collectors.toMap(MonsterSkillStrategy::getTargetSkill, s -> s));
         this.potionService = potionService;
+        this.spellRepository = spellRepository;
     }
 
     @Override
     @Transactional
-    public CombatReport executeTurn(Player player, Monster monster, int aliveEnemyCount, int round, CombatAction action, String potionTargetName) {
+    public CombatReport executeTurn(Player player, Monster monster, int aliveEnemyCount, int round, CombatAction action, String actionTargetName) {
         List<CombatEvent> events = new ArrayList<>();
 
         player.processTurnEffects(events);
 
         switch (action) {
             case ATTACK -> handlePlayerAttack(player, monster, aliveEnemyCount, events);
-            case USE_POTION -> handlePotionUse(player, potionTargetName, events);
-            case CAST_SPELL -> events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Магия недоступна"));
+            case USE_POTION -> handlePotionUse(player, actionTargetName, events);
+            case CAST_SPELL -> handlePlayerCastSpell(player, monster, aliveEnemyCount, actionTargetName, events);
             case FLEE -> events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Двери заперты"));
         }
 
@@ -76,6 +83,94 @@ public class CombatServiceImpl implements CombatService {
         }
 
         return new CombatReport(round, events, false, isPlayerDead);
+    }
+
+    private void handlePlayerCastSpell(Player player, Monster monster, int aliveEnemyCount, String spellName, List<CombatEvent> events) {
+        Optional<PlayerItem> magicWeaponOpt = player.getMainHandWeapon()
+                .filter(item -> item.getTemplate().getType() == ItemType.MAGIC_WEAPON);
+
+        if (magicWeaponOpt.isEmpty()) {
+            events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "В руках нет магического оружия"));
+            return;
+        }
+
+        PlayerItem weapon = magicWeaponOpt.get();
+        int maxTier = weapon.getTemplate().getRarity().getTierIndex();
+        MagicWeaponEffect effect = weapon.getMagicEffect();
+
+        Spell spellToCast;
+
+        if (effect == MagicWeaponEffect.CHAOS) {
+            List<Spell> chaosSpells = spellRepository.findByTier(maxTier);
+            if (chaosSpells.isEmpty()) {
+                events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Магия Хаоса не нашла заклинаний"));
+                return;
+            }
+            spellToCast = chaosSpells.get(ThreadLocalRandom.current().nextInt(chaosSpells.size()));
+        } else {
+            Optional<Spell> spellOpt = spellRepository.findByName(spellName);
+            if (spellOpt.isEmpty() || spellOpt.get().getTier() > maxTier) {
+                events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Заклинание недоступно для этого оружия"));
+                return;
+            }
+            spellToCast = spellOpt.get();
+        }
+
+        int manaCost = spellToCast.getManaCost();
+        if (effect == MagicWeaponEffect.MANA_DISCOUNT) {
+            manaCost = (int) (manaCost * 0.8);
+        }
+
+        if (!player.spendMp(manaCost)) {
+            events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Недостаточно маны"));
+            return;
+        }
+
+        int d20 = DiceRoller.rollD20();
+        int intModifier = StatMathUtils.calculateModifier(player.getTotalIntelligence());
+        int attackRoll = d20 + intModifier;
+
+        if (effect == MagicWeaponEffect.HOMING) {
+            attackRoll += 5;
+        }
+
+        if (d20 == 1) {
+            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Критическая осечка магии"));
+            return;
+        }
+
+        if (d20 != 20 && attackRoll < monster.getArmorClass()) {
+            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Заклинание прошло вскользь"));
+            return;
+        }
+
+        boolean isCrit = (d20 == 20);
+        int diceCount = spellToCast.getDiceCount();
+        if (isCrit) diceCount *= 2;
+
+        int baseDamage = DiceRoller.roll(diceCount, spellToCast.getDamageDice().getSides()) + spellToCast.getFlatBonus();
+        int totalDamage = baseDamage + intModifier;
+
+        double multiplier = 1.0;
+        if (effect == MagicWeaponEffect.SPELL_POWER) multiplier += 0.10;
+        if (effect == MagicWeaponEffect.ELEMENTAL_MASTERY && spellToCast.getElement() == weapon.getMagicEffectElement()) multiplier += 0.20;
+        if (effect == MagicWeaponEffect.CHAOS) multiplier += 0.40;
+
+        totalDamage = (int) (totalDamage * multiplier);
+        DamageType damageType = spellToCast.getElement();
+
+        for (ItemPassive passive : player.getActivePassives()) {
+            if (passiveStrategies.containsKey(passive)) {
+                totalDamage = passiveStrategies.get(passive)
+                        .modifyOutgoingDamage(player, monster, aliveEnemyCount, damageType, totalDamage, events);
+            }
+        }
+
+        int finalDamage = damageCalculator.calculateFinalDamage(totalDamage, damageType, monster.getElements());
+        monster.takeDamage(finalDamage, damageType);
+
+        String eventType = isCrit ? "CRIT_SPELL" : "CAST_SPELL";
+        events.add(new CombatEvent(player.getName(), eventType, monster.getName(), finalDamage, spellToCast.getName()));
     }
 
     private void handlePlayerAttack(Player player, Monster monster, int aliveEnemyCount, List<CombatEvent> events) {
@@ -101,12 +196,16 @@ public class CombatServiceImpl implements CombatService {
         if (weaponOpt.isPresent()) {
             ItemTemplate weaponTemplate = weaponOpt.get().getTemplate();
             rarityBonus = weaponTemplate.getRarity().getFlatModifier();
-            String[] diceParts = weaponTemplate.getDamageDice().toLowerCase().split("d");
-            int diceCount = Integer.parseInt(diceParts[0]);
-            int diceSides = Integer.parseInt(diceParts[1]);
 
-            if (isCrit) diceCount *= 2;
-            baseWeaponDamage = DiceRoller.roll(diceCount, diceSides);
+            DiceType diceType = weaponTemplate.getDamageDice();
+            int diceCount = weaponTemplate.getDiceCount();
+
+            if (diceType != null && diceCount > 0) {
+                if (isCrit) diceCount *= 2;
+                baseWeaponDamage = DiceRoller.roll(diceCount, diceType.getSides());
+            } else {
+                baseWeaponDamage = isCrit ? 2 : 1;
+            }
         } else {
             baseWeaponDamage = isCrit ? 2 : 1;
         }
@@ -122,7 +221,6 @@ public class CombatServiceImpl implements CombatService {
         }
 
         int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, playerDamageType, monster.getElements());
-        // Добавлен аргумент playerDamageType
         monster.takeDamage(finalDamage, playerDamageType);
 
         events.add(new CombatEvent(player.getName(), isCrit ? "CRIT_ATTACK" : "ATTACK", monster.getName(), finalDamage, "Нанесение урона"));

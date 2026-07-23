@@ -1,6 +1,8 @@
 package com.java_dragons.dnd_tenebres.domain.item.entity;
 
+import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
+import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import jakarta.persistence.*;
 import lombok.*;
@@ -58,4 +60,13 @@ public class PlayerItem {
 
     @Column(name = "bonus_charisma", nullable = false)
     private int bonusCharisma;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "magic_effect", nullable = false)
+    @Builder.Default
+    private MagicWeaponEffect magicEffect = MagicWeaponEffect.NONE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "magic_effect_element")
+    private DamageType magicEffectElement;
 }

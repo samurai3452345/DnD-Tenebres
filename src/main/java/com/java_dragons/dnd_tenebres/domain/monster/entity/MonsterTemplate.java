@@ -46,6 +46,9 @@ public class MonsterTemplate {
     @Column(name = "damage_dice", nullable = false)
     private DiceType damageDice;
 
+    @Column(name = "dice_count", nullable = false)
+    private int diceCount;
+
     @Column(name = "damage_bonus", nullable = false)
     private int damageBonus;
 

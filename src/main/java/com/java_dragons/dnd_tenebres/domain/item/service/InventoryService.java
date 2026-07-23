@@ -1,8 +1,10 @@
 package com.java_dragons.dnd_tenebres.domain.item.service;
 
+import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
+import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.item.repository.ItemTemplateRepository;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import lombok.RequiredArgsConstructor;
@@ -72,11 +74,29 @@ public class InventoryService {
         for (int i = 0; i < amount; i++) {
             PlayerItem newItem = createBaseItem(player, template, 1);
             applyRandomStats(newItem, template.getStatBudget());
+
+            if (template.getType() == ItemType.MAGIC_WEAPON) {
+                rollMagicWeaponEffect(newItem);
+            }
+
             player.getInventory().add(newItem);
         }
     }
 
-    // Вынесли создание базового предмета, чтобы избавиться от дублирования
+    private void rollMagicWeaponEffect(PlayerItem item) {
+        MagicWeaponEffect[] effects = MagicWeaponEffect.values();
+        int randomIndex = java.util.concurrent.ThreadLocalRandom.current().nextInt(1, effects.length);
+        MagicWeaponEffect rolledEffect = effects[randomIndex];
+
+        item.setMagicEffect(rolledEffect);
+
+        if (rolledEffect == MagicWeaponEffect.ELEMENTAL_MASTERY) {
+            DamageType[] elements = DamageType.values();
+            int randomElement = java.util.concurrent.ThreadLocalRandom.current().nextInt(1, elements.length);
+            item.setMagicEffectElement(elements[randomElement]);
+        }
+    }
+
     private PlayerItem createBaseItem(Player player, ItemTemplate template, int amount) {
         PlayerItem item = new PlayerItem();
         item.setPlayer(player);

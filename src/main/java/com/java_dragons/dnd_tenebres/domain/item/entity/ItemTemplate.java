@@ -42,8 +42,12 @@ public class ItemTemplate {
     @Column(name = "required_strength", nullable = false)
     private int requiredStrength;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "damage_dice")
-    private String damageDice;
+    private DiceType damageDice;
+
+    @Column(name = "dice_count", nullable = false)
+    private int diceCount = 0;
 
     @Column(name = "stat_budget", nullable = false)
     private int statBudget;

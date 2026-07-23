@@ -53,6 +53,10 @@ public class Monster {
     @Column(name = "damage_dice", nullable = false)
     private DiceType damageDice;
 
+    @Column(name = "dice_count", nullable = false)
+    @Builder.Default
+    private int diceCount = 1;
+
     @Column(name = "damage_bonus", nullable = false)
     private int damageBonus;
 
@@ -112,7 +116,7 @@ public class Monster {
             }
         }
 
-        int diceDamage = DiceRoller.roll(1, this.damageDice.getSides());
+        int diceDamage = DiceRoller.roll(this.diceCount, this.damageDice.getSides());
         int totalDamage = diceDamage + this.damageBonus;
         return new MonsterAttackResult(this.attackName, totalDamage);
     }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="019-create-magic-system" author="magic_dev">
+
+        <addColumn tableName="player_items">
+            <column name="magic_effect" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="magic_effect_element" type="VARCHAR(50)"/>
+        </addColumn>
+
+        <createTable tableName="spells">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="tier" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mana_cost" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="element" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="damage_dice" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dice_count" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="flat_bonus" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Тестовые заклинания -->
+        <!-- Tier 1 -->
+        <insert tableName="spells">
+            <column name="name" value="Огненная стрела"/>
+            <column name="tier" valueNumeric="1"/>
+            <column name="mana_cost" valueNumeric="5"/>
+            <column name="element" value="FIRE"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <!-- Tier 2 -->
+        <insert tableName="spells">
+            <column name="name" value="Ледяной шип"/>
+            <column name="tier" valueNumeric="2"/>
+            <column name="mana_cost" valueNumeric="15"/>
+            <column name="element" value="ICE"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="2"/>
+            <column name="flat_bonus" valueNumeric="3"/>
+        </insert>
+
+        <!-- Tier 3 -->
+        <insert tableName="spells">
+            <column name="name" value="Огненный шар"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="35"/>
+            <column name="element" value="FIRE"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="8"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>
