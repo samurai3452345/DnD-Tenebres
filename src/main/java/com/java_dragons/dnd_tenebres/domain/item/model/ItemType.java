@@ -5,5 +5,6 @@ public enum ItemType {
     ARMOR,
     ARTIFACT,
     RESOURCE,
-    CONSUMABLE
+    CONSUMABLE,
+    MAGIC_WEAPON
 }
