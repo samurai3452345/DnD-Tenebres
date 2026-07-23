@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="019-create-magic-system" author="magic_dev">
+    <changeSet id="016-create-magic-system" author="magic_dev">
 
         <addColumn tableName="player_items">
             <column name="magic_effect" type="VARCHAR(50)" defaultValue="NONE">
@@ -47,18 +47,59 @@
         <!-- Тестовые заклинания -->
         <!-- Tier 1 -->
         <insert tableName="spells">
-            <column name="name" value="Огненная стрела"/>
+            <column name="name" value="Искра"/>
             <column name="tier" valueNumeric="1"/>
-            <column name="mana_cost" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="4"/>
             <column name="element" value="FIRE"/>
-            <column name="damage_dice" value="D10"/>
+            <column name="damage_dice" value="D6"/>
             <column name="dice_count" valueNumeric="1"/>
             <column name="flat_bonus" valueNumeric="0"/>
         </insert>
 
+        <insert tableName="spells">
+            <column name="name" value="Каменный снаряд"/>
+            <column name="tier" valueNumeric="1"/>
+            <column name="mana_cost" valueNumeric="4"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Электрическая стрела"/>
+            <column name="tier" valueNumeric="1"/>
+            <column name="mana_cost" valueNumeric="5"/>
+            <column name="element" value="ELECTRICITY"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Леденой болт"/>
+            <column name="tier" valueNumeric="1"/>
+            <column name="mana_cost" valueNumeric="5"/>
+            <column name="element" value="ICE"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Травеной хлыст"/>
+            <column name="tier" valueNumeric="1"/>
+            <column name="mana_cost" valueNumeric="3"/>
+            <column name="element" value="NATURE"/>
+            <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+
         <!-- Tier 2 -->
         <insert tableName="spells">
-            <column name="name" value="Ледяной шип"/>
+            <column name="name" value="Ледяные шипы"/>
             <column name="tier" valueNumeric="2"/>
             <column name="mana_cost" valueNumeric="15"/>
             <column name="element" value="ICE"/>
@@ -67,6 +108,58 @@
             <column name="flat_bonus" valueNumeric="3"/>
         </insert>
 
+        <insert tableName="spells">
+            <column name="name" value="Малый разрез"/>
+            <column name="tier" valueNumeric="2"/>
+            <column name="mana_cost" valueNumeric="14"/>
+            <column name="element" value="AIR"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="1"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Укрепление кожи"/>
+            <column name="tier" valueNumeric="2"/>
+            <column name="mana_cost" valueNumeric="16"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value=""/>
+            <column name="dice_count" valueNumeric=""/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Поджег"/>
+            <column name="tier" valueNumeric="2"/>
+            <column name="mana_cost" valueNumeric="15"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Обморожение"/>
+            <column name="tier" valueNumeric="2"/>
+            <column name="mana_cost" valueNumeric="13"/>
+            <column name="element" value="ICE"/>
+            <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Разряд"/>
+            <column name="tier" valueNumeric="2"/>
+            <column name="mana_cost" valueNumeric="16"/>
+            <column name="element" value="ELECTRICITY"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="3"/>
+        </insert>
+
+
+
         <!-- Tier 3 -->
         <insert tableName="spells">
             <column name="name" value="Огненный шар"/>
@@ -74,8 +167,261 @@
             <column name="mana_cost" valueNumeric="35"/>
             <column name="element" value="FIRE"/>
             <column name="damage_dice" value="D6"/>
-            <column name="dice_count" valueNumeric="8"/>
+            <column name="dice_count" valueNumeric="6"/>
             <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Копье грома"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="35"/>
+            <column name="element" value="ELECTRICITY"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="5"/>
+            <column name="flat_bonus" valueNumeric="6"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Разрез"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="35"/>
+            <column name="element" value="AIR"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="2"/>
+            <column name="flat_bonus" valueNumeric="10"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Путы лазы"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="36"/>
+            <column name="element" value="NATURE"/>
+            <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="4"/>
+            <column name="flat_bonus" valueNumeric="2"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Шквал леденых шипов"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="36"/>
+            <column name="element" value="ICE"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="6"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Метка света"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="36"/>
+            <column name="element" value="LIGHT"/>
+            <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="3"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Теневой шип"/>
+            <column name="tier" valueNumeric="3"/>
+            <column name="mana_cost" valueNumeric="36"/>
+            <column name="element" value="DARK"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="5"/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <!-- Tier 4 -->
+        <insert tableName="spells">
+            <column name="name" value="Метеорит"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="70"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="8"/>
+            <column name="flat_bonus" valueNumeric="5"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Вспышка"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="68"/>
+            <column name="element" value="LIGHT"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="6"/>
+            <column name="flat_bonus" valueNumeric="4"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Животворяший пузырь"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="72"/>
+            <column name="element" value="WATER"/>
+            <column name="damage_dice" value=""/>
+            <column name="dice_count" valueNumeric=""/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Каменный капкан"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="72"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="5"/>
+            <column name="flat_bonus" valueNumeric="10"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Стрела испипеления"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="72"/>
+            <column name="element" value="FIRE"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="5"/>
+            <column name="flat_bonus" valueNumeric="10"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Копье бога грома"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="85"/>
+            <column name="element" value="ELECTRICITY"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="5"/>
+            <column name="flat_bonus" valueNumeric="20"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Од"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="74"/>
+            <column name="element" value="LIGHT"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="6"/>
+            <column name="flat_bonus" valueNumeric="15"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Иерро"/>
+            <column name="tier" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="70"/>
+            <column name="element" value="DARK"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="5"/>
+            <column name="flat_bonus" valueNumeric="10"/>
+        </insert>
+
+        <!-- Tier 5 -->
+
+        <insert tableName="spells">
+            <column name="name" value="Водоворот"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="120"/>
+            <column name="element" value="WATER"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="10"/>
+            <column name="flat_bonus" valueNumeric="30"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Метеоритный дождь"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="120"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="9"/>
+            <column name="flat_bonus" valueNumeric="30"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Абсолютный ноль"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="140"/>
+            <column name="element" value="ICE"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="8"/>
+            <column name="flat_bonus" valueNumeric="30"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Ланса дель Релампаго"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="160"/>
+            <column name="element" value="ELECTRICITY"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="10"/>
+            <column name="flat_bonus" valueNumeric="60"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Аура неприкосновенности"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="110"/>
+            <column name="element" value="LIGHT"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="8"/>
+            <column name="flat_bonus" valueNumeric="20"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Приказ бесмертия"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="120"/>
+            <column name="element" value="NATURE"/>
+            <column name="damage_dice" value=""/>
+            <column name="dice_count" valueNumeric=""/>
+            <column name="flat_bonus" valueNumeric="0"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Пламя инферно"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="120"/>
+            <column name="element" value="FIRE"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="9"/>
+            <column name="flat_bonus" valueNumeric="20"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Взрыв"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="150"/>
+            <column name="element" value="FIRE"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="10"/>
+            <column name="flat_bonus" valueNumeric="60"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Подавление"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="120"/>
+            <column name="element" value="DARK"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="10"/>
+            <column name="flat_bonus" valueNumeric="20"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Шквал"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="130"/>
+            <column name="element" value="AIR"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="10"/>
+            <column name="flat_bonus" valueNumeric="35"/>
+        </insert>
+
+        <insert tableName="spells">
+            <column name="name" value="Призыв голема"/>
+            <column name="tier" valueNumeric="5"/>
+            <column name="mana_cost" valueNumeric="190"/>
+            <column name="element" value="EARTH"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="flat_bonus" valueNumeric="80"/>
         </insert>
 
     </changeSet>
