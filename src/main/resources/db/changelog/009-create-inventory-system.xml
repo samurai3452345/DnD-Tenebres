@@ -31,7 +31,12 @@
             <column name="required_strength" type="INTEGER" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
+
             <column name="damage_dice" type="VARCHAR(20)"/>
+
+            <column name="dice_count" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
             <column name="stat_budget" type="INTEGER" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
@@ -77,36 +82,5 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-    </changeSet>
-
-    <changeSet id="009-populate-item-templates" author="Sawaron">
-        <insert tableName="item_templates">
-            <column name="name" value="Ржавый меч"/>
-            <column name="type" value="WEAPON"/>
-            <column name="slot" value="MAIN_HAND"/>
-            <column name="rarity" value="COMMON"/>
-            <column name="damage_dice" value="1d6"/>
-        </insert>
-        <insert tableName="item_templates">
-            <column name="name" value="Кожаный доспех"/>
-            <column name="type" value="ARMOR"/>
-            <column name="slot" value="CHEST"/>
-            <column name="rarity" value="COMMON"/>
-            <column name="armor_type" value="LIGHT"/>
-            <column name="armor_class" valueNumeric="11"/>
-        </insert>
-        <insert tableName="item_templates">
-            <column name="name" value="Кровоцвет"/>
-            <column name="type" value="RESOURCE"/>
-            <column name="slot" value="NONE"/>
-            <column name="rarity" value="COMMON"/>
-        </insert>
-        <insert tableName="item_templates">
-            <column name="name" value="Кольцо Всевластия"/>
-            <column name="type" value="ARTIFACT"/>
-            <column name="slot" value="RING"/>
-            <column name="rarity" value="LEGENDARY"/>
-            <column name="stat_budget" valueNumeric="5"/>
-        </insert>
     </changeSet>
 </databaseChangeLog>

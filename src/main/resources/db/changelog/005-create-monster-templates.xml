@@ -35,6 +35,9 @@
             <column name="damage_dice" type="VARCHAR(20)">
                 <constraints nullable="false"/>
             </column>
+            <column name="dice_count" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
             <column name="damage_bonus" type="INTEGER" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
@@ -82,6 +85,7 @@
             <column name="xp_reward" valueNumeric="7"/>
             <column name="gold_reward" valueNumeric="2"/>
             <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Удар ржавым кинжалом"/>
             <!-- Остальным мобам колонки скиллов можно не писать, БД сама подставит дефолтные NONE и 0 -->
@@ -102,6 +106,7 @@
             <column name="xp_reward" valueNumeric="9"/>
             <column name="gold_reward" valueNumeric="4"/>
             <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Взмах мечем"/>
         </insert>
@@ -121,6 +126,7 @@
             <column name="xp_reward" valueNumeric="8"/>
             <column name="gold_reward" valueNumeric="3"/>
             <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Выстрел из лука"/>
         </insert>
@@ -140,6 +146,7 @@
             <column name="xp_reward" valueNumeric="10"/>
             <column name="gold_reward" valueNumeric="4"/>
             <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Огненный всплеск посоха"/>
         </insert>
@@ -159,6 +166,7 @@
             <column name="xp_reward" valueNumeric="10"/>
             <column name="gold_reward" valueNumeric="4"/>
             <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Взмах мечем"/>
         </insert>
@@ -178,6 +186,7 @@
             <column name="xp_reward" valueNumeric="15"/>
             <column name="gold_reward" valueNumeric="6"/>
             <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Взмах мечем"/>
         </insert>
@@ -197,6 +206,7 @@
             <column name="xp_reward" valueNumeric="10"/>
             <column name="gold_reward" valueNumeric="4"/>
             <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Взмах мечем"/>
         </insert>
@@ -216,6 +226,7 @@
             <column name="xp_reward" valueNumeric="50"/>
             <column name="gold_reward" valueNumeric="35"/>
             <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Взмах длинным мечем"/>
 
@@ -242,6 +253,7 @@
             <column name="xp_reward" valueNumeric="5"/>
             <column name="gold_reward" valueNumeric="0"/>
             <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="0"/>
             <column name="attack_name" value="Укус"/>
         </insert>
@@ -260,6 +272,7 @@
             <column name="xp_reward" valueNumeric="30"/>
             <column name="gold_reward" valueNumeric="10"/>
             <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="2"/>
             <column name="attack_name" value="Укус"/>
         </insert>
@@ -278,6 +291,7 @@
             <column name="xp_reward" valueNumeric="20"/>
             <column name="gold_reward" valueNumeric="9"/>
             <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
             <column name="damage_bonus" valueNumeric="3"/>
             <column name="attack_name" value="Удар кинжалом"/>
         </insert>

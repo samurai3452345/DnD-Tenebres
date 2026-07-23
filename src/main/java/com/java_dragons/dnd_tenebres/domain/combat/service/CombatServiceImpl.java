@@ -10,6 +10,7 @@ import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.combat.strategy.ItemPassiveStrategy;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.item.service.PotionService;
@@ -35,7 +36,6 @@ public class CombatServiceImpl implements CombatService {
     private final Map<MonsterSkill, MonsterSkillStrategy> monsterSkillStrategies;
     private final PotionService potionService;
 
-    // ВАЖНО: Добавлен аргумент List<MonsterSkillStrategy> monsterStrategies
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
                              List<ItemPassiveStrategy> itemStrategies,
@@ -101,12 +101,16 @@ public class CombatServiceImpl implements CombatService {
         if (weaponOpt.isPresent()) {
             ItemTemplate weaponTemplate = weaponOpt.get().getTemplate();
             rarityBonus = weaponTemplate.getRarity().getFlatModifier();
-            String[] diceParts = weaponTemplate.getDamageDice().toLowerCase().split("d");
-            int diceCount = Integer.parseInt(diceParts[0]);
-            int diceSides = Integer.parseInt(diceParts[1]);
 
-            if (isCrit) diceCount *= 2;
-            baseWeaponDamage = DiceRoller.roll(diceCount, diceSides);
+            DiceType diceType = weaponTemplate.getDamageDice();
+            int diceCount = weaponTemplate.getDiceCount();
+
+            if (diceType != null && diceCount > 0) {
+                if (isCrit) diceCount *= 2;
+                baseWeaponDamage = DiceRoller.roll(diceCount, diceType.getSides());
+            } else {
+                baseWeaponDamage = isCrit ? 2 : 1;
+            }
         } else {
             baseWeaponDamage = isCrit ? 2 : 1;
         }
@@ -122,7 +126,6 @@ public class CombatServiceImpl implements CombatService {
         }
 
         int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, playerDamageType, monster.getElements());
-        // Добавлен аргумент playerDamageType
         monster.takeDamage(finalDamage, playerDamageType);
 
         events.add(new CombatEvent(player.getName(), isCrit ? "CRIT_ATTACK" : "ATTACK", monster.getName(), finalDamage, "Нанесение урона"));

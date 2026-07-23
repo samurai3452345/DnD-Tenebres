@@ -15,7 +15,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="2"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -28,7 +27,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -41,7 +39,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="2"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -54,7 +51,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="2"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -67,7 +63,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -80,7 +75,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -93,7 +87,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -106,7 +99,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -119,7 +111,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
@@ -132,7 +123,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="ORICHALCUM"/>
         </insert>
@@ -145,7 +135,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="ORICHALCUM"/>
         </insert>
@@ -158,7 +147,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="ORICHALCUM"/>
         </insert>
@@ -171,7 +159,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -184,7 +171,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -197,7 +183,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="0"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -210,7 +195,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -223,7 +207,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -236,7 +219,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="5"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -249,7 +231,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="15"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -262,7 +243,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="15"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -275,7 +255,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="15"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="DRAGON_SCALES"/>
         </insert>
@@ -288,7 +267,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="4"/>
             <column name="passive_effect" value="LIGHTBRINGER"/>
         </insert>
@@ -301,7 +279,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="LIGHTBRINGER"/>
         </insert>
@@ -314,7 +291,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="5"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="LIGHTBRINGER"/>
         </insert>
@@ -327,7 +303,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="14"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="BERSERKER_RAGE"/>
         </insert>
@@ -340,7 +315,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="14"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="BERSERKER_RAGE"/>
         </insert>
@@ -353,7 +327,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="14"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="BERSERKER_RAGE"/>
         </insert>
@@ -366,7 +339,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="4"/>
             <column name="passive_effect" value="EXECUTIONER"/>
         </insert>
@@ -379,7 +351,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="EXECUTIONER"/>
         </insert>
@@ -392,7 +363,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="5"/>
             <column name="required_strength" value="10"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="EXECUTIONER"/>
         </insert>
@@ -405,7 +375,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="8"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="4"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -418,7 +387,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="8"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -431,7 +399,6 @@
             <column name="armor_type" value="LIGHT"/>
             <column name="armor_class" value="3"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -444,7 +411,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="4"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -457,7 +423,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -470,7 +435,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="5"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -483,7 +447,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="15"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="4"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -496,7 +459,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="15"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -509,7 +471,6 @@
             <column name="armor_type" value="HEAVY"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="15"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="SWARM_BREAKER"/>
         </insert>
@@ -522,7 +483,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="4"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="4"/>
             <column name="passive_effect" value="DARK_PACT"/>
         </insert>
@@ -535,7 +495,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="6"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="DARK_PACT"/>
         </insert>
@@ -548,7 +507,6 @@
             <column name="armor_type" value="MEDIUM"/>
             <column name="armor_class" value="5"/>
             <column name="required_strength" value="12"/>
-            <column name="damage_dice" value=""/>
             <column name="stat_budget" value="5"/>
             <column name="passive_effect" value="DARK_PACT"/>
         </insert>
