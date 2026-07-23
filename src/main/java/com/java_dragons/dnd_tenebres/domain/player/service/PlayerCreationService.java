@@ -1,8 +1,6 @@
 package com.java_dragons.dnd_tenebres.domain.player.service;
 
-
 import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculator;
-import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.entity.PlayerStats;
@@ -40,7 +38,7 @@ public class PlayerCreationService {
                 anyMatch(upgrade -> upgrade < 8 || upgrade > 15);
 
         if (hasInvalidUpgrade) {
-            throw new IllegalArgumentException("Характеристики должны быть от 8 до 15!");
+            throw new IllegalArgumentException();
         }
 
         int totalPointSpend = abilities.stream()
@@ -48,9 +46,8 @@ public class PlayerCreationService {
                 .sum();
 
         if(totalPointSpend != 27){
-            throw new IllegalArgumentException("Неверно распределены очки!: " + totalPointSpend + " а нужно 27!");
+            throw new IllegalArgumentException();
         }
-
 
         PlayerStats stats = new PlayerStats(
                 request.strength(),
@@ -61,12 +58,15 @@ public class PlayerCreationService {
                 request.charisma());
 
         int initialHp = progressionCalculator.getHeroBaseHp(1);
+        int initialMp = progressionCalculator.calculateMaxMp(1, request.intelligence());
 
         return Player.builder()
                 .name(request.name())
                 .stats(stats)
                 .maxHp(initialHp)
                 .currentHp(initialHp)
+                .maxMp(initialMp)
+                .currentMp(initialMp)
                 .build();
     }
 }

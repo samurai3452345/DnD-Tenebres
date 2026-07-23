@@ -57,9 +57,8 @@ public class Player {
     @Column(name = "current_mp")
     private int currentMp;
 
-    @Builder.Default
     @Column(name = "max_mp", nullable = false)
-    private int maxMp = 100;
+    private int maxMp;
 
     @Embedded
     private PlayerStats stats;
