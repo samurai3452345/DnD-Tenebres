@@ -14,6 +14,8 @@ import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.item.service.PotionService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
+import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
+import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,15 +32,20 @@ public class CombatServiceImpl implements CombatService {
 
     private final DamageCalculator damageCalculator;
     private final Map<ItemPassive, ItemPassiveStrategy> passiveStrategies;
+    private final Map<MonsterSkill, MonsterSkillStrategy> monsterSkillStrategies;
     private final PotionService potionService;
 
+    // ВАЖНО: Добавлен аргумент List<MonsterSkillStrategy> monsterStrategies
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
-                             List<ItemPassiveStrategy> strategies,
+                             List<ItemPassiveStrategy> itemStrategies,
+                             List<MonsterSkillStrategy> monsterStrategies,
                              PotionService potionService) {
         this.damageCalculator = damageCalculator;
-        this.passiveStrategies = strategies.stream()
+        this.passiveStrategies = itemStrategies.stream()
                 .collect(Collectors.toMap(ItemPassiveStrategy::getTargetPassive, s -> s));
+        this.monsterSkillStrategies = monsterStrategies.stream()
+                .collect(Collectors.toMap(MonsterSkillStrategy::getTargetSkill, s -> s));
         this.potionService = potionService;
     }
 
@@ -115,7 +122,8 @@ public class CombatServiceImpl implements CombatService {
         }
 
         int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, playerDamageType, monster.getElements());
-        monster.takeDamage(finalDamage);
+        // Добавлен аргумент playerDamageType
+        monster.takeDamage(finalDamage, playerDamageType);
 
         events.add(new CombatEvent(player.getName(), isCrit ? "CRIT_ATTACK" : "ATTACK", monster.getName(), finalDamage, "Нанесение урона"));
     }
@@ -148,7 +156,8 @@ public class CombatServiceImpl implements CombatService {
             return;
         }
 
-        var attackResult = monster.performAttack(round);
+        MonsterSkillStrategy currentSkillStrategy = monsterSkillStrategies.get(monster.getSpecialSkill());
+        var attackResult = monster.performAttack(round, currentSkillStrategy);
         int totalMonsterDamage = attackResult.totalDamage();
         DamageType monsterDamageType = DamageType.PHYSICAL;
 

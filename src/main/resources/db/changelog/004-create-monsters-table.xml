@@ -45,6 +45,13 @@
             <column name="attack_name" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="special_skill" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="skill_frequency" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -61,6 +68,21 @@
         <addUniqueConstraint tableName="monster_elements"
                              columnNames="monster_id, element"
                              constraintName="uq_monster_id_element"/>
+    </changeSet>
+
+    <changeSet id="20260722-create-monster-resistances" author="Sawaron">
+        <createTable tableName="monster_resistances">
+            <column name="monster_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_monster_resistances_monster" referencedTableName="monsters" referencedColumnNames="id"/>
+            </column>
+            <column name="element" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="monster_resistances"
+                             columnNames="monster_id, element"
+                             constraintName="uq_monster_id_resistance"/>
     </changeSet>
 
 </databaseChangeLog>

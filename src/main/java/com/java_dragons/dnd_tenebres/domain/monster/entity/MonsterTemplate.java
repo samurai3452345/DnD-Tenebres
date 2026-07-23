@@ -1,16 +1,14 @@
 package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
-
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
+import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
-
-
 
 @Getter
 @Entity
@@ -46,7 +44,7 @@ public class MonsterTemplate {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "damage_dice", nullable = false)
-    private DiceType damageDice; // Твой Enum, где лежат D4, D6 и т.д.
+    private DiceType damageDice;
 
     @Column(name = "damage_bonus", nullable = false)
     private int damageBonus;
@@ -54,10 +52,22 @@ public class MonsterTemplate {
     @Column(name = "attack_name", nullable = false)
     private String attackName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "special_skill", nullable = false)
+    private MonsterSkill specialSkill = MonsterSkill.NONE;
 
-    @ElementCollection(fetch = FetchType.EAGER) // EAGER здесь допустим, так как стихий мало (1-3)
+    @Column(name = "skill_frequency", nullable = false)
+    private int skillFrequency = 0;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "template_elements", joinColumns = @JoinColumn(name = "template_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
     private Set<DamageType> elements = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "template_resistances", joinColumns = @JoinColumn(name = "template_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "element")
+    private Set<DamageType> resistances = new HashSet<>();
 }
