@@ -2,13 +2,16 @@ package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
+import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
 import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -119,5 +122,13 @@ public class Monster {
         int diceDamage = DiceRoller.roll(this.diceCount, this.damageDice.getSides());
         int totalDamage = diceDamage + this.damageBonus;
         return new MonsterAttackResult(this.attackName, totalDamage);
+    }
+    @Transient
+    private List<ActiveEffect> combatEffects = new ArrayList<>();
+    public void addCombatEffect(ActiveEffect effect) {
+        this.combatEffects.add(effect);
+    }
+    public List<ActiveEffect> getCombatEffects() {
+        return this.combatEffects;
     }
 }
