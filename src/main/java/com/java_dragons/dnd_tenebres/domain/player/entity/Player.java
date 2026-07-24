@@ -288,13 +288,13 @@ public class Player {
                 int oldHp = this.currentHp;
                 this.heal(effect.getPower());
                 int healed = this.currentHp - oldHp;
-                effect.decrementDuration();
-
                 events.add(new CombatEvent(this.name, "EFFECT_HEAL", this.name, healed, "Регенерация"));
+            }
 
-                if (effect.getDuration() <= 0) {
-                    iterator.remove();
-                }
+            effect.decrementDuration();
+
+            if (effect.getDuration() <= 0) {
+                iterator.remove();
             }
         }
     }

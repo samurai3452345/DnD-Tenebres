@@ -10,6 +10,9 @@ import com.java_dragons.dnd_tenebres.domain.combat.model.DamageCalculator;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.combat.repository.SpellRepository;
 import com.java_dragons.dnd_tenebres.domain.combat.strategy.ItemPassiveStrategy;
+import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
+import com.java_dragons.dnd_tenebres.domain.effect.model.EffectTarget;
+import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +65,14 @@ public class CombatServiceImpl implements CombatService {
     public CombatReport executeTurn(Player player, Monster monster, int aliveEnemyCount, int round, CombatAction action, String actionTargetName) {
         List<CombatEvent> events = new ArrayList<>();
 
+        // 1. Процессим эффекты перед ходом (Регенерация, Урон от кровотечения)
         player.processTurnEffects(events);
+        processMonsterTurnEffects(monster, events);
+
+        if (monster.isDead()) {
+            events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, "Монстр погиб от периодического урона!"));
+            return new CombatReport(round, events, true, false);
+        }
 
         switch (action) {
             case ATTACK -> handlePlayerAttack(player, monster, aliveEnemyCount, events);
@@ -96,30 +107,26 @@ public class CombatServiceImpl implements CombatService {
 
         PlayerItem weapon = magicWeaponOpt.get();
         int maxTier = weapon.getTemplate().getRarity().getTierIndex();
-        MagicWeaponEffect effect = weapon.getMagicEffect();
+        MagicWeaponEffect weaponEffect = weapon.getMagicEffect();
 
         Spell spellToCast;
 
-        if (effect == MagicWeaponEffect.CHAOS) {
+        if (weaponEffect == MagicWeaponEffect.CHAOS) {
             List<Spell> chaosSpells = spellRepository.findByTier(maxTier);
-            if (chaosSpells.isEmpty()) {
-                events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Магия Хаоса не нашла заклинаний"));
-                return;
-            }
+            if (chaosSpells.isEmpty()) return;
             spellToCast = chaosSpells.get(ThreadLocalRandom.current().nextInt(chaosSpells.size()));
+            events.add(new CombatEvent(player.getName(), "CHAOS_PROC", monster.getName(), 0, "Магия Хаоса выбрала: " + spellToCast.getName()));
         } else {
             Optional<Spell> spellOpt = spellRepository.findByName(spellName);
             if (spellOpt.isEmpty() || spellOpt.get().getTier() > maxTier) {
-                events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Заклинание недоступно для этого оружия"));
+                events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Заклинание недоступно"));
                 return;
             }
             spellToCast = spellOpt.get();
         }
 
         int manaCost = spellToCast.getManaCost();
-        if (effect == MagicWeaponEffect.MANA_DISCOUNT) {
-            manaCost = (int) (manaCost * 0.8);
-        }
+        if (weaponEffect == MagicWeaponEffect.MANA_DISCOUNT) manaCost = (int) (manaCost * 0.8);
 
         if (!player.spendMp(manaCost)) {
             events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Недостаточно маны"));
@@ -129,48 +136,170 @@ public class CombatServiceImpl implements CombatService {
         int d20 = DiceRoller.rollD20();
         int intModifier = StatMathUtils.calculateModifier(player.getTotalIntelligence());
         int attackRoll = d20 + intModifier;
+        if (weaponEffect == MagicWeaponEffect.HOMING) attackRoll += 5;
 
-        if (effect == MagicWeaponEffect.HOMING) {
-            attackRoll += 5;
-        }
-
-        if (d20 == 1) {
-            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Критическая осечка магии"));
-            return;
-        }
-
-        if (d20 != 20 && attackRoll < monster.getArmorClass()) {
-            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Заклинание прошло вскользь"));
+        if (d20 == 1 || (d20 != 20 && attackRoll < monster.getArmorClass())) {
+            events.add(new CombatEvent(player.getName(), "MISS", monster.getName(), 0, "Заклинание ушло в молоко"));
             return;
         }
 
         boolean isCrit = (d20 == 20);
-        int diceCount = spellToCast.getDiceCount();
-        if (isCrit) diceCount *= 2;
+        int finalDamage = calculateSpellDamage(spellToCast, player, monster, weapon, isCrit, events);
 
-        int baseDamage = DiceRoller.roll(diceCount, spellToCast.getDamageDice().getSides()) + spellToCast.getFlatBonus();
-        int totalDamage = baseDamage + intModifier;
+        if (finalDamage > 0) {
+            monster.takeDamage(finalDamage, spellToCast.getElement());
+            events.add(new CombatEvent(player.getName(), isCrit ? "CRIT_SPELL" : "CAST_SPELL", monster.getName(), finalDamage, spellToCast.getName()));
+        }
+
+        applySpellEffect(spellToCast, player, monster, finalDamage, events);
+    }
+
+    private int calculateSpellDamage(Spell spell, Player player, Monster monster, PlayerItem weapon, boolean isCrit, List<CombatEvent> events) {
+        if (spell.getDamageDice() == null || spell.getDiceCount() == 0) return 0;
+
+        int diceCount = isCrit ? spell.getDiceCount() * 2 : spell.getDiceCount();
+        int baseDamage = DiceRoller.roll(diceCount, spell.getDamageDice().getSides()) + spell.getFlatBonus();
+        int rarityBonus = weapon.getTemplate().getRarity().getFlatModifier();
+        int totalDamage = baseDamage + rarityBonus + StatMathUtils.calculateModifier(player.getTotalIntelligence());
 
         double multiplier = 1.0;
-        if (effect == MagicWeaponEffect.SPELL_POWER) multiplier += 0.10;
-        if (effect == MagicWeaponEffect.ELEMENTAL_MASTERY && spellToCast.getElement() == weapon.getMagicEffectElement()) multiplier += 0.20;
-        if (effect == MagicWeaponEffect.CHAOS) multiplier += 0.40;
+        if (weapon.getMagicEffect() == MagicWeaponEffect.SPELL_POWER) multiplier += 0.10;
+        if (weapon.getMagicEffect() == MagicWeaponEffect.ELEMENTAL_MASTERY && spell.getElement() == weapon.getMagicEffectElement()) multiplier += 0.20;
+        if (weapon.getMagicEffect() == MagicWeaponEffect.CHAOS) multiplier += 0.40;
 
-        totalDamage = (int) (totalDamage * multiplier);
-        DamageType damageType = spellToCast.getElement();
+        if (monster.getCombatEffects().stream().anyMatch(e -> e.getType() == EffectType.LIGHT_MARK)) {
+            multiplier += 0.20;
+            events.add(new CombatEvent(monster.getName(), "EFFECT_TRIGGER", monster.getName(), 0, "Метка Света увеличивает урон!"));
+        }
 
-        for (ItemPassive passive : player.getActivePassives()) {
-            if (passiveStrategies.containsKey(passive)) {
-                totalDamage = passiveStrategies.get(passive)
-                        .modifyOutgoingDamage(player, monster, aliveEnemyCount, damageType, totalDamage, events);
+        return damageCalculator.calculateFinalDamage((int) (totalDamage * multiplier), spell.getElement(), monster.getElements());
+    }
+
+    private void applySpellEffect(Spell spell, Player player, Monster monster, int damageDealt, List<CombatEvent> events) {
+        if (spell.getEffectType() == null || spell.getEffectType() == EffectType.NONE) return;
+
+        if (spell.getEffectType() == EffectType.LIFESTEAL) {
+            int healAmount = damageDealt / 2;
+            player.heal(healAmount);
+            events.add(new CombatEvent(player.getName(), "HEAL", player.getName(), healAmount, "Истощение (Вампиризм)"));
+            return;
+        }
+
+        ActiveEffect newEffect = new ActiveEffect(spell.getEffectType(), spell.getEffectDuration(), spell.getEffectPower());
+
+        if (spell.getEffectTarget() == EffectTarget.ENEMY) {
+            monster.addCombatEffect(newEffect);
+            events.add(new CombatEvent(player.getName(), "APPLY_DEBUFF", monster.getName(), spell.getEffectPower(), spell.getEffectType().name()));
+        } else if (spell.getEffectTarget() == EffectTarget.CASTER) {
+            player.addEffect(newEffect);
+            events.add(new CombatEvent(player.getName(), "APPLY_BUFF", player.getName(), spell.getEffectPower(), spell.getEffectType().name()));
+        }
+    }
+
+    private void handleEnemyTurn(Player player, Monster monster, int round, List<CombatEvent> events) {
+        boolean isStunned = monster.getCombatEffects().stream()
+                .anyMatch(e -> e.getType() == EffectType.FREEZE || e.getType() == EffectType.SUPPRESSION || e.getType() == EffectType.BLIND);
+
+        if (isStunned) {
+            events.add(new CombatEvent(monster.getName(), "SKIP_TURN", player.getName(), 0, "Монстр пропускает ход из-за эффекта контроля"));
+            return;
+        }
+
+        int playerAc = player.getArmorClass();
+
+        Optional<ActiveEffect> shieldOpt = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.PROTECTION_UP).findFirst();
+        if (shieldOpt.isPresent()) playerAc += shieldOpt.get().getPower();
+
+        int monsterD20 = DiceRoller.rollD20();
+
+        if (monster.getCombatEffects().stream().anyMatch(e -> e.getType() == EffectType.SHOCK)) {
+            monsterD20 /= 2;
+            events.add(new CombatEvent(monster.getName(), "EFFECT_TRIGGER", monster.getName(), 0, "Шок снижает точность врага"));
+        }
+
+        Optional<ActiveEffect> frostOpt = monster.getCombatEffects().stream().filter(e -> e.getType() == EffectType.FROSTBITE).findFirst();
+        if (frostOpt.isPresent()) {
+            monsterD20 -= frostOpt.get().getPower();
+            events.add(new CombatEvent(monster.getName(), "EFFECT_TRIGGER", monster.getName(), 0, "Обморожение сковывает движения"));
+        }
+
+        if ((monsterD20 + monster.getLevel()) < playerAc) {
+            events.add(new CombatEvent(monster.getName(), "MISS", player.getName(), 0, "Промах"));
+            return;
+        }
+
+        var attackResult = monster.performAttack(round, monsterSkillStrategies.get(monster.getSpecialSkill()));
+        int damage = attackResult.totalDamage();
+
+        Optional<ActiveEffect> absShield = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.ABSOLUTE_SHIELD).findFirst();
+        if (absShield.isPresent()) {
+            events.add(new CombatEvent(player.getName(), "BLOCK", monster.getName(), damage, "Абсолютный щит поглотил урон!"));
+            absShield.get().decrementDuration();
+            if (absShield.get().getDuration() <= 0) player.removeEffect(EffectType.ABSOLUTE_SHIELD);
+            return;
+        }
+
+        if (player.hasEffect(EffectType.DAMAGE_REDUCTION)) {
+            int originalDamage = damage;
+            damage = (int) (damage * 0.1);
+            events.add(new CombatEvent(player.getName(), "EFFECT_TRIGGER", monster.getName(), originalDamage - damage, "Аура Неприкосновенности поглощает 90% урона!"));
+        }
+
+        Optional<ActiveEffect> shieldHpOpt = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.SHIELD_HP).findFirst();
+        if (shieldHpOpt.isPresent()) {
+            ActiveEffect shield = shieldHpOpt.get();
+            if (damage <= shield.getPower()) {
+                shield.reducePower(damage); // Тот самый наш бизнес-метод!
+                events.add(new CombatEvent(player.getName(), "BLOCK", monster.getName(), damage, "Магический щит принял удар"));
+                damage = 0;
+            } else {
+                int blocked = shield.getPower();
+                damage -= blocked;
+                shield.reducePower(blocked);
+                player.removeEffect(EffectType.SHIELD_HP);
+                events.add(new CombatEvent(player.getName(), "BLOCK", monster.getName(), blocked, "Магический щит разбит, но часть урона поглощена"));
             }
         }
 
-        int finalDamage = damageCalculator.calculateFinalDamage(totalDamage, damageType, monster.getElements());
-        monster.takeDamage(finalDamage, damageType);
+        Optional<ActiveEffect> golem = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.GOLEM).findFirst();
+        if (golem.isPresent() && damage > 0) {
+            ActiveEffect g = golem.get();
+            events.add(new CombatEvent(monster.getName(), "ATTACK_GOLEM", "Голем", damage, "Удар пришелся по голему"));
 
-        String eventType = isCrit ? "CRIT_SPELL" : "CAST_SPELL";
-        events.add(new CombatEvent(player.getName(), eventType, monster.getName(), finalDamage, spellToCast.getName()));
+            g.reducePower(damage);
+
+            if (g.getPower() <= 0) {
+                player.removeEffect(EffectType.GOLEM);
+                events.add(new CombatEvent("Голем", "DEATH", "Голем", 0, "Голем рассыпался"));
+            }
+            return;
+        }
+
+        if (damage > 0) {
+            player.takeDamage(damage);
+            events.add(new CombatEvent(monster.getName(), "ATTACK", player.getName(), damage, attackResult.attackName()));
+
+            if (player.hasEffect(EffectType.THORNS)) {
+                int reflectDamage = damage / 2;
+                if (reflectDamage > 0) {
+                    monster.takeDamage(reflectDamage, DamageType.NATURE);
+                    events.add(new CombatEvent(player.getName(), "REFLECT", monster.getName(), reflectDamage, "Шипы возвращают урон!"));
+                }
+            }
+        }
+    }
+
+    private void processMonsterTurnEffects(Monster monster, List<CombatEvent> events) {
+        Iterator<ActiveEffect> iterator = monster.getCombatEffects().iterator();
+        while (iterator.hasNext()) {
+            ActiveEffect effect = iterator.next();
+            if (effect.getType() == EffectType.BURN || effect.getType() == EffectType.BLEEDING) {
+                monster.takeDamage(effect.getPower(), DamageType.FIRE);
+                events.add(new CombatEvent(monster.getName(), "TICK_DAMAGE", monster.getName(), effect.getPower(), "Урон от статуса " + effect.getType()));
+            }
+            effect.decrementDuration();
+            if (effect.getDuration() <= 0) iterator.remove();
+        }
     }
 
     private void handlePlayerAttack(Player player, Monster monster, int aliveEnemyCount, List<CombatEvent> events) {
@@ -242,31 +371,5 @@ public class CombatServiceImpl implements CombatService {
         } else {
             events.add(new CombatEvent(player.getName(), "FAIL", player.getName(), 0, "Предмет не найден"));
         }
-    }
-
-    private void handleEnemyTurn(Player player, Monster monster, int round, List<CombatEvent> events) {
-        int playerAc = player.getArmorClass();
-        int monsterD20 = DiceRoller.rollD20();
-        int monsterAttackRoll = monsterD20 + monster.getLevel();
-
-        if (monsterAttackRoll < playerAc) {
-            events.add(new CombatEvent(monster.getName(), "MISS", player.getName(), 0, "Промах"));
-            return;
-        }
-
-        MonsterSkillStrategy currentSkillStrategy = monsterSkillStrategies.get(monster.getSpecialSkill());
-        var attackResult = monster.performAttack(round, currentSkillStrategy);
-        int totalMonsterDamage = attackResult.totalDamage();
-        DamageType monsterDamageType = DamageType.PHYSICAL;
-
-        for (ItemPassive passive : player.getActivePassives()) {
-            if (passiveStrategies.containsKey(passive)) {
-                totalMonsterDamage = passiveStrategies.get(passive)
-                        .modifyIncomingDamage(player, monster, monsterDamageType, totalMonsterDamage, events);
-            }
-        }
-
-        player.takeDamage(totalMonsterDamage);
-        events.add(new CombatEvent(monster.getName(), "ATTACK", player.getName(), totalMonsterDamage, attackResult.attackName()));
     }
 }

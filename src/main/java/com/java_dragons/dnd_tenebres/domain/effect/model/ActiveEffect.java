@@ -29,4 +29,11 @@ public class ActiveEffect {
             this.duration--;
         }
     }
+
+    public void reducePower(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Урон по эффекту не может быть отрицательным!");
+        }
+        this.power = Math.max(0, this.power - amount);
+    }
 }
