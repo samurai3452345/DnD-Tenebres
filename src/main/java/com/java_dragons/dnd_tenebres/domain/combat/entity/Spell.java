@@ -1,6 +1,8 @@
 package com.java_dragons.dnd_tenebres.domain.combat.entity;
 
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
+import com.java_dragons.dnd_tenebres.domain.effect.model.EffectTarget;
+import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,4 +45,15 @@ public class Spell {
 
     @Column(name = "flat_bonus", nullable = false)
     private int flatBonus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "effect_type", nullable = false)
+    private EffectType effectType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "effect_target", nullable = false)
+    private EffectTarget effectTarget;
+    @Column(name = "effect_duration", nullable = false)
+    private int effectDuration;
+    @Column(name = "effect_power", nullable = false)
+    private int effectPower;
 }

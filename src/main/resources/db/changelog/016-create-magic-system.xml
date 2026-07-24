@@ -42,6 +42,18 @@
             <column name="flat_bonus" type="INTEGER" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
+            <column name="effect_type" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="effect_target" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="effect_duration" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="effect_power" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <!-- Тестовые заклинания -->

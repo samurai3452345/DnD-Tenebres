@@ -21,8 +21,13 @@ public enum EffectType {
     WELL_RESTED(EffectCategory.BUFF), // бафф от COZY_TAVERN +10 к макс хп
 
     BERSERKER_RAGE(EffectCategory.NEUTRAL), // увеличивается урон +20% но уменьшается класс защиты АС -15%
-    BLOOD_CONTRACT(EffectCategory.NEUTRAL) // увеличивается урон +20% но накладывается кровотечение
-    ;
+    BLOOD_CONTRACT(EffectCategory.NEUTRAL), // увеличивается урон +20% но накладывается кровотечение
+    BURN(EffectCategory.DEBUFF),
+    FROSTBITE(EffectCategory.DEBUFF),
+    LIGHT_MARK(EffectCategory.BUFF),
+    ABSOLUT_SHIELD(EffectCategory.BUFF),
+    GOLEM(EffectCategory.NEUTRAL),
+    NONE(EffectCategory.NEUTRAL);
 
     private final EffectCategory effectCategory;
 
