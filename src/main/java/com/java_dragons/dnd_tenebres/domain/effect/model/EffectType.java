@@ -9,6 +9,16 @@ public enum EffectType {
     PROTECTION_REDUCED(EffectCategory.DEBUFF), // защита: АС уменьшается -20%
     STUN(EffectCategory.NEUTRAL), // оглушение 1 ход пропускается
     MAGIC_SICKNESS(EffectCategory.DEBUFF), // Дебафф от локации ANTI_MAGIC_FIELD стоимость закленаний x2 маны
+    BURN(EffectCategory.DEBUFF),
+    FROSTBITE(EffectCategory.DEBUFF),
+    BLIND(EffectCategory.DEBUFF),  // Ослепление (пропуск хода)
+    THORNS(EffectCategory.DEBUFF),    // Отражение урона
+    SUPPRESSION(EffectCategory.DEBUFF),       // Подавление (пропуск хода)
+    DAMAGE_REDUCTION(EffectCategory.DEBUFF),  // Снижение входящего урона в %
+    SHOCK(EffectCategory.DEBUFF),             // Штраф к d20 врага
+    FREEZE(EffectCategory.DEBUFF),  // Заморозка (пропуск хода)
+
+
 
     HEAL_INSTANT(EffectCategory.BUFF),
     MANA_RESTORE(EffectCategory.BUFF),
@@ -19,13 +29,15 @@ public enum EffectType {
     DAMAGE_UP(EffectCategory.BUFF), // увеличивает урон на +10%
     SHADOW_DEATH(EffectCategory.BUFF), //после получения смертельного урона выживаеш с 1 хп
     WELL_RESTED(EffectCategory.BUFF), // бафф от COZY_TAVERN +10 к макс хп
+    ABSOLUTE_SHIELD(EffectCategory.BUFF),
+    LIGHT_MARK(EffectCategory.BUFF),
+    LIFESTEAL(EffectCategory.BUFF),  // Восстановление ХП от урона
+    SHIELD_HP(EffectCategory.BUFF), // Поглощение урона (Иерро)
+
+
 
     BERSERKER_RAGE(EffectCategory.NEUTRAL), // увеличивается урон +20% но уменьшается класс защиты АС -15%
     BLOOD_CONTRACT(EffectCategory.NEUTRAL), // увеличивается урон +20% но накладывается кровотечение
-    BURN(EffectCategory.DEBUFF),
-    FROSTBITE(EffectCategory.DEBUFF),
-    LIGHT_MARK(EffectCategory.BUFF),
-    ABSOLUT_SHIELD(EffectCategory.BUFF),
     GOLEM(EffectCategory.NEUTRAL),
     NONE(EffectCategory.NEUTRAL);
 

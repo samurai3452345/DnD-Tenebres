@@ -56,16 +56,19 @@
             </column>
         </createTable>
 
-        <!-- Тестовые заклинания -->
         <!-- Tier 1 -->
         <insert tableName="spells">
             <column name="name" value="Искра"/>
             <column name="tier" valueNumeric="1"/>
-            <column name="mana_cost" valueNumeric="4"/>
+            <column name="mana_cost" valueNumeric="5"/>
             <column name="element" value="FIRE"/>
-            <column name="damage_dice" value="D6"/>
+            <column name="damage_dice" value="D4"/>
             <column name="dice_count" valueNumeric="1"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="BURN"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="2"/>
+            <column name="effect_power" valueNumeric="2"/>
         </insert>
 
         <insert tableName="spells">
@@ -89,7 +92,7 @@
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Леденой болт"/>
+            <column name="name" value="Ледяной осколок"/>
             <column name="tier" valueNumeric="1"/>
             <column name="mana_cost" valueNumeric="5"/>
             <column name="element" value="ICE"/>
@@ -99,7 +102,7 @@
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Травеной хлыст"/>
+            <column name="name" value="Травяной хлыст"/>
             <column name="tier" valueNumeric="1"/>
             <column name="mana_cost" valueNumeric="3"/>
             <column name="element" value="NATURE"/>
@@ -135,19 +138,25 @@
             <column name="tier" valueNumeric="2"/>
             <column name="mana_cost" valueNumeric="16"/>
             <column name="element" value="EARTH"/>
-            <column name="damage_dice" value=""/>
-            <column name="dice_count" valueNumeric=""/>
-            <column name="flat_bonus" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="effect_type" value="PROTECTION_UP"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="4"/>
+            <column name="effect_power" valueNumeric="3"/>
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Поджег"/>
+            <column name="name" value="Поджог"/>
             <column name="tier" valueNumeric="2"/>
             <column name="mana_cost" valueNumeric="15"/>
             <column name="element" value="EARTH"/>
             <column name="damage_dice" value="D6"/>
             <column name="dice_count" valueNumeric="1"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="BURN"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="2"/>
+            <column name="effect_power" valueNumeric="4"/>
         </insert>
 
         <insert tableName="spells">
@@ -158,6 +167,10 @@
             <column name="damage_dice" value="D4"/>
             <column name="dice_count" valueNumeric="1"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="FROSTBITE"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="2"/>
+            <column name="effect_power" valueNumeric="3"/>
         </insert>
 
         <insert tableName="spells">
@@ -168,6 +181,10 @@
             <column name="damage_dice" value="D10"/>
             <column name="dice_count" valueNumeric="1"/>
             <column name="flat_bonus" valueNumeric="3"/>
+            <column name="effect_type" value="SHOCK"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="2"/>
+            <column name="effect_power" valueNumeric="40"/>
         </insert>
 
 
@@ -181,6 +198,10 @@
             <column name="damage_dice" value="D6"/>
             <column name="dice_count" valueNumeric="6"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="BURN"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="4"/>
         </insert>
 
         <insert tableName="spells">
@@ -201,20 +222,28 @@
             <column name="damage_dice" value="D10"/>
             <column name="dice_count" valueNumeric="2"/>
             <column name="flat_bonus" valueNumeric="10"/>
+            <column name="effect_type" value="BLEEDING"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="4"/>
+            <column name="effect_power" valueNumeric="3"/>
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Путы лазы"/>
+            <column name="name" value="Шипы"/>
             <column name="tier" valueNumeric="3"/>
             <column name="mana_cost" valueNumeric="36"/>
             <column name="element" value="NATURE"/>
             <column name="damage_dice" value="D4"/>
             <column name="dice_count" valueNumeric="4"/>
             <column name="flat_bonus" valueNumeric="2"/>
+            <column name="effect_type" value="THORNS"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="50"/>
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Шквал леденых шипов"/>
+            <column name="name" value="Шквал ледяных шипов"/>
             <column name="tier" valueNumeric="3"/>
             <column name="mana_cost" valueNumeric="36"/>
             <column name="element" value="ICE"/>
@@ -231,16 +260,24 @@
             <column name="damage_dice" value="D4"/>
             <column name="dice_count" valueNumeric="3"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="LIGHT_MARK"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="20"/>
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Теневой шип"/>
+            <column name="name" value="Истощение"/>
             <column name="tier" valueNumeric="3"/>
             <column name="mana_cost" valueNumeric="36"/>
             <column name="element" value="DARK"/>
             <column name="damage_dice" value="D8"/>
             <column name="dice_count" valueNumeric="5"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="LIFESTEAL"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="0"/>
+            <column name="effect_power" valueNumeric="50"/>
         </insert>
 
         <!-- Tier 4 -->
@@ -262,16 +299,23 @@
             <column name="damage_dice" value="D10"/>
             <column name="dice_count" valueNumeric="6"/>
             <column name="flat_bonus" valueNumeric="4"/>
+            <column name="effect_type" value="BLIND"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="1"/>
+            <column name="effect_power" valueNumeric="0"/>
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Животворяший пузырь"/>
+            <column name="name" value="Животворящий пузырь"/>
             <column name="tier" valueNumeric="4"/>
             <column name="mana_cost" valueNumeric="72"/>
             <column name="element" value="WATER"/>
-            <column name="damage_dice" value=""/>
-            <column name="dice_count" valueNumeric=""/>
+            <column name="dice_count" valueNumeric="0"/>
             <column name="flat_bonus" valueNumeric="0"/>
+            <column name="effect_type" value="REGENERATION"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="25"/>
         </insert>
 
         <insert tableName="spells">
@@ -285,13 +329,17 @@
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Стрела испипеления"/>
+            <column name="name" value="Стрела испепеления"/>
             <column name="tier" valueNumeric="4"/>
             <column name="mana_cost" valueNumeric="72"/>
             <column name="element" value="FIRE"/>
             <column name="damage_dice" value="D10"/>
             <column name="dice_count" valueNumeric="5"/>
             <column name="flat_bonus" valueNumeric="10"/>
+            <column name="effect_type" value="BURN"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="8"/>
         </insert>
 
         <insert tableName="spells">
@@ -302,6 +350,10 @@
             <column name="damage_dice" value="D12"/>
             <column name="dice_count" valueNumeric="5"/>
             <column name="flat_bonus" valueNumeric="20"/>
+            <column name="effect_type" value="SHOCK"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="2"/>
+            <column name="effect_power" valueNumeric="50"/>
         </insert>
 
         <insert tableName="spells">
@@ -322,6 +374,10 @@
             <column name="damage_dice" value="D6"/>
             <column name="dice_count" valueNumeric="5"/>
             <column name="flat_bonus" valueNumeric="10"/>
+            <column name="effect_type" value="SHIELD_HP"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="40"/>
         </insert>
 
         <!-- Tier 5 -->
@@ -354,6 +410,10 @@
             <column name="damage_dice" value="D10"/>
             <column name="dice_count" valueNumeric="8"/>
             <column name="flat_bonus" valueNumeric="30"/>
+            <column name="effect_type" value="FREEZE"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="0"/>
         </insert>
 
         <insert tableName="spells">
@@ -364,6 +424,10 @@
             <column name="damage_dice" value="D12"/>
             <column name="dice_count" valueNumeric="10"/>
             <column name="flat_bonus" valueNumeric="60"/>
+            <column name="effect_type" value="SHOCK"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="60"/>
         </insert>
 
         <insert tableName="spells">
@@ -374,36 +438,47 @@
             <column name="damage_dice" value="D10"/>
             <column name="dice_count" valueNumeric="8"/>
             <column name="flat_bonus" valueNumeric="20"/>
+            <column name="effect_type" value="DAMAGE_REDUCTION"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="2"/>
+            <column name="effect_power" valueNumeric="90"/>
         </insert>
 
         <insert tableName="spells">
-            <column name="name" value="Приказ бесмертия"/>
+            <column name="name" value="Приказ бессмертия"/>
             <column name="tier" valueNumeric="5"/>
             <column name="mana_cost" valueNumeric="120"/>
             <column name="element" value="NATURE"/>
-            <column name="damage_dice" value=""/>
-            <column name="dice_count" valueNumeric=""/>
-            <column name="flat_bonus" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="effect_type" value="ABSOLUTE_SHIELD"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="1"/>
+            <column name="effect_power" valueNumeric="0"/>
         </insert>
 
         <insert tableName="spells">
             <column name="name" value="Пламя инферно"/>
             <column name="tier" valueNumeric="5"/>
-            <column name="mana_cost" valueNumeric="120"/>
+            <column name="mana_cost" valueNumeric="130"/>
             <column name="element" value="FIRE"/>
             <column name="damage_dice" value="D12"/>
-            <column name="dice_count" valueNumeric="9"/>
+            <column name="dice_count" valueNumeric="8"/>
             <column name="flat_bonus" valueNumeric="20"/>
+            <column name="effect_type" value="BURN"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="5"/>
+            <column name="effect_power" valueNumeric="12"/>
         </insert>
 
         <insert tableName="spells">
             <column name="name" value="Взрыв"/>
             <column name="tier" valueNumeric="5"/>
-            <column name="mana_cost" valueNumeric="150"/>
+            <column name="mana_cost" valueNumeric="160"/>
             <column name="element" value="FIRE"/>
             <column name="damage_dice" value="D12"/>
             <column name="dice_count" valueNumeric="10"/>
-            <column name="flat_bonus" valueNumeric="60"/>
+            <column name="flat_bonus" valueNumeric="70"/>
+
         </insert>
 
         <insert tableName="spells">
@@ -414,6 +489,10 @@
             <column name="damage_dice" value="D8"/>
             <column name="dice_count" valueNumeric="10"/>
             <column name="flat_bonus" valueNumeric="20"/>
+            <column name="effect_type" value="SUPPRESSION"/>
+            <column name="effect_target" value="ENEMY"/>
+            <column name="effect_duration" valueNumeric="3"/>
+            <column name="effect_power" valueNumeric="0"/>
         </insert>
 
         <insert tableName="spells">
@@ -434,6 +513,10 @@
             <column name="damage_dice" value="D12"/>
             <column name="dice_count" valueNumeric="1"/>
             <column name="flat_bonus" valueNumeric="80"/>
+            <column name="effect_type" value="GOLEM"/>
+            <column name="effect_target" value="CASTER"/>
+            <column name="effect_duration" valueNumeric="99"/>
+            <column name="effect_power" valueNumeric="100"/>
         </insert>
 
     </changeSet>
