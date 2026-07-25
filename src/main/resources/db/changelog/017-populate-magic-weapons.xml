@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="017-populate-magic-weapons" author="хияр_and_sawaron">
+
+        <!-- Tier 1: COMMON (Заклинания 1 уровня  -->
+
+
+        <!--  Стартовый базовый предмет для D&D / Базовое фэнтези -->
+        <insert tableName="item_templates">
+            <column name="name" value="Старый дубовый посох"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="2"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!--  Классический стартовый артефакт магов из настолок -->
+        <insert tableName="item_templates">
+            <column name="name" value="Гримуар ученика"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="stat_budget" valueNumeric="3"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!--  Базовое фэнтези (Жезл огненных кастеров начального уровня) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Жезл ученика огня"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D4"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="3"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+
+        <!-- Tier 2: UNCOMMON (Заклинания 1-2 уровня -->
+
+
+        <!--  Базовое темное фэнтези (Классический фокус бездна-магов) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Сфера пустоты"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="5"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!--  Элементальный предмет под магию льда (Спеллы ICE) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Посох ледяного пика"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="5"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+
+        <!-- Tier 3: RARE (Заклинания 1-3 уровня   -->
+
+
+        <!-- Темное фэнтези (Оружие сектантов/еретиков) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Гримуар культа тьмы"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="stat_budget" valueNumeric="8"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!--  Гибрид боевого мага / боевой клинок пламени -->
+        <insert tableName="item_templates">
+            <column name="name" value="Клинок магического пламени"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="2"/>
+            <column name="stat_budget" valueNumeric="8"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!-- Берсерк (Посох молодой чародейки Ширке с дубовым набалдашником) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Посох Лесного Духа"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D6"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="9"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+
+        <!-- Tier 4: EPIC (Заклинания 1-4 уровня)                    -->
+
+
+        <!-- Классическое оружие эльфийских следопытов/магов -->
+        <insert tableName="item_templates">
+            <column name="name" value="Магический лук прозрения"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="stat_budget" valueNumeric="12"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!-- Берсерк (Посох чародейки Флоры из Дерева Мельхиора) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Посох Древней Мельхиоровой Ветви"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="14"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!-- KonoSuba (Знаменитый посох Мегумин для каста Explosion) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Посох Алого Демона Разрушения"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D12"/>
+            <column name="dice_count" valueNumeric="1"/>
+            <column name="stat_budget" valueNumeric="15"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+
+        <!-- Tier 5: LEGENDARY (Заклинания 1-5 уровня -->
+
+
+        <!-- Высшая молниевая магия / Божественный реликт -->
+        <insert tableName="item_templates">
+            <column name="name" value="Посох бога грома"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="2"/>
+            <column name="stat_budget" valueNumeric="20"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!-- Берсерк (Пасхалка на Алый Бехелит / Яйцо Завоюющего Мира) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Гримуар Багрового Лика"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="stat_budget" valueNumeric="25"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!-- Frieren (Узнаваемый деревянный посох Фрирен) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Посох Странствующей Странницы"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D10"/>
+            <column name="dice_count" valueNumeric="2"/>
+            <column name="stat_budget" valueNumeric="22"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <!-- Overlord (Посох Гильдии Аинза Оал Гоуна) -->
+        <insert tableName="item_templates">
+            <column name="name" value="Скипетр Владыки Назарика"/>
+            <column name="type" value="MAGIC_WEAPON"/>
+            <column name="slot" value="MAIN_HAND"/>
+            <column name="rarity" value="LEGENDARY"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" value="D8"/>
+            <column name="dice_count" valueNumeric="2"/>
+            <column name="stat_budget" valueNumeric="24"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
