@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <include file="db/changelog/001-create-players-table.xml"/>
+    <include file="/db/changelog/001-create-players-table.xml"/>
     <include file="/db/changelog/002-create-player-effects.xml"/>
     <include file="/db/changelog/003-create-items-table.xml"/>
     <include file="/db/changelog/004-create-monsters-table.xml"/>
@@ -19,6 +19,9 @@
     <include file="/db/changelog/012-populate-weapons.xml"/>
     <include file="/db/changelog/013-populate-artifacts.xml"/>
     <include file="/db/changelog/014-populate-resources.xml"/>
+    <include file="/db/changelog/015-populate-consumables.xml"/>
+    <include file="/db/changelog/016-create-magic-system.xml"/>
+    <include file="/db/changelog/017-populate-magic-weapons.xml"/>
 
 
 </databaseChangeLog>
