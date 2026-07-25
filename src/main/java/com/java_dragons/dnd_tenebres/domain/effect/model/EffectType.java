@@ -12,17 +12,16 @@ public enum EffectType {
     BURN(EffectCategory.DEBUFF),
     FROSTBITE(EffectCategory.DEBUFF),
     BLIND(EffectCategory.DEBUFF),  // Ослепление (пропуск хода)
-    THORNS(EffectCategory.DEBUFF),    // Отражение урона
     SUPPRESSION(EffectCategory.DEBUFF),       // Подавление (пропуск хода)
-    DAMAGE_REDUCTION(EffectCategory.DEBUFF),  // Снижение входящего урона в %
     SHOCK(EffectCategory.DEBUFF),             // Штраф к d20 врага
     FREEZE(EffectCategory.DEBUFF),  // Заморозка (пропуск хода)
+    POISON(EffectCategory.DEBUFF),
 
 
-
+    DAMAGE_REDUCTION(EffectCategory.BUFF),  // Снижение входящего урона в %
+    THORNS(EffectCategory.BUFF),    // Отражение урона
     HEAL_INSTANT(EffectCategory.BUFF),
     MANA_RESTORE(EffectCategory.BUFF),
-    POISON(EffectCategory.BUFF),
     REGENERATION(EffectCategory.BUFF),
     PROTECTION_UP(EffectCategory.BUFF), // защита: АС увеличивается +10%
     TREATMENT(EffectCategory.BUFF), // лечение: каждый раунд востанавливает часть хп

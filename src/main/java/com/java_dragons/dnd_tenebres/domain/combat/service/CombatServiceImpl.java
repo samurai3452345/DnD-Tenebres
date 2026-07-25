@@ -65,7 +65,12 @@ public class CombatServiceImpl implements CombatService {
     public CombatReport executeTurn(Player player, Monster monster, int aliveEnemyCount, int round, CombatAction action, String actionTargetName) {
         List<CombatEvent> events = new ArrayList<>();
 
-        // 1. Процессим эффекты перед ходом (Регенерация, Урон от кровотечения)
+        for (ItemPassive passive : player.getActivePassives()) {
+            if (passiveStrategies.containsKey(passive)) {
+                passiveStrategies.get(passive).onRoundStart(player, events);
+            }
+        }
+
         player.processTurnEffects(events);
         processMonsterTurnEffects(monster, events);
 
