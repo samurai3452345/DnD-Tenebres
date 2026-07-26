@@ -24,6 +24,7 @@ import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
 import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,13 +45,16 @@ public class CombatServiceImpl implements CombatService {
     private final Map<MonsterSkill, MonsterSkillStrategy> monsterSkillStrategies;
     private final PotionService potionService;
     private final SpellRepository spellRepository;
+    private final PlayerRepository playerRepository; // Твое новое поле
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
                              List<ItemPassiveStrategy> itemStrategies,
                              List<MonsterSkillStrategy> monsterStrategies,
                              PotionService potionService,
-                             SpellRepository spellRepository) {
+                             SpellRepository spellRepository,
+                             PlayerRepository playerRepository) {
+
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
                 .collect(Collectors.toMap(ItemPassiveStrategy::getTargetPassive, s -> s));
@@ -58,6 +62,8 @@ public class CombatServiceImpl implements CombatService {
                 .collect(Collectors.toMap(MonsterSkillStrategy::getTargetSkill, s -> s));
         this.potionService = potionService;
         this.spellRepository = spellRepository;
+
+        this.playerRepository = playerRepository;
     }
 
     @Override
@@ -376,5 +382,26 @@ public class CombatServiceImpl implements CombatService {
         } else {
             events.add(new CombatEvent(player.getName(), "FAIL", player.getName(), 0, "Предмет не найден"));
         }
+    }
+
+    @Override
+    @Transactional
+    public CombatReport executeAmbushTurn(Long playerId, Monster monster) {
+        // Достаем игрока внутри транзакции боя
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+
+        List<CombatEvent> events = new ArrayList<>();
+        events.add(new CombatEvent(monster.getName(), "AMBUSH", player.getName(), 0, "Монстр напал на вас во время привала!"));
+
+        handleEnemyTurn(player, monster, 0, events);
+
+        boolean isPlayerDead = player.getCurrentHp() <= 0;
+        if (isPlayerDead) {
+            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли во сне..."));
+        }
+
+        // Никакого save()!
+        return new CombatReport(0, events, false, isPlayerDead);
     }
 }

@@ -307,4 +307,17 @@ public class Player {
             this.inventory.remove(item);
         }
     }
+
+    public boolean consumeItemByName(String itemName) {
+        Optional<PlayerItem> itemOpt = this.inventory.stream()
+                .filter(i -> i.getTemplate().getName().equalsIgnoreCase(itemName))
+                .filter(i -> i.getAmount() > 0)
+                .findFirst();
+
+        if (itemOpt.isPresent()) {
+            consumeItem(itemOpt.get());
+            return true;
+        }
+        return false;
+    }
 }
