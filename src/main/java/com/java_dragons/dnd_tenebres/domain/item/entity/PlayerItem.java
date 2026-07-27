@@ -69,4 +69,26 @@ public class PlayerItem {
     @Enumerated(EnumType.STRING)
     @Column(name = "magic_effect_element")
     private DamageType magicEffectElement;
+
+    @Column(name = "item_xp", nullable = false)
+    @Builder.Default
+    private long itemXp = 0;
+
+    @Column(name = "tier", nullable = false)
+    @Builder.Default
+    private int tier = 1;
+
+    public void addXp(int xp, int newTier) {
+        if (xp < 0) throw new IllegalArgumentException("Опыт не может быть отрицательным");
+        this.itemXp += xp;
+
+        if (newTier > this.tier) {
+            this.tier = newTier;
+        }
+    }
+
+    public int getTotalDiceCount() {
+        if (this.template.getDiceCount() == 0) return 0;
+        return this.template.getDiceCount() + (this.tier - 1);
+    }
 }
