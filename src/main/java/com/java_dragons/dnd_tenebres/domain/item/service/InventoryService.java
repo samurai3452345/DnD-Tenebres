@@ -3,10 +3,13 @@ package com.java_dragons.dnd_tenebres.domain.item.service;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
+import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.item.repository.ItemTemplateRepository;
+import com.java_dragons.dnd_tenebres.domain.item.repository.PlayerItemRepository;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class InventoryService {
 
     private final ItemTemplateRepository itemTemplateRepository;
+    private final PlayerRepository playerRepository;
+    private final PlayerItemRepository playerItemRepository;
+
     private static final int MAX_RESOURCE_STACK = 100;
     private static final int MAX_CONSUMABLE_STACK = 16;
 
@@ -135,4 +141,32 @@ public class InventoryService {
                 item.getBonusStrength(), item.getBonusDexterity(), item.getBonusConstitution(),
                 item.getBonusIntelligence(), item.getBonusWisdom(), item.getBonusCharisma());
     }
+    @Transactional(readOnly = true)
+    public List<PlayerItem> getPlayerInventory(Long playerId) {
+        return playerItemRepository.findByPlayerId(playerId);
+    }
+
+    @Transactional
+    public void equipItem(Long playerId, Long itemId, EquipmentSlot slot) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+
+        PlayerItem itemToEquip = playerItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден"));
+
+        if (!itemToEquip.getPlayer().getId().equals(playerId)) {
+            throw new IllegalArgumentException("Это не ваш предмет!");
+        }
+
+        player.equipItem(itemId, slot);
+    }
+
+    @Transactional
+    public void unequipItem(Long playerId, EquipmentSlot slot) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+
+        player.unequipItem(slot);
+    }
+
 }

@@ -320,4 +320,15 @@ public class Player {
         }
         return false;
     }
+
+    public void unequipItem(EquipmentSlot targetSlot) {
+        this.inventory.stream()
+                .filter(PlayerItem::isEquipped)
+                .filter(item -> item.getEquippedSlot() == targetSlot)
+                .findFirst()
+                .ifPresent(item -> {
+                    item.setEquipped(false);
+                    item.setEquippedSlot(EquipmentSlot.NONE);
+                });
+    }
 }
