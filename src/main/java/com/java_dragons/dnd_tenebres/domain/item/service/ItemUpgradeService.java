@@ -1,11 +1,9 @@
 package com.java_dragons.dnd_tenebres.domain.item.service;
 
-
-
 import com.java_dragons.dnd_tenebres.core.math.ItemProgressionCalculator;
-import com.java_dragons.dnd_tenebres.domain.item.entity.Artifact;
-import com.java_dragons.dnd_tenebres.domain.item.entity.Item;
-import com.java_dragons.dnd_tenebres.domain.item.repository.ItemRepository;
+import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem; // Обрати внимание, теперь тут PlayerItem
+import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
+import com.java_dragons.dnd_tenebres.domain.item.repository.PlayerItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,47 +14,50 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemUpgradeService {
 
-    private final ItemRepository itemRepository;
+    private final PlayerItemRepository playerItemRepository;
     private final ItemProgressionCalculator itemProgressionCalculator;
 
     @Transactional
-    public void feedItems(Long playerId, Long targetItemId, List<Long> foodItemIds ) {
+    public void feedItems(Long playerId, Long targetItemId, List<Long> foodItemIds) {
 
-        Item itemTarget = itemRepository.findById(targetItemId)
+        PlayerItem itemTarget = playerItemRepository.findById(targetItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Предмет не найден!"));
 
         if(!itemTarget.getPlayer().getId().equals(playerId)) {
-            throw new  IllegalArgumentException("Это не твой предмет!");
+            throw new IllegalArgumentException("Это не твой предмет!");
         }
-        if(itemTarget instanceof Artifact){
-            throw new IllegalArgumentException("Артефакты нельзя прокачивать!");
+
+        ItemType targetType = itemTarget.getTemplate().getType();
+        if(targetType == ItemType.ARTIFACT || targetType == ItemType.CONSUMABLE || targetType == ItemType.RESOURCE){
+            throw new IllegalArgumentException("Этот тип предмета нельзя прокачивать!");
         }
+
         if (foodItemIds.contains(targetItemId)){
             throw new IllegalArgumentException("Нельзя скармливать предмет самому себе!");
         }
 
-        List<Item> foodItems = itemRepository.findAllById(foodItemIds);
+        List<PlayerItem> foodItems = playerItemRepository.findAllById(foodItemIds);
 
         if(foodItems.size() != foodItemIds.size()){
-            throw new IllegalArgumentException("Один или несколько предметов из списка корма не найдены в базе данных!");
+            throw new IllegalArgumentException("Один или несколько предметов из списка корма не найдены в БД!");
         }
 
         if(!foodItems.stream().allMatch(foodItem -> foodItem.getPlayer().getId().equals(playerId))){
-            throw new  IllegalArgumentException("Это не твой предмет!");
+            throw new IllegalArgumentException("Один из предметов для скармливания тебе не принадлежит!");
         }
 
-        for(Item foodItem : foodItems){
+        for(PlayerItem foodItem : foodItems){
             int xpYield = itemProgressionCalculator.calculateXpYield(
-                    itemTarget.getItemType(), itemTarget.getRarity(),
-                    foodItem.getItemType(), foodItem.getRarity()
+                    itemTarget.getTemplate().getType(), itemTarget.getTemplate().getRarity(),
+                    foodItem.getTemplate().getType(), foodItem.getTemplate().getRarity()
             );
-            itemTarget.addXp(xpYield);
 
+            long projectedXp = itemTarget.getItemXp() + xpYield;
+            int newTier = itemProgressionCalculator.getTierByXp(projectedXp);
+
+            itemTarget.addXp(xpYield, newTier);
         }
-        itemRepository.deleteAll(foodItems);
-        itemRepository.save(itemTarget);
 
-
+        playerItemRepository.deleteAll(foodItems);
     }
-
 }

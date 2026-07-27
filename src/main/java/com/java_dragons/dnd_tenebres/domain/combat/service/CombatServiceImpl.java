@@ -338,8 +338,7 @@ public class CombatServiceImpl implements CombatService {
             rarityBonus = weaponTemplate.getRarity().getFlatModifier();
 
             DiceType diceType = weaponTemplate.getDamageDice();
-            int diceCount = weaponTemplate.getDiceCount();
-
+            int diceCount = weaponOpt.get().getTotalDiceCount();
             if (diceType != null && diceCount > 0) {
                 if (isCrit) diceCount *= 2;
                 baseWeaponDamage = DiceRoller.roll(diceCount, diceType.getSides());
