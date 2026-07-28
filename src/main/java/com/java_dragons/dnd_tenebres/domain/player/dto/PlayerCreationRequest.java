@@ -1,6 +1,5 @@
 package com.java_dragons.dnd_tenebres.domain.player.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -14,5 +13,4 @@ public record PlayerCreationRequest(
         int intelligence,
         int wisdom,
         int charisma
-) {
-}
+) {}

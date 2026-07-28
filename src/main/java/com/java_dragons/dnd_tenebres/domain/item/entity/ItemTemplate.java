@@ -55,4 +55,8 @@ public class ItemTemplate {
     @Enumerated(EnumType.STRING)
     @Column(name = "passive_effect", nullable = false)
     private ItemPassive passiveEffect = ItemPassive.NONE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "consumable_action")
+    private ConsumableAction consumableAction = ConsumableAction.NONE;
 }

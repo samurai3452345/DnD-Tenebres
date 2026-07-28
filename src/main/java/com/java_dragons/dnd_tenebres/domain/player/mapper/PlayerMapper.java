@@ -12,6 +12,13 @@ public interface PlayerMapper {
 
     @Mapping(source = "id", target = "playerId")
     @Mapping(source = "name", target = "playerName")
+    @Mapping(target = "totalStrength", expression = "java(player.getTotalStrength())")
+    @Mapping(target = "totalDexterity", expression = "java(player.getTotalDexterity())")
+    @Mapping(target = "totalConstitution", expression = "java(player.getTotalConstitution())")
+    @Mapping(target = "totalIntelligence", expression = "java(player.getTotalIntelligence())")
+    @Mapping(target = "totalWisdom", expression = "java(player.getTotalWisdom())")
+    @Mapping(target = "totalCharisma", expression = "java(player.getTotalCharisma())")
+    @Mapping(target = "armorClass", expression = "java(player.getArmorClass())")
     PlayerResponse toResponse(Player player);
 
 }
