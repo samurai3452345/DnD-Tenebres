@@ -22,8 +22,10 @@ import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.item.service.PotionService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
+import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
 import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
+import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,8 @@ public class CombatServiceImpl implements CombatService {
     private final Map<MonsterSkill, MonsterSkillStrategy> monsterSkillStrategies;
     private final PotionService potionService;
     private final SpellRepository spellRepository;
-    private final PlayerRepository playerRepository; // Твое новое поле
+    private final PlayerRepository playerRepository;
+    private final MonsterRepository monsterRepository;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -53,7 +56,8 @@ public class CombatServiceImpl implements CombatService {
                              List<MonsterSkillStrategy> monsterStrategies,
                              PotionService potionService,
                              SpellRepository spellRepository,
-                             PlayerRepository playerRepository) {
+                             PlayerRepository playerRepository,
+                             MonsterRepository monsterRepository) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -64,6 +68,7 @@ public class CombatServiceImpl implements CombatService {
         this.spellRepository = spellRepository;
 
         this.playerRepository = playerRepository;
+        this.monsterRepository = monsterRepository;
     }
 
     @Override
@@ -400,7 +405,26 @@ public class CombatServiceImpl implements CombatService {
             events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли во сне..."));
         }
 
-        // Никакого save()!
         return new CombatReport(0, events, false, isPlayerDead);
+    }
+
+    @Override
+    @Transactional
+    public CombatReport executeTurnByIds(Long playerId, CombatTurnRequest request) {
+
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+
+        Monster monster = monsterRepository.findById(request.monsterId())
+                .orElseThrow(() -> new IllegalArgumentException("Монстр не найден"));
+
+        return executeTurn(
+                player,
+                monster,
+                request.aliveEnemyCount(),
+                request.round(),
+                request.action(),
+                request.actionTargetName()
+        );
     }
 }
