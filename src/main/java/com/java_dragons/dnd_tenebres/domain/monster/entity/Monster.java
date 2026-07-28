@@ -124,11 +124,9 @@ public class Monster {
         return new MonsterAttackResult(this.attackName, totalDamage);
     }
     @Transient
+    @Builder.Default
     private List<ActiveEffect> combatEffects = new ArrayList<>();
     public void addCombatEffect(ActiveEffect effect) {
         this.combatEffects.add(effect);
-    }
-    public List<ActiveEffect> getCombatEffects() {
-        return this.combatEffects;
     }
 }
