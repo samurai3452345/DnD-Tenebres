@@ -132,11 +132,7 @@ public class ExplorationService {
         while (player.getCurrentHp() > 0 && monster.getCurrentHp() > 0) {
             log.info("--- Раунд {} ---", round);
 
-            // ✅ ИСПРАВЛЕНО: Вызываем executeTurn по новому контракту боевой системы.
-            // Для консольного MVP эмулируем, что персонаж всегда атакует (CombatAction.ATTACK).
-            // Если у персонажа в инвентаре будут зелья, здесь можно будет временно захардкодить
-            // CombatAction.USE_POTION и передавать имя зелья для тестов.
-            String roundLog = combatService.executeTurn(
+            var report = combatService.executeTurn(
                     player,
                     monster,
                     aliveEnemyCount,
@@ -145,7 +141,15 @@ public class ExplorationService {
                     null
             );
 
-            log.info(roundLog);
+            for (var event : report.events()) {
+                log.info("[{}] {}: {} -> {} (Урон/Эффект: {})",
+                        event.actionType(),
+                        event.actor(),
+                        event.description(),
+                        event.target(),
+                        event.value());
+            }
+
             round++;
         }
 
