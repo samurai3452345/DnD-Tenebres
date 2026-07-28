@@ -5,67 +5,78 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
 
-    <changeSet id="003-create-items-table" author="Sawaron">
-        <createTable tableName="items">
+    <changeSet id="003-create-item-templates-and-player-items" author="Sawaron">
+
+        <createTable tableName="item_templates">
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="version" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rarity" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="armor_type" type="VARCHAR(50)"/>
+            <column name="armor_class" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="required_strength" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="stat_budget" type="INTEGER" defaultValueNumeric="0"/>
 
+            <column name="passive_effect" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="consumable_action" type="VARCHAR(50)" defaultValue="NONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="player_items">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
             <column name="version" type="INTEGER" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
 
             <column name="player_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_items_player" referencedTableName="players" referencedColumnNames="id"/>
+                <constraints nullable="false" foreignKeyName="fk_pi_player" referencedTableName="players" referencedColumnNames="id"/>
+            </column>
+            <column name="template_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_pi_template" referencedTableName="item_templates" referencedColumnNames="id"/>
             </column>
 
-            <column name="item_type" type="VARCHAR(31)">
+            <column name="amount" type="INTEGER" defaultValueNumeric="1">
                 <constraints nullable="false"/>
             </column>
-
-            <column name="rarity" type="VARCHAR(50)">
+            <column name="item_xp" type="BIGINT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
-
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="current_xp" type="BIGINT" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="base_dice_type" type="VARCHAR(10)"/>
-
             <column name="is_equipped" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
+            <column name="equipped_slot" type="VARCHAR(50)"/>
 
-            <column name="equip_slot" type="VARCHAR(50)"/>
+            <column name="bonus_strength" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="bonus_dexterity" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="bonus_constitution" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="bonus_intelligence" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="bonus_wisdom" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="bonus_charisma" type="INTEGER" defaultValueNumeric="0"/>
 
-            <column name="parent_item_id" type="BIGINT">
-                <constraints foreignKeyName="fk_items_parent" referencedTableName="items" referencedColumnNames="id"/>
-            </column>
-
-            <column name="stat_str" type="INTEGER" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="stat_dex" type="INTEGER" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="stat_con" type="INTEGER" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="stat_int" type="INTEGER" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="stat_wis" type="INTEGER" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="stat_cha" type="INTEGER" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
+            <column name="magic_effect" type="VARCHAR(50)"/>
+            <column name="magic_effect_element" type="VARCHAR(50)"/>
         </createTable>
+
     </changeSet>
 
 </databaseChangeLog>

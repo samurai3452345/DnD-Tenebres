@@ -2,7 +2,6 @@ package com.java_dragons.dnd_tenebres.domain.player.controller;
 
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerResponse;
-import com.java_dragons.dnd_tenebres.domain.player.mapper.PlayerMapper;
 import com.java_dragons.dnd_tenebres.domain.player.service.PlayerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/players")
 public class PlayerController {
+
     private final PlayerService playerService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // Автоматически вернет статус 201 Created при успехе
+    @ResponseStatus(HttpStatus.CREATED)
     public PlayerResponse createPlayer(@RequestBody @Valid PlayerCreationRequest request) {
         return playerService.createPlayer(request);
     }

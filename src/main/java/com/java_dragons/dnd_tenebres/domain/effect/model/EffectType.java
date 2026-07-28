@@ -20,8 +20,6 @@ public enum EffectType {
 
     DAMAGE_REDUCTION(EffectCategory.BUFF),  // Снижение входящего урона в %
     THORNS(EffectCategory.BUFF),    // Отражение урона
-    HEAL_INSTANT(EffectCategory.BUFF),
-    MANA_RESTORE(EffectCategory.BUFF),
     REGENERATION(EffectCategory.BUFF),
     PROTECTION_UP(EffectCategory.BUFF), // защита: АС увеличивается +10%
     TREATMENT(EffectCategory.BUFF), // лечение: каждый раунд востанавливает часть хп
