@@ -15,6 +15,7 @@ public class PlayerResponse {
     int maxHp;
     int gold;
     PlayerStats stats;
+    int statPoints;
     int totalStrength;
     int totalDexterity;
     int totalConstitution;
