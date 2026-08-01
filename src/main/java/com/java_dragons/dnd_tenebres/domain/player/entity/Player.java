@@ -67,6 +67,10 @@ public class Player {
     @JoinColumn(name = "current_location_id")
     private Location currentLocation;
 
+    @Builder.Default
+    @Column(name = "stat_points", nullable = false)
+    private int statPoints = 0;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "player_effects", joinColumns = @JoinColumn(name = "player_id"))
     @Builder.Default
@@ -221,17 +225,6 @@ public class Player {
         return coreAc + offHandAc;
     }
 
-    public int getMaxHp() {
-        int calculatedMaxHp = this.maxHp;
-        Set<ItemPassive> passives = getActivePassives();
-
-        if (passives.contains(ItemPassive.DARK_PACT)) {
-            calculatedMaxHp = (int) (calculatedMaxHp * 0.70);
-        }
-
-        return calculatedMaxHp;
-    }
-
     public Set<ItemPassive> getActivePassives() {
         Set<ItemPassive> activePassives = new HashSet<>();
 
@@ -331,4 +324,60 @@ public class Player {
                     item.setEquippedSlot(EquipmentSlot.NONE);
                 });
     }
+
+    public void levelUp(int baseHpForLevel, int baseMpForLevel) {
+        this.level++;
+        this.statPoints += 1;
+
+        this.maxHp = baseHpForLevel;
+        this.maxMp = baseMpForLevel;
+
+        this.currentHp = this.getMaxHp();
+        this.currentMp = this.getMaxMp();
+    }
+
+    public void allocateStats(int addStr, int addDex, int addCon, int addInt, int addWis, int addCha) {
+        int totalCost = addStr + addDex + addCon + addInt + addWis + addCha;
+
+        if (totalCost <= 0) return;
+        if (totalCost > this.statPoints) {
+            throw new IllegalStateException("Недостаточно поинтов! У вас: " + this.statPoints);
+        }
+
+        this.statPoints -= totalCost;
+        this.stats.addStats(addStr, addDex, addCon, addInt, addWis, addCha);
+    }
+
+    public int getMaxHp() {
+        int calculatedHp = this.maxHp;
+
+        int conModifier = StatMathUtils.calculateModifier(this.getTotalConstitution());
+        calculatedHp += (conModifier * this.level);
+
+        if (this.hasEffect(EffectType.WELL_RESTED)) {
+            calculatedHp += 10;
+        }
+
+        Set<ItemPassive> passives = getActivePassives();
+
+        if (passives.contains(ItemPassive.DARK_PACT)) {
+            calculatedHp = (int) (calculatedHp * 0.70);
+        }
+
+        return Math.max(1, calculatedHp);
+    }
+
+    public int getMaxMp() {
+        int calculatedMp = this.maxMp;
+
+        int intModifier = StatMathUtils.calculateModifier(this.getTotalIntelligence());
+        calculatedMp += (intModifier * 3 * this.level);
+
+        if (this.hasEffect(EffectType.MAGIC_SICKNESS)) {
+            calculatedMp = (int) (calculatedMp * 0.50);
+        }
+
+        return Math.max(0, calculatedMp);
+    }
+
 }

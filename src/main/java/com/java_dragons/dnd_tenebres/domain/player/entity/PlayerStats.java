@@ -30,4 +30,13 @@ public class PlayerStats {
     @Column(name = "stat_cha", nullable = false)
     private int charisma;       //Харизма (CHA)
 
+    public void addStats(int addStr, int addDex, int addCon, int addInt, int addWis, int addCha) {
+        this.strength += addStr;
+        this.dexterity += addDex;
+        this.constitution += addCon;
+        this.intelligence += addInt;
+        this.wisdom += addWis;
+        this.charisma += addCha;
+    }
+
 }

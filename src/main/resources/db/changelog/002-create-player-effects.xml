@@ -22,6 +22,10 @@
             <column name="duration" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="power" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
     </changeSet>
