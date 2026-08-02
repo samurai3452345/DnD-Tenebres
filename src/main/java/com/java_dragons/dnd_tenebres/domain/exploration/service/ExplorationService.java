@@ -2,15 +2,15 @@ package com.java_dragons.dnd_tenebres.domain.exploration.service;
 
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
-import com.java_dragons.dnd_tenebres.domain.combat.model.CombatAction;
-import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
-import com.java_dragons.dnd_tenebres.domain.exploration.model.ExplorationAction;
+import com.java_dragons.dnd_tenebres.domain.exploration.dto.ExplorationReport;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
+import com.java_dragons.dnd_tenebres.domain.location.model.LocationType;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,142 +25,78 @@ import java.util.Set;
 public class ExplorationService {
 
     private final MonsterSpawnerService monsterSpawnerService;
-    private final CombatService combatService;
     private final LocationService locationService;
     private final InventoryService inventoryService;
+    private final PlayerRepository playerRepository;
 
-    @Transactional // Защищаем изменения состояния игрока и мира в БД
-    public void explore(Player player, Location location, ExplorationAction action) {
-        log.info("Вы выбрали действие: {}", action);
+    @Transactional
+    public ExplorationReport travel(Long playerId, String targetLocationId) {
+        Player player = getPlayer(playerId);
+        Location currentLocation = player.getCurrentLocation();
 
-        switch (action) {
-            case HUNT -> handleHunt(player, location);
-            case SEARCH -> handleSearch(player, location);
-            case TRAVEL -> handleTravel(player, location);
-            default -> log.info("Вы стоите в раздумиях.");
-        }
+        // 1. Проверяем, доступны ли пути из текущей локации
+        Set<Location> paths = locationService.getAvailableConnections(currentLocation.getId());
+
+        Location targetLocation = paths.stream()
+                .filter(loc -> loc.getId().equals(targetLocationId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Вы не можете попасть туда отсюда!"));
+
+        // 2. Двигаем игрока
+        player.moveTo(targetLocation);
+        playerRepository.save(player);
+
+        log.info("Игрок {} перешел в локацию {}", player.getName(), targetLocation.getName());
+        return ExplorationReport.moved(targetLocation.getName());
     }
 
-    private void handleHunt(Player player, Location location) {
-        String zoneId = location.getZoneId();
+    @Transactional
+    public ExplorationReport hunt(Long playerId) {
+        Player player = getPlayer(playerId);
+        Location location = player.getCurrentLocation();
 
-        if ("green_forest".equals(zoneId)) {
-            log.info("Вы осматриваете заросли в поисках следов...");
-
-            int roll = DiceRoller.rollD20();
-            int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
-            int totalCheck = roll + wisMod;
-
-            log.info("Бросок на Восприятие: {} + {} = {}", roll, wisMod, totalCheck);
-
-            if (totalCheck >= 12) {
-                log.info("Вы выследили врага! Бой начинается!");
-                Monster monster = monsterSpawnerService.spawnRandomMonster("FOREST", location.getLevel());
-                log.info("На вас нападает: {}", monster.getName());
-
-                startCombatLoop(player, monster, 1);
-            } else {
-                log.info("Вы не нашли ни одного врага.");
-            }
-
-        } else if ("forgotten_crypt".equals(zoneId)) {
-            log.info("Вы входите в комнату подземелья, враги уже ждут вас!");
-
-            List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(location.getId());
-
-            if (squad.isEmpty()) {
-                log.info("Здесь тихо... Врагов нет.");
-                return;
-            }
-
-            log.info("Перед вами отряд из {} врагов!", squad.size());
-
-            int aliveCount = squad.size();
-            for (Monster m : squad) {
-                if (player.getCurrentHp() <= 0) {
-                    break;
-                }
-                startCombatLoop(player, m, aliveCount);
-                aliveCount--;
-            }
-        } else {
-            log.info("Здесь не на кого охотиться. Это безопасная зона.");
+        if (location.getType() == LocationType.SAFE_ZONE) {
+            return ExplorationReport.nothing("Здесь безопасно. Вы не нашли никого для охоты.");
         }
+
+        // Бросок на восприятие
+        int roll = DiceRoller.rollD20();
+        int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
+        int totalCheck = roll + wisMod;
+
+        // В будущем сложность поиска (DC) можно привязать к локации
+        int difficultyClass = 12;
+
+        if (totalCheck >= difficultyClass) {
+            // Спавним монстра в зависимости от БИОМА локации, убираем хардкод "green_forest"
+            Monster monster = monsterSpawnerService.spawnRandomMonster(location.getBiome().name(), location.getLevel());
+
+            log.info("Игрок {} нашел монстра: {}", player.getName(), monster.getName());
+            return ExplorationReport.combat("Из теней появляется " + monster.getName() + "!", monster.getId());
+        }
+
+        return ExplorationReport.nothing("Вы долго бродили по окрестностям, но так никого и не выследили.");
     }
 
-    private void handleSearch(Player player, Location location) {
-        if ("crypt_armory".equals(location.getId())) {
-            log.info("Вы обыскали пыльные стойки...");
+    @Transactional
+    public ExplorationReport search(Long playerId) {
+        Player player = getPlayer(playerId);
+        Location location = player.getCurrentLocation();
 
-            inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
-            inventoryService.addItemToPlayer(player, "Кровоцвет", 2);
+        // Простой бросок кубика на удачу (Luck)
+        int roll = DiceRoller.rollD20();
 
-            log.info("Найденные предметы успешно добавлены в ваш инвентарь!");
-            // TODO: в будущем здесь нужно будет помечать в базе данных,
-            // что игрок УЖЕ обыскал эту комнату, чтобы он не фармил мечи бесконечно.
-        } else {
-            log.info("Вы тщательно всё обыскали, но нашли только пыль и паутину.");
+        if (roll >= 15) { // 25% шанс найти случайный лут
+            // Хардкод пока оставляем, так как у нас еще нет нормальной таблицы лута
+            inventoryService.addItemToPlayer(player, "Кровоцвет", 1);
+            return ExplorationReport.loot("Вам повезло! Вы нашли кое-что полезное.", List.of("Кровоцвет (1 шт.)"));
         }
+
+        return ExplorationReport.nothing("Вы тщательно обыскали каждый угол, но нашли только пыль.");
     }
 
-    private void handleTravel(Player player, Location location) {
-        log.info("Вы находитесь в: {}", location.getName());
-        log.info("Вы осматриваетесь в поисках путей...");
-
-        Set<Location> paths = locationService.getAvailableConnections(location.getId());
-
-        if (paths == null || paths.isEmpty()) {
-            log.info("Тупик. Отсюда нет выхода.");
-            return;
-        }
-
-        log.info("Доступные пути:");
-        for (Location path : paths) {
-            log.info("- {}", path.getName());
-        }
-
-        // TODO: автовыбор пути, потом поменять на выбор игрока
-        Location nextLocation = paths.iterator().next();
-        player.moveTo(nextLocation);
-        log.info("🗺️ Вы отправились в: {}", nextLocation.getName());
-    }
-
-    private void startCombatLoop(Player player, Monster monster, int aliveEnemyCount) {
-        log.info("⚔️ БОЙ НАЧИНАЕТСЯ: {} против {}!", player.getName(), monster.getName());
-
-        int round = 1;
-        while (player.getCurrentHp() > 0 && monster.getCurrentHp() > 0) {
-            log.info("--- Раунд {} ---", round);
-
-            var report = combatService.executeTurn(
-                    player,
-                    monster,
-                    aliveEnemyCount,
-                    round,
-                    CombatAction.ATTACK,
-                    null
-            );
-
-            for (var event : report.events()) {
-                log.info("[{}] {}: {} -> {} (Урон/Эффект: {})",
-                        event.actionType(),
-                        event.actor(),
-                        event.description(),
-                        event.target(),
-                        event.value());
-            }
-
-            round++;
-        }
-
-        if (player.getCurrentHp() <= 0) {
-            log.info("💀 {} пал в бою... Игра окончена.", player.getName());
-        } else {
-            log.info("🏆 {} повержен! Вы победили.", monster.getName());
-            log.info("🎁 Вы обыскали врага...");
-
-            inventoryService.addItemToPlayer(player, "Кровоцвет", 3);
-            inventoryService.addItemToPlayer(player, "Ржавый меч", 1);
-        }
+    private Player getPlayer(Long playerId) {
+        return playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
     }
 }
