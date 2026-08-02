@@ -19,4 +19,8 @@ public class DiceRoller {
         return roll(1, 20);
     }
 
+    public static int rollD100() {
+        return roll(1, 100);
+    }
+
 }
