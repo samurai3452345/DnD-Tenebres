@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+        <changeSet id="018-create-monster-loot-table" author="Sawaron">
+            <createTable tableName="monster_loot_tables">
+                <column name="id" type="BIGSERIAL">
+                    <constraints primaryKey="true" nullable="false"/>
+                </column>
+                <column name="monster_template_id" type="BIGINT">
+                    <constraints foreignKeyName="fk_loot_table_monster" nullable="false" references="monster_templates(id)"/>
+                </column>
+                <column name="item_template_id" type="BIGINT">
+                    <constraints foreignKeyName="fk_loot_table_item" nullable="false" references="item_templates(id)"/>
+                </column>
+                <column name="min_amount" type="INTEGER" defaultValueNumeric="1">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="max_amount" type="INTEGER" defaultValueNumeric="1">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="drop_chance" type="INTEGER">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+        </changeSet>
+</databaseChangeLog>
