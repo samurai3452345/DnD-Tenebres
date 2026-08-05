@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="021-create-random-encounters" author="Sawaron">
+        <createTable tableName="location_random_encounters">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="location_id" type="VARCHAR(100)">
+                <constraints nullable="false" foreignKeyName="fk_rand_enc_location" referencedTableName="locations" referencedColumnNames="id"/>
+            </column>
+            <column name="monster_template_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="spawn_chance" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="021-populate-forest-encounters" author="Sawaron">
+        <insert tableName="location_random_encounters">
+            <column name="location_id" value="forest_wolf_trail"/>
+            <column name="monster_template_name" value="Волк"/>
+            <column name="spawn_chance" valueNumeric="75"/>
+        </insert>
+        <insert tableName="location_random_encounters">
+            <column name="location_id" value="forest_wolf_trail"/>
+            <column name="monster_template_name" value="Гоблин"/>
+            <column name="spawn_chance" valueNumeric="25"/>
+        </insert>
+
+        <insert tableName="location_random_encounters">
+            <column name="location_id" value="forest_goblin_camp"/>
+            <column name="monster_template_name" value="Гоблин"/>
+            <column name="spawn_chance" valueNumeric="80"/>
+        </insert>
+        <insert tableName="location_random_encounters">
+            <column name="location_id" value="forest_goblin_camp"/>
+            <column name="monster_template_name" value="Волк"/>
+            <column name="spawn_chance" valueNumeric="20"/>
+        </insert>
+
+        <insert tableName="location_random_encounters">
+            <column name="location_id" value="forest_edge"/>
+            <column name="monster_template_name" value="Гоблин"/>
+            <column name="spawn_chance" valueNumeric="50"/>
+        </insert>
+        <insert tableName="location_random_encounters">
+            <column name="location_id" value="forest_edge"/>
+            <column name="monster_template_name" value="Волк"/>
+            <column name="spawn_chance" valueNumeric="50"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
