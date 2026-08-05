@@ -59,7 +59,10 @@ public class ExplorationService {
             return ExplorationReport.nothing("Здесь безопасно. Вы не нашли никого для охоты.");
         }
 
-        // Бросок на восприятие
+        if (location.getType() == LocationType.DANGEROUS) {
+            return ExplorationReport.nothing("Вы победили всех врагов, здесь пусто.");
+        }
+
         int roll = DiceRoller.rollD20();
         int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
         int totalCheck = roll + wisMod;
