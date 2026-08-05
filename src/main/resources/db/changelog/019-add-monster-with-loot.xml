@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="019-populate-test-loot" author="Sawaron">
+        <sql>
+            INSERT INTO monster_loot_tables (monster_template_id,
+            item_template_id,
+            min_amount,
+            max_amount,
+            drop_chance
+            )
+            VALUES (
+            (SELECT id FROM monster_templates WHERE name = 'Лесной Гоблин'),
+            (SELECT id FROM item_templates WHERE name = 'Кровоцвет'),
+            1,
+            3,
+            50
+            );
+        </sql>
+        <sql>
+            INSERT INTO monster_loot_tables(monster_template_id,
+            item_template_id,
+            min_amount,
+            max_amount,
+            drop_chance
+            )
+            VALUES (
+            (SELECT id FROM monster_templates WHERE name = 'Скелет-воин'),
+            (SELECT id FROM item_templates WHERE name = 'Железо'),
+            1,
+            1,
+            30
+            );
+        </sql>
+        <sql>
+            INSERT INTO monster_loot_tables(monster_template_id,
+            item_template_id,
+            min_amount,
+            max_amount,
+            drop_chance
+            )
+            VALUES (
+            (SELECT id FROM monster_templates WHERE name = 'Волк'),
+            (SELECT id FROM item_templates WHERE name = 'Кожа'),
+            1,
+            3,
+            70
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
