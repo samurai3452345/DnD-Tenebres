@@ -7,7 +7,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -73,4 +75,7 @@ public class MonsterTemplate {
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
     private Set<DamageType> resistances = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true, mappedBy = "monsterTemplate")
+    private List<MonsterLootEntry> lootTable = new ArrayList<>();
 }
