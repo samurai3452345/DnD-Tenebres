@@ -21,11 +21,13 @@ import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.item.service.PotionService;
+import com.java_dragons.dnd_tenebres.domain.location.service.LocationClearService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterTemplateRepository;
+import com.java_dragons.dnd_tenebres.domain.monster.service.LootGeneratorService;
 import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
@@ -55,6 +57,7 @@ public class CombatServiceImpl implements CombatService {
     private final LootGeneratorService lootGeneratorService;
     private final InventoryService inventoryService;
     private final MonsterTemplateRepository monsterTemplateRepository;
+    private final LocationClearService locationClearService;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -63,7 +66,11 @@ public class CombatServiceImpl implements CombatService {
                              PotionService potionService,
                              SpellRepository spellRepository,
                              PlayerRepository playerRepository,
-                             MonsterRepository monsterRepository) {
+                             MonsterRepository monsterRepository,
+                             LootGeneratorService lootGeneratorService,
+                             InventoryService inventoryService,
+                             MonsterTemplateRepository monsterTemplateRepository,
+                             LocationClearService locationClearService) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -78,6 +85,7 @@ public class CombatServiceImpl implements CombatService {
         this.lootGeneratorService = lootGeneratorService;
         this.inventoryService = inventoryService;
         this.monsterTemplateRepository = monsterTemplateRepository;
+        this.locationClearService = locationClearService;
     }
 
     @Override
@@ -95,7 +103,7 @@ public class CombatServiceImpl implements CombatService {
         processMonsterTurnEffects(monster, events);
 
         if (monster.isDead()) {
-            return handleMonsterDeath(player, monster, round, events, "Монстр погиб от периодического урона!");
+            return handleMonsterDeath(player, monster, aliveEnemyCount, round, events, "Монстр погиб от периодического урона!");
         }
 
         switch (action) {
@@ -106,7 +114,7 @@ public class CombatServiceImpl implements CombatService {
         }
 
         if (monster.isDead()) {
-            return handleMonsterDeath(player, monster, round, events, "Враг повержен!");
+            return handleMonsterDeath(player, monster, aliveEnemyCount, round, events, "Враг повержен!");
         }
 
         handleEnemyTurn(player, monster, round, events);
@@ -398,7 +406,6 @@ public class CombatServiceImpl implements CombatService {
     @Override
     @Transactional
     public CombatReport executeAmbushTurn(Long playerId, Monster monster) {
-        // Достаем игрока внутри транзакции боя
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
@@ -435,7 +442,7 @@ public class CombatServiceImpl implements CombatService {
         );
     }
 
-    private CombatReport handleMonsterDeath(Player player, Monster monster, int round, List<CombatEvent> events, String deathMessage) {
+    private CombatReport handleMonsterDeath(Player player, Monster monster, int aliveEnemyCount, int round, List<CombatEvent> events, String deathMessage) {
         events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, deathMessage));
 
         MonsterTemplate template = monsterTemplateRepository.findByName(monster.getTemplateName())
@@ -451,9 +458,16 @@ public class CombatServiceImpl implements CombatService {
                 int amount = entry.getValue();
 
                 inventoryService.addItemToPlayer(player, itemTemplate.getName(), amount);
-
-                events.add(new CombatEvent(monster.getName(), "LOOT", player.getName(), amount, "Выбито: " + itemTemplate.getName()));
+                events.add(new CombatEvent(monster.getName(), "LOOT", player.getName(), amount, "Выбито: " + itemTemplate.getName() + " (x" + amount + ")"));
             }
+        }
+
+        if (aliveEnemyCount <= 1 && player.getCurrentLocation() != null) {
+            String locationId = player.getCurrentLocation().getId();
+
+            locationClearService.markLocationAsCleared(player.getId(), locationId);
+
+            events.add(new CombatEvent("Система", "ROOM_CLEARED", player.getName(), 0, "Врагов больше нет. Локация зачищена!"));
         }
 
         return new CombatReport(round, events, true, false);
