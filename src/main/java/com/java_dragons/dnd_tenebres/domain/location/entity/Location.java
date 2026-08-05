@@ -44,6 +44,12 @@ public class Location {
     @Column(name = "biome", nullable = false)
     private BiomeType biome;
 
+    @Column(name = "hunt_difficulty", nullable = false)
+    private int huntDifficulty = 12;
+
+    @Column(name = "search_difficulty", nullable = false)
+    private int searchDifficulty = 15;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "location_connections",
