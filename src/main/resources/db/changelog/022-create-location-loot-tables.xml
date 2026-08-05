@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="023-create-location-loot" author="Sawaron">
+        <createTable tableName="location_loot_tables">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="location_id" type="VARCHAR(100)">
+                <!-- Ссылка на строковый ID локации -->
+                <constraints nullable="false" foreignKeyName="fk_loc_loot_location" referencedTableName="locations" referencedColumnNames="id"/>
+            </column>
+            <column name="item_template_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_loc_loot_item" referencedTableName="item_templates" referencedColumnNames="id"/>
+            </column>
+            <column name="min_amount" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_amount" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Шанс нахождения при успешном обыске -->
+            <column name="find_chance" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="023-populate-location-loot" author="Sawaron">
+        <!-- Лес: Тихая опушка (Кровоцвет 30%) -->
+        <sql>
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            VALUES ('forest_edge', (SELECT id FROM item_templates WHERE name = 'Кровоцвет'), 1, 2, 30);
+        </sql>
+        <!-- Данж: Вход в склеп (Железо 20%) -->
+        <sql>
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            VALUES ('crypt_entrance', (SELECT id FROM item_templates WHERE name = 'Железо'), 1, 1, 20);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
