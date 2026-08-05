@@ -5,8 +5,10 @@ import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.exploration.dto.ExplorationReport;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
+import com.java_dragons.dnd_tenebres.domain.location.entity.LocationLootEntry;
 import com.java_dragons.dnd_tenebres.domain.location.model.LocationType;
 import com.java_dragons.dnd_tenebres.domain.location.repository.LocationFixedMonsterRepository;
+import com.java_dragons.dnd_tenebres.domain.location.repository.LocationLootEntryRepository;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationClearService;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
@@ -18,8 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -32,6 +36,7 @@ public class ExplorationService {
     private final PlayerRepository playerRepository;
     private final LocationClearService locationClearService;
     private final LocationFixedMonsterRepository fixedMonsterRepository;
+    private final LocationLootEntryRepository locationLootEntryRepository;
 
     @Transactional
     public ExplorationReport travel(Long playerId, String targetLocationId) {
@@ -88,7 +93,6 @@ public class ExplorationService {
         int difficultyClass = location.getHuntDifficulty();
 
         if (totalCheck >= difficultyClass) {
-            // Спавним монстра в зависимости от БИОМА локации, убираем хардкод "green_forest"
             Monster monster = monsterSpawnerService.spawnRandomMonster(location.getId());
 
             log.info("Игрок {} нашел монстра: {}", player.getName(), monster.getName());
@@ -103,15 +107,40 @@ public class ExplorationService {
         Player player = getPlayer(playerId);
         Location location = player.getCurrentLocation();
 
+        // 1. Бросаем кубик на успешность обыска
         int roll = DiceRoller.rollD20();
-
-        if (roll >= 15) { // 25% шанс найти случайный лут
-            // Хардкод пока оставляем, так как у нас еще нет нормальной таблицы лута
-            inventoryService.addItemToPlayer(player, "Кровоцвет", 1);
-            return ExplorationReport.loot("Вам повезло! Вы нашли кое-что полезное.", List.of("Кровоцвет (1 шт.)"));
+        if (roll < location.getSearchDifficulty()) {
+            return ExplorationReport.nothing("Вы ничего не нашли (Провал проверки обыска: " + roll + " < " + location.getSearchDifficulty() + ").");
         }
 
-        return ExplorationReport.nothing("Вы тщательно обыскали каждый угол, но нашли только пыль.");
+        List<LocationLootEntry> lootTable = locationLootEntryRepository.findByLocationId(location.getId());
+
+        if (lootTable.isEmpty()) {
+            return ExplorationReport.nothing("Здесь абсолютно нечего искать.");
+        }
+
+        List<String> foundItemsList = new ArrayList<>();
+        StringBuilder foundItemsMsg = new StringBuilder("Вы нашли: ");
+
+        for (LocationLootEntry entry : lootTable) {
+            if (DiceRoller.rollD100() <= entry.getFindChance()) {
+                int amount = ThreadLocalRandom.current().nextInt(entry.getMinAmount(), entry.getMaxAmount() + 1);
+
+                inventoryService.addItemToPlayer(player, entry.getItemTemplate().getName(), amount);
+
+                String itemDisplay = entry.getItemTemplate().getName() + " (x" + amount + ")";
+                foundItemsList.add(itemDisplay);
+                foundItemsMsg.append(itemDisplay).append(", ");
+            }
+        }
+
+        if (foundItemsList.isEmpty()) {
+            return ExplorationReport.nothing("Вы тщательно осмотрели местность, но ничего интересного не попалось.");
+        }
+
+        foundItemsMsg.setLength(foundItemsMsg.length() - 2);
+
+        return ExplorationReport.loot(foundItemsMsg.toString(), foundItemsList);
     }
 
     private Player getPlayer(Long playerId) {
