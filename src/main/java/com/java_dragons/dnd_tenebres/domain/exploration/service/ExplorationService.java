@@ -6,6 +6,8 @@ import com.java_dragons.dnd_tenebres.domain.exploration.dto.ExplorationReport;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
 import com.java_dragons.dnd_tenebres.domain.location.model.LocationType;
+import com.java_dragons.dnd_tenebres.domain.location.repository.LocationFixedMonsterRepository;
+import com.java_dragons.dnd_tenebres.domain.location.service.LocationClearService;
 import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
@@ -28,13 +30,14 @@ public class ExplorationService {
     private final LocationService locationService;
     private final InventoryService inventoryService;
     private final PlayerRepository playerRepository;
+    private final LocationClearService locationClearService;
+    private final LocationFixedMonsterRepository fixedMonsterRepository;
 
     @Transactional
     public ExplorationReport travel(Long playerId, String targetLocationId) {
         Player player = getPlayer(playerId);
         Location currentLocation = player.getCurrentLocation();
 
-        // 1. Проверяем, доступны ли пути из текущей локации
         Set<Location> paths = locationService.getAvailableConnections(currentLocation.getId());
 
         Location targetLocation = paths.stream()
@@ -42,11 +45,26 @@ public class ExplorationService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Вы не можете попасть туда отсюда!"));
 
-        // 2. Двигаем игрока
         player.moveTo(targetLocation);
         playerRepository.save(player);
-
         log.info("Игрок {} перешел в локацию {}", player.getName(), targetLocation.getName());
+
+        if (targetLocation.getType() == LocationType.DANGEROUS) {
+            boolean isCleared = locationClearService.isLocationCleared(playerId, targetLocation.getId());
+
+            if (!isCleared) {
+                boolean hasEnemies = fixedMonsterRepository.existsByLocationId(targetLocation.getId());
+
+                if (hasEnemies) {
+                    List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(targetLocation.getId());
+                    log.info("Засада в локации {}! Врагов: {}", targetLocation.getName(), squad.size());
+
+                    return ExplorationReport.combat("Как только вы вошли, на вас напали!", squad.get(0).getId());
+                } else {
+                    locationClearService.markLocationAsCleared(playerId, targetLocation.getId());
+                }
+            }
+        }
         return ExplorationReport.moved(targetLocation.getName());
     }
 

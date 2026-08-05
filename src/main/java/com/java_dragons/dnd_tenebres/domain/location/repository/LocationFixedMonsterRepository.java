@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface LocationFixedMonsterRepository extends JpaRepository<LocationFixedMonster, Long> {
     List<LocationFixedMonster> findByLocationId(String locationId);
+
+    boolean existsByLocationId(String locationId);
 }
