@@ -67,8 +67,7 @@ public class ExplorationService {
         int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
         int totalCheck = roll + wisMod;
 
-        // В будущем сложность поиска (DC) можно привязать к локации
-        int difficultyClass = 12;
+        int difficultyClass = location.getHuntDifficulty();
 
         if (totalCheck >= difficultyClass) {
             // Спавним монстра в зависимости от БИОМА локации, убираем хардкод "green_forest"
