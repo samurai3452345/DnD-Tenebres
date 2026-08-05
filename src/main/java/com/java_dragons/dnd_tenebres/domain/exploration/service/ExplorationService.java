@@ -72,7 +72,7 @@ public class ExplorationService {
 
         if (totalCheck >= difficultyClass) {
             // Спавним монстра в зависимости от БИОМА локации, убираем хардкод "green_forest"
-            Monster monster = monsterSpawnerService.spawnRandomMonster(location.getBiome().name(), location.getLevel());
+            Monster monster = monsterSpawnerService.spawnRandomMonster(location.getId());
 
             log.info("Игрок {} нашел монстра: {}", player.getName(), monster.getName());
             return ExplorationReport.combat("Из теней появляется " + monster.getName() + "!", monster.getId());

@@ -1,7 +1,9 @@
 package com.java_dragons.dnd_tenebres.domain.monster.service;
 
 import com.java_dragons.dnd_tenebres.domain.location.entity.LocationFixedMonster;
+import com.java_dragons.dnd_tenebres.domain.location.entity.LocationRandomEncounter;
 import com.java_dragons.dnd_tenebres.domain.location.repository.LocationFixedMonsterRepository;
+import com.java_dragons.dnd_tenebres.domain.location.repository.LocationRandomEncounterRepository;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
@@ -21,18 +23,42 @@ public class MonsterSpawnerService {
     private final MonsterRepository monsterRepository;
     private final MonsterTemplateRepository monsterTemplateRepository;
     private final LocationFixedMonsterRepository locationFixedMonsterRepository;
+    private final LocationRandomEncounterRepository randomEncounterRepository;
 
     @Transactional
-    public Monster spawnRandomMonster(String biome, int locationLevel) {
-        List<MonsterTemplate> templates =
-                monsterTemplateRepository.findAllByBiomeAndLevel(biome, locationLevel);
+    public Monster spawnRandomMonster(String locationId) {
+        // 1. Получаем список встреч для конкретной локации
+        List<LocationRandomEncounter> encounters = randomEncounterRepository.findByLocationId(locationId);
 
-        if (templates.isEmpty()) {
-            throw new IllegalArgumentException("Нет шаблонов монстров для биома: " + biome + " и уровня: " + locationLevel);
+        if (encounters.isEmpty()) {
+            throw new IllegalArgumentException("В локации " + locationId + " нет случайных встреч!");
         }
 
-        MonsterTemplate template = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
+        // 2. Считаем общий вес шансов
+        int totalWeight = encounters.stream().mapToInt(LocationRandomEncounter::getSpawnChance).sum();
 
+        // 3. Бросаем кубик от 0 до totalWeight - 1
+        int roll = ThreadLocalRandom.current().nextInt(totalWeight);
+        int currentSum = 0;
+        String chosenMonsterName = null;
+
+        // 4. Определяем, кто выпал (алгоритм рулетки)
+        for (LocationRandomEncounter encounter : encounters) {
+            currentSum += encounter.getSpawnChance();
+            if (roll < currentSum) {
+                chosenMonsterName = encounter.getMonsterTemplateName();
+                break;
+            }
+        }
+
+        // 5. Загружаем шаблон выпавшего монстра из БД
+        // Создаем финальную копию переменной специально для лямбды
+        final String finalMonsterName = chosenMonsterName;
+
+        MonsterTemplate template = monsterTemplateRepository.findByName(finalMonsterName)
+                .orElseThrow(() -> new IllegalStateException("Шаблон монстра не найден: " + finalMonsterName));
+
+        // 6. Создаем физического монстра
         Monster monster = Monster.builder()
                 .name(template.getName())
                 .templateName(template.getName())
