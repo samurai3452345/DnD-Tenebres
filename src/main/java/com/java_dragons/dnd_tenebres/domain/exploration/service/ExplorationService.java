@@ -83,7 +83,6 @@ public class ExplorationService {
         Player player = getPlayer(playerId);
         Location location = player.getCurrentLocation();
 
-        // Простой бросок кубика на удачу (Luck)
         int roll = DiceRoller.rollD20();
 
         if (roll >= 15) { // 25% шанс найти случайный лут

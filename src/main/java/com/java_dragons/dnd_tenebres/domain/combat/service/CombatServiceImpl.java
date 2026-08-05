@@ -19,10 +19,13 @@ import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemPassive;
 import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
 import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
+import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.domain.item.service.PotionService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
+import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
+import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterTemplateRepository;
 import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrategy;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
@@ -49,6 +52,9 @@ public class CombatServiceImpl implements CombatService {
     private final SpellRepository spellRepository;
     private final PlayerRepository playerRepository;
     private final MonsterRepository monsterRepository;
+    private final LootGeneratorService lootGeneratorService;
+    private final InventoryService inventoryService;
+    private final MonsterTemplateRepository monsterTemplateRepository;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -69,6 +75,9 @@ public class CombatServiceImpl implements CombatService {
 
         this.playerRepository = playerRepository;
         this.monsterRepository = monsterRepository;
+        this.lootGeneratorService = lootGeneratorService;
+        this.inventoryService = inventoryService;
+        this.monsterTemplateRepository = monsterTemplateRepository;
     }
 
     @Override
@@ -86,8 +95,7 @@ public class CombatServiceImpl implements CombatService {
         processMonsterTurnEffects(monster, events);
 
         if (monster.isDead()) {
-            events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, "Монстр погиб от периодического урона!"));
-            return new CombatReport(round, events, true, false);
+            return handleMonsterDeath(player, monster, round, events, "Монстр погиб от периодического урона!");
         }
 
         switch (action) {
@@ -98,8 +106,7 @@ public class CombatServiceImpl implements CombatService {
         }
 
         if (monster.isDead()) {
-            events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, "Враг повержен"));
-            return new CombatReport(round, events, true, false);
+            return handleMonsterDeath(player, monster, round, events, "Враг повержен!");
         }
 
         handleEnemyTurn(player, monster, round, events);
@@ -426,5 +433,29 @@ public class CombatServiceImpl implements CombatService {
                 request.action(),
                 request.actionTargetName()
         );
+    }
+
+    private CombatReport handleMonsterDeath(Player player, Monster monster, int round, List<CombatEvent> events, String deathMessage) {
+        events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, deathMessage));
+
+        MonsterTemplate template = monsterTemplateRepository.findByName(monster.getTemplateName())
+                .orElseThrow(() -> new IllegalStateException("Шаблон монстра не найден: " + monster.getTemplateName()));
+
+        Map<ItemTemplate, Integer> generatedLoot = lootGeneratorService.generateLootForMonster(template);
+
+        if (generatedLoot.isEmpty()) {
+            events.add(new CombatEvent(monster.getName(), "LOOT", player.getName(), 0, "Монстр не оставил после себя ничего ценного."));
+        } else {
+            for (Map.Entry<ItemTemplate, Integer> entry : generatedLoot.entrySet()) {
+                ItemTemplate itemTemplate = entry.getKey();
+                int amount = entry.getValue();
+
+                inventoryService.addItemToPlayer(player, itemTemplate.getName(), amount);
+
+                events.add(new CombatEvent(monster.getName(), "LOOT", player.getName(), amount, "Выбито: " + itemTemplate.getName()));
+            }
+        }
+
+        return new CombatReport(round, events, true, false);
     }
 }

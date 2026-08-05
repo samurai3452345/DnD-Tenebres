@@ -18,6 +18,11 @@
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="template_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="level" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
