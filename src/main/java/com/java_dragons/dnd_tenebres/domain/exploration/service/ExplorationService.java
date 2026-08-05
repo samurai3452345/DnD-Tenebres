@@ -59,16 +59,18 @@ public class ExplorationService {
             return ExplorationReport.nothing("Здесь безопасно. Вы не нашли никого для охоты.");
         }
 
+        if (location.getType() == LocationType.DANGEROUS) {
+            return ExplorationReport.nothing("Вы убили всех монстров, тут пусто.");
+        }
+
         // Бросок на восприятие
         int roll = DiceRoller.rollD20();
         int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
         int totalCheck = roll + wisMod;
 
-        // В будущем сложность поиска (DC) можно привязать к локации
-        int difficultyClass = 12;
+        int difficultyClass = location.getHuntDifficulty();
 
         if (totalCheck >= difficultyClass) {
-            // Спавним монстра в зависимости от БИОМА локации, убираем хардкод "green_forest"
             Monster monster = monsterSpawnerService.spawnRandomMonster(location.getBiome().name(), location.getLevel());
 
             log.info("Игрок {} нашел монстра: {}", player.getName(), monster.getName());
