@@ -35,6 +35,7 @@ public class MonsterSpawnerService {
 
         Monster monster = Monster.builder()
                 .name(template.getName())
+                .templateName(template.getName())
                 .level(template.getLevel())
                 .currentHp(template.getBaseHp())
                 .maxHp(template.getBaseHp())
@@ -66,6 +67,7 @@ public class MonsterSpawnerService {
             for (int i = 0; i < fm.getCount(); i++) {
                 Monster monster = Monster.builder()
                         .name(template.getName() + (fm.getCount() > 1 ? " #" + (i+1) : ""))
+                        .templateName(template.getName())
                         .level(template.getLevel())
                         .maxHp(template.getBaseHp())
                         .currentHp(template.getBaseHp())

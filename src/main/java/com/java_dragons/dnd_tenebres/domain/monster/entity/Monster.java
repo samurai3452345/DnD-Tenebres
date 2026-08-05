@@ -33,6 +33,9 @@ public class Monster {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "template_name", nullable = false)
+    private String templateName;
+
     @Column(name = "level")
     private int level;
 
@@ -123,9 +126,11 @@ public class Monster {
         int totalDamage = diceDamage + this.damageBonus;
         return new MonsterAttackResult(this.attackName, totalDamage);
     }
+
     @Transient
     @Builder.Default
     private List<ActiveEffect> combatEffects = new ArrayList<>();
+
     public void addCombatEffect(ActiveEffect effect) {
         this.combatEffects.add(effect);
     }
