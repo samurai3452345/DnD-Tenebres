@@ -43,6 +43,10 @@ public class ExplorationService {
         Player player = getPlayer(playerId);
         Location currentLocation = player.getCurrentLocation();
 
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Вы не можете путешествовать, пока находитесь в бою!");
+        }
+
         Set<Location> paths = locationService.getAvailableConnections(currentLocation.getId());
 
         Location targetLocation = paths.stream()
@@ -62,6 +66,9 @@ public class ExplorationService {
 
                 if (hasEnemies) {
                     List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(targetLocation.getId());
+
+                    player.enterCombat(squad.get(0).getId());
+
                     log.info("Засада в локации {}! Врагов: {}", targetLocation.getName(), squad.size());
 
                     return ExplorationReport.combat("Как только вы вошли, на вас напали!", squad.get(0).getId());
@@ -76,6 +83,11 @@ public class ExplorationService {
     @Transactional
     public ExplorationReport hunt(Long playerId) {
         Player player = getPlayer(playerId);
+
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Вы уже в бою! Сначала победите текущего врага.");
+        }
+
         Location location = player.getCurrentLocation();
 
         if (location.getType() == LocationType.SAFE_ZONE) {
@@ -95,6 +107,8 @@ public class ExplorationService {
         if (totalCheck >= difficultyClass) {
             Monster monster = monsterSpawnerService.spawnRandomMonster(location.getId());
 
+            player.enterCombat(monster.getId());
+
             log.info("Игрок {} нашел монстра: {}", player.getName(), monster.getName());
             return ExplorationReport.combat("Из теней появляется " + monster.getName() + "!", monster.getId());
         }
@@ -105,6 +119,11 @@ public class ExplorationService {
     @Transactional
     public ExplorationReport search(Long playerId) {
         Player player = getPlayer(playerId);
+
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Нельзя искать предметы, когда вас пытаются убить!");
+        }
+
         Location location = player.getCurrentLocation();
 
         // 1. Бросаем кубик на успешность обыска

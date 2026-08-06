@@ -76,6 +76,8 @@
             </column>
 
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+
+            <column name="active_combat_monster_id" type="BIGINT"/>
         </createTable>
     </changeSet>
 

@@ -28,6 +28,10 @@ public class RestingService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Вы не можете разбить привал во время боя!");
+        }
+
         LocationType locType = player.getCurrentLocation().getType();
 
         if (!player.consumeItemByName("Припасы")) {
@@ -67,6 +71,10 @@ public class RestingService {
     public RestReport takeLongRest(Long playerId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Вы не можете путешествовать, пока находитесь в бою!");
+        }
 
         LocationType type = player.getCurrentLocation().getType();
         LocationEffect effect = player.getCurrentLocation().getEffect();

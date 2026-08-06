@@ -32,6 +32,7 @@ import com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterSkillStrateg
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
+import com.java_dragons.dnd_tenebres.domain.player.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +59,7 @@ public class CombatServiceImpl implements CombatService {
     private final InventoryService inventoryService;
     private final MonsterTemplateRepository monsterTemplateRepository;
     private final LocationClearService locationClearService;
+    private final PlayerService playerService;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -70,7 +72,8 @@ public class CombatServiceImpl implements CombatService {
                              LootGeneratorService lootGeneratorService,
                              InventoryService inventoryService,
                              MonsterTemplateRepository monsterTemplateRepository,
-                             LocationClearService locationClearService) {
+                             LocationClearService locationClearService,
+                             PlayerService playerService) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -86,6 +89,7 @@ public class CombatServiceImpl implements CombatService {
         this.inventoryService = inventoryService;
         this.monsterTemplateRepository = monsterTemplateRepository;
         this.locationClearService = locationClearService;
+        this.playerService = playerService;
     }
 
     @Override
@@ -109,8 +113,26 @@ public class CombatServiceImpl implements CombatService {
         switch (action) {
             case ATTACK -> handlePlayerAttack(player, monster, aliveEnemyCount, events);
             case USE_POTION -> handlePotionUse(player, actionTargetName, events);
-            case CAST_SPELL -> handlePlayerCastSpell(player, monster, aliveEnemyCount, actionTargetName, events);
-            case FLEE -> events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Двери заперты"));
+            case CAST_SPELL -> handlePlayerCastSpell(player, monster, actionTargetName, events);
+            case FLEE -> {
+                int fleeRoll = DiceRoller.rollD20();
+                if (fleeRoll >= 10) {
+                    events.add(new CombatEvent(player.getName(), "FLEE_SUCCESS", monster.getName(), fleeRoll, "Вы бросаетесь наутек, открываясь для удара вдогонку!"));
+
+                    handleEnemyTurn(player, monster, round, events);
+
+                    player.leaveCombat();
+
+                    boolean isDead = player.getCurrentHp() <= 0;
+                    if (isDead) {
+                        events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы не пережили этот побег"));
+                    }
+
+                    return new CombatReport(round, events, false, isDead);
+                } else {
+                    events.add(new CombatEvent(player.getName(), "FLEE_FAIL", monster.getName(), fleeRoll, "Путь к отступлению отрезан! Враг атакует!"));
+                }
+            }
         }
 
         if (monster.isDead()) {
@@ -121,13 +143,14 @@ public class CombatServiceImpl implements CombatService {
 
         boolean isPlayerDead = player.getCurrentHp() <= 0;
         if (isPlayerDead) {
+            player.leaveCombat();
             events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли"));
         }
 
         return new CombatReport(round, events, false, isPlayerDead);
     }
 
-    private void handlePlayerCastSpell(Player player, Monster monster, int aliveEnemyCount, String spellName, List<CombatEvent> events) {
+    private void handlePlayerCastSpell(Player player, Monster monster, String spellName, List<CombatEvent> events) {
         Optional<PlayerItem> magicWeaponOpt = player.getMainHandWeapon()
                 .filter(item -> item.getTemplate().getType() == ItemType.MAGIC_WEAPON);
 
@@ -280,7 +303,7 @@ public class CombatServiceImpl implements CombatService {
         if (shieldHpOpt.isPresent()) {
             ActiveEffect shield = shieldHpOpt.get();
             if (damage <= shield.getPower()) {
-                shield.reducePower(damage); // Тот самый наш бизнес-метод!
+                shield.reducePower(damage);
                 events.add(new CombatEvent(player.getName(), "BLOCK", monster.getName(), damage, "Магический щит принял удар"));
                 damage = 0;
             } else {
@@ -350,7 +373,7 @@ public class CombatServiceImpl implements CombatService {
         }
 
         Optional<PlayerItem> weaponOpt = player.getMainHandWeapon();
-        int baseWeaponDamage = 0;
+        int baseWeaponDamage;
         int rarityBonus = 0;
 
         if (weaponOpt.isPresent()) {
@@ -409,6 +432,8 @@ public class CombatServiceImpl implements CombatService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
+        player.enterCombat(monster.getId());
+
         List<CombatEvent> events = new ArrayList<>();
         events.add(new CombatEvent(monster.getName(), "AMBUSH", player.getName(), 0, "Монстр напал на вас во время привала!"));
 
@@ -416,6 +441,7 @@ public class CombatServiceImpl implements CombatService {
 
         boolean isPlayerDead = player.getCurrentHp() <= 0;
         if (isPlayerDead) {
+            player.leaveCombat();
             events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли во сне..."));
         }
 
@@ -432,6 +458,14 @@ public class CombatServiceImpl implements CombatService {
         Monster monster = monsterRepository.findById(request.monsterId())
                 .orElseThrow(() -> new IllegalArgumentException("Монстр не найден"));
 
+        if (player.isInCombat() && !player.getActiveCombatMonsterId().equals(monster.getId())) {
+            throw new IllegalStateException("Вы уже сражаетесь с другим противником!");
+        }
+
+        if (!player.isInCombat()) {
+            player.enterCombat(monster.getId());
+        }
+
         return executeTurn(
                 player,
                 monster,
@@ -444,6 +478,16 @@ public class CombatServiceImpl implements CombatService {
 
     private CombatReport handleMonsterDeath(Player player, Monster monster, int aliveEnemyCount, int round, List<CombatEvent> events, String deathMessage) {
         events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, deathMessage));
+
+        playerService.addExperienceToPlayer(player, monster.getXpReward());
+        player.addGold(monster.getGoldReward());
+
+        events.add(new CombatEvent("Система", "REWARD", player.getName(), monster.getXpReward(), "Получен опыт"));
+        if (monster.getGoldReward() > 0) {
+            events.add(new CombatEvent("Система", "REWARD", player.getName(), monster.getGoldReward(), "Найдено золото"));
+        }
+
+        player.leaveCombat();
 
         MonsterTemplate template = monsterTemplateRepository.findByName(monster.getTemplateName())
                 .orElseThrow(() -> new IllegalStateException("Шаблон монстра не найден: " + monster.getTemplateName()));
