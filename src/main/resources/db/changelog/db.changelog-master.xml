@@ -26,6 +26,7 @@
     <include file="/db/changelog/019-add-monster-with-loot.xml"/>
     <include file="/db/changelog/020-create-random-encounters.xml"/>
     <include file="/db/changelog/021-create-cleared-locations.xml"/>
+    <include file="/db/changelog/022-create-location-loot-tables.xml"/>
 
 
 </databaseChangeLog>
