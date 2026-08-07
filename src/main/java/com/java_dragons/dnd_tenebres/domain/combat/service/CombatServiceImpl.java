@@ -123,12 +123,15 @@ public class CombatServiceImpl implements CombatService {
 
                     player.leaveCombat();
 
-                    boolean isDead = player.getCurrentHp() <= 0;
-                    if (isDead) {
-                        events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы не пережили этот побег"));
+                    boolean isPlayerDead = player.getCurrentHp() <= 0;
+                    if (isPlayerDead) {
+                        player.leaveCombat();
+                        playerService.respawnPlayer(player);
+                        events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0,
+                                "Вы погибли. Очнувшись в таверне 'Очаг Севера', вы обнаружили пропажу части золота..."));
                     }
 
-                    return new CombatReport(round, events, false, isDead);
+                    return new CombatReport(round, events, false, isPlayerDead);
                 } else {
                     events.add(new CombatEvent(player.getName(), "FLEE_FAIL", monster.getName(), fleeRoll, "Путь к отступлению отрезан! Враг атакует!"));
                 }

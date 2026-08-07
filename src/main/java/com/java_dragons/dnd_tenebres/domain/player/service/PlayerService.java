@@ -7,6 +7,8 @@ import com.java_dragons.dnd_tenebres.domain.player.dto.StatAllocationRequest;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.mapper.PlayerMapper;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
+import com.java_dragons.dnd_tenebres.domain.location.entity.Location;
+import com.java_dragons.dnd_tenebres.domain.location.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final PlayerMapper playerMapper;
     private final ProgressionCalculator progressionCalculator;
+    private final LocationService locationService;
+
 
     @Transactional
     public PlayerResponse createPlayer(PlayerCreationRequest request) {
@@ -72,5 +76,14 @@ public class PlayerService {
         );
 
         return playerMapper.toResponse(player);
+    }
+
+    @Transactional
+    public void respawnPlayer(Player player) {
+        player.revive();
+        player.clearEffects();
+
+        Location tavern = locationService.getLocationById("city_tavern");
+        player.moveTo(tavern);
     }
 }
