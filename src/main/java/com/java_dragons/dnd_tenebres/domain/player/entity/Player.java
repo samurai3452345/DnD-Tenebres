@@ -398,4 +398,10 @@ public class Player {
         return this.activeCombatMonsterId != null;
     }
 
+    public void revive() {
+        this.currentHp = 1;
+        long lostGold = (long) (this.gold * 0.20); // Штраф 20% золота
+        this.gold -= lostGold;
+    }
+
 }
