@@ -12,3 +12,9 @@ spring:
     show-sql: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+
+application:
+  security:
+    jwt:
+      # на проде он должен передаваться через переменные окружения!
+      secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
