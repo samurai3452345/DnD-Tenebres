@@ -5,11 +5,23 @@ services:
     container_name: dnd_postgres_v4
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "31415926535"
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: dnd_tenebres
     ports:
       - "5433:5432"
     volumes:
       - postgres_data_v4:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: dnd_backend
+    ports:
+      - "8081:8081"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/dnd_tenebres
+    depends_on:
+      - db
+
 volumes:
   postgres_data_v4:
