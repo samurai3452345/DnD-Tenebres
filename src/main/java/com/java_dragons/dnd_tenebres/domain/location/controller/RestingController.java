@@ -6,6 +6,7 @@ import com.java_dragons.dnd_tenebres.domain.location.service.RestingService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.dto.RestReport;
+import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +22,14 @@ public class RestingController {
     private final CombatService combatService;
     private final MonsterSpawnerService monsterSpawnerService;
 
-    @PostMapping("/short/{playerId}")
-    public ResponseEntity<?> takeShortRest(@PathVariable Long playerId) {
+    @PostMapping("/short")
+    public ResponseEntity<?> takeShortRest(@CurrentPlayerId Long playerId) {
 
         RestReport report = restingService.takeShortRest(playerId);
 
         if (report.isAmbushed()) {
 
-            Monster ambushingMonster = monsterSpawnerService.spawnRandomMonster(report.biome(), report.level());
-
+            Monster ambushingMonster = monsterSpawnerService.spawnRandomMonster(report.locationId());
             CombatReport ambushReport = combatService.executeAmbushTurn(playerId, ambushingMonster);
 
             return ResponseEntity.ok(Map.of(
@@ -46,8 +46,8 @@ public class RestingController {
         ));
     }
 
-    @PostMapping("/long/{playerId}")
-    public ResponseEntity<?> takeLongRest(@PathVariable Long playerId) {
+    @PostMapping("/long")
+    public ResponseEntity<?> takeLongRest(@CurrentPlayerId Long playerId) {
 
         RestReport report = restingService.takeLongRest(playerId);
 

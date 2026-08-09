@@ -52,10 +52,10 @@ public class RestingService {
         if (isAmbushed) {
             log.warn("Отдых прерван! Засада!");
 
-            String biome = player.getCurrentLocation().getBiome().name();
-            int locationLevel = player.getCurrentLocation().getLevel();
+            // Берем ID локации вместо биома и уровня
+            String locationId = player.getCurrentLocation().getId();
 
-            return new RestReport("Ваш отдых был прерван внезапным нападением!", true, biome, locationLevel);
+            return new RestReport("Ваш отдых был прерван внезапным нападением!", true, locationId);
         }
 
         player.heal(player.getMaxHp() / 2);
@@ -64,7 +64,7 @@ public class RestingService {
         player.removeEffect(EffectType.BLEEDING);
         player.removeEffect(EffectType.BURN);
 
-        return new RestReport("Вы немного отдохнули и перевели дух.", false, null, 0);
+        return new RestReport("Вы немного отдохнули и перевели дух.", false);
     }
 
     @Transactional

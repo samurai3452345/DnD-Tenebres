@@ -3,6 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.item.controller;
 import com.java_dragons.dnd_tenebres.domain.item.dto.EquipRequest;
 import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
+import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,15 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @GetMapping("/{playerId}")
-    public ResponseEntity<List<PlayerItem>> getInventory(@PathVariable Long playerId) {
+    @GetMapping
+    public ResponseEntity<List<PlayerItem>> getInventory(@CurrentPlayerId Long playerId) {
         List<PlayerItem> inventory = inventoryService.getPlayerInventory(playerId);
         return ResponseEntity.ok(inventory);
     }
 
-    @PostMapping("/{playerId}/equip/{itemId}")
+    @PostMapping("/equip/{itemId}")
     public ResponseEntity<?> equipItem(
-            @PathVariable Long playerId,
+            @CurrentPlayerId Long playerId,
             @PathVariable Long itemId,
             @RequestBody EquipRequest request) {
 
@@ -37,9 +38,9 @@ public class InventoryController {
         ));
     }
 
-    @PostMapping("/{playerId}/unequip")
+    @PostMapping("/unequip")
     public ResponseEntity<?> unequipItem(
-            @PathVariable Long playerId,
+            @CurrentPlayerId Long playerId,
             @RequestBody EquipRequest request) {
 
         inventoryService.unequipItem(playerId, request.slot());
