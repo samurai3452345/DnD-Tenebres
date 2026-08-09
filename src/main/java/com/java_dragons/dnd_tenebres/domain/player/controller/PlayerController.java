@@ -3,6 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.player.controller;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerResponse;
 import com.java_dragons.dnd_tenebres.domain.player.service.PlayerService;
+import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,8 @@ public class PlayerController {
         return playerService.createPlayer(request);
     }
 
-    @GetMapping("/{id}")
-    public PlayerResponse getPlayer(@PathVariable long id) {
+    @GetMapping("/me")
+    public PlayerResponse getPlayer(@CurrentPlayerId Long id) {
         return playerService.getPlayerById(id);
     }
-
 }
