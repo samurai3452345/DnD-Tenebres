@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+   <changeSet id="025-populate-quests" author="Sawaron">
+       <insert tableName="quest_templates">
+           <column name="name" value="Зачистка леса"/>
+           <column name="description" value="Зачистить локацию 'Лес'"/>
+           <column name="quest_type" value="CLEAR_LOCATION"/>
+           <column name="target_identifier" value="Лес"/>
+           <column name="target_count" value="1"/>
+           <column name="reward_xp" value="300"/>
+           <column name="reward_gold" value="55"/>
+       </insert>
+       <insert tableName="quest_templates">
+           <column name="name" value="Убийца гоблинов"/>
+           <column name="description" value="Убить гоблинов"/>
+           <column name="quest_type" value="KILL_MONSTERS"/>
+           <column name="target_identifier" value="Лесной Гоблин"/>
+           <column name="target_count" value="5"/>
+           <column name="reward_xp" value="75"/>
+           <column name="reward_gold" value="25"/>
+       </insert>
+       <insert tableName="quest_templates">
+           <column name="name" value="Охотник за кожей"/>
+           <column name="description" value="Собрать кожу"/>
+           <column name="quest_type" value="GATHER_ITEMS"/>
+           <column name="target_identifier" value="Кожа"/>
+           <column name="target_count" value="10"/>
+           <column name="reward_xp" value="25"/>
+           <column name="reward_gold" value="20"/>
+       </insert>
+       <insert tableName="quest_templates">
+           <column name="name" value="Вдруг повезет"/>
+           <column name="description" value="Найти чешую дракона"/>
+           <column name="quest_type" value="GATHER_ITEMS"/>
+           <column name="target_identifier" value="Чешуя дракона"/>
+           <column name="target_count" value="1"/>
+           <column name="reward_xp" value="2500"/>
+           <column name="reward_gold" value="3000"/>
+       </insert>
+   </changeSet>
+</databaseChangeLog>
