@@ -43,10 +43,33 @@ public class PlayerQuest {
             questStatus = QuestStatus.COMPLETED;
         }
     }
+
     public void markAsRewarded() {
         if (this.questStatus != QuestStatus.COMPLETED) {
             throw new IllegalStateException("Quest status must be COMPLETED");
         }
         this.questStatus = QuestStatus.REWARDED;
+    }
+
+    private PlayerQuest(Player player, QuestTemplate questTemplate) {
+        this.questStatus = QuestStatus.ACTIVE;
+        this.currentProgress = 0;
+        this.questTemplate = questTemplate;
+        this.player = player;
+    }
+
+    public static PlayerQuest create(Player player, QuestTemplate questTemplate) {
+
+        PlayerQuest playerQuest = new PlayerQuest(player, questTemplate);
+
+        return playerQuest;
+
+    }
+    public int getRewardXp() {
+        return questTemplate.getRewardXp();
+    }
+
+    public int getRewardGold() {
+        return questTemplate.getRewardGold();
     }
 }
