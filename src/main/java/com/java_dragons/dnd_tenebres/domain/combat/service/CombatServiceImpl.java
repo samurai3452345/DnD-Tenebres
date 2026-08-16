@@ -1,5 +1,8 @@
 package com.java_dragons.dnd_tenebres.domain.combat.service;
 
+import com.java_dragons.dnd_tenebres.core.event.ItemLootedEvent;
+import com.java_dragons.dnd_tenebres.core.event.LocationClearedEvent;
+import com.java_dragons.dnd_tenebres.core.event.MonsterKilledEvent;
 import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatEvent;
@@ -34,6 +37,7 @@ import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import com.java_dragons.dnd_tenebres.domain.player.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +64,7 @@ public class CombatServiceImpl implements CombatService {
     private final MonsterTemplateRepository monsterTemplateRepository;
     private final LocationClearService locationClearService;
     private final PlayerService playerService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -73,7 +78,7 @@ public class CombatServiceImpl implements CombatService {
                              InventoryService inventoryService,
                              MonsterTemplateRepository monsterTemplateRepository,
                              LocationClearService locationClearService,
-                             PlayerService playerService) {
+                             PlayerService playerService, ApplicationEventPublisher applicationEventPublisher) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -90,6 +95,7 @@ public class CombatServiceImpl implements CombatService {
         this.monsterTemplateRepository = monsterTemplateRepository;
         this.locationClearService = locationClearService;
         this.playerService = playerService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -481,6 +487,7 @@ public class CombatServiceImpl implements CombatService {
 
     private CombatReport handleMonsterDeath(Player player, Monster monster, int aliveEnemyCount, int round, List<CombatEvent> events, String deathMessage) {
         events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, deathMessage));
+        applicationEventPublisher.publishEvent(new MonsterKilledEvent(player.getId(), monster.getTemplateName()));
 
         playerService.addExperienceToPlayer(player, monster.getXpReward());
         player.addGold(monster.getGoldReward());
@@ -505,6 +512,7 @@ public class CombatServiceImpl implements CombatService {
                 int amount = entry.getValue();
 
                 inventoryService.addItemToPlayer(player, itemTemplate.getName(), amount);
+                applicationEventPublisher.publishEvent(new ItemLootedEvent(player.getId(), itemTemplate.getName(), amount));
                 events.add(new CombatEvent(monster.getName(), "LOOT", player.getName(), amount, "Выбито: " + itemTemplate.getName() + " (x" + amount + ")"));
             }
         }
@@ -514,6 +522,7 @@ public class CombatServiceImpl implements CombatService {
 
             locationClearService.markLocationAsCleared(player.getId(), locationId);
 
+            applicationEventPublisher.publishEvent(new LocationClearedEvent(player.getId(), locationId));
             events.add(new CombatEvent("Система", "ROOM_CLEARED", player.getName(), 0, "Врагов больше нет. Локация зачищена!"));
         }
 

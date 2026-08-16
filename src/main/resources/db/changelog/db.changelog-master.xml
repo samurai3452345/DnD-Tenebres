@@ -28,7 +28,8 @@
     <include file="/db/changelog/021-create-cleared-locations.xml"/>
     <include file="/db/changelog/022-create-location-loot-tables.xml"/>
     <include file="/db/changelog/023-create-user-accounts.xml"/>
-
+    <include file="/db/changelog/024-create-quests.xml"/>
+    <include file="/db/changelog/025-populate-quests.xml"/>
 
 
 </databaseChangeLog>
