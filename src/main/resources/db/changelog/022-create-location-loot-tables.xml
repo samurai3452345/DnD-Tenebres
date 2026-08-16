@@ -11,7 +11,6 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="location_id" type="VARCHAR(100)">
-                <!-- Ссылка на строковый ID локации -->
                 <constraints nullable="false" foreignKeyName="fk_loc_loot_location" referencedTableName="locations" referencedColumnNames="id"/>
             </column>
             <column name="item_template_id" type="BIGINT">
@@ -23,7 +22,6 @@
             <column name="max_amount" type="INTEGER" defaultValueNumeric="1">
                 <constraints nullable="false"/>
             </column>
-            <!-- Шанс нахождения при успешном обыске -->
             <column name="find_chance" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
@@ -31,7 +29,6 @@
     </changeSet>
 
     <changeSet id="023-populate-location-loot" author="Sawaron">
-        <!-- Лес: Тихая опушка (Кровоцвет 30%) -->
         <sql>
             INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
             VALUES ('forest_edge', (SELECT id FROM item_templates WHERE name = 'Кровоцвет'), 1, 2, 30);

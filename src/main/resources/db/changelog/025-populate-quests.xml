@@ -5,42 +5,48 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-   <changeSet id="025-populate-quests" author="Sawaron">
-       <insert tableName="quest_templates">
-           <column name="name" value="Зачистка леса"/>
-           <column name="description" value="Зачистить локацию 'Лес'"/>
-           <column name="quest_type" value="CLEAR_LOCATION"/>
-           <column name="target_identifier" value="Лес"/>
-           <column name="target_count" value="1"/>
-           <column name="reward_xp" value="300"/>
-           <column name="reward_gold" value="55"/>
-       </insert>
-       <insert tableName="quest_templates">
-           <column name="name" value="Убийца гоблинов"/>
-           <column name="description" value="Убить гоблинов"/>
-           <column name="quest_type" value="KILL_MONSTERS"/>
-           <column name="target_identifier" value="Лесной Гоблин"/>
-           <column name="target_count" value="5"/>
-           <column name="reward_xp" value="75"/>
-           <column name="reward_gold" value="25"/>
-       </insert>
-       <insert tableName="quest_templates">
-           <column name="name" value="Охотник за кожей"/>
-           <column name="description" value="Собрать кожу"/>
-           <column name="quest_type" value="GATHER_ITEMS"/>
-           <column name="target_identifier" value="Кожа"/>
-           <column name="target_count" value="10"/>
-           <column name="reward_xp" value="25"/>
-           <column name="reward_gold" value="20"/>
-       </insert>
-       <insert tableName="quest_templates">
-           <column name="name" value="Вдруг повезет"/>
-           <column name="description" value="Найти чешую дракона"/>
-           <column name="quest_type" value="GATHER_ITEMS"/>
-           <column name="target_identifier" value="Чешуя дракона"/>
-           <column name="target_count" value="1"/>
-           <column name="reward_xp" value="2500"/>
-           <column name="reward_gold" value="3000"/>
-       </insert>
-   </changeSet>
+    <changeSet id="025-populate-quests" author="Sawaron">
+
+        <insert tableName="quest_templates">
+            <column name="name" value="Зачистка леса"/>
+            <column name="description" value="Зачистить локацию 'Гоблинский лагерь'"/>
+            <column name="quest_type" value="CLEAR_LOCATION"/>
+            <column name="target_identifier" value="forest_goblin_camp"/>
+            <column name="target_count" valueNumeric="1"/>
+            <column name="reward_xp" valueNumeric="300"/>
+            <column name="reward_gold" valueNumeric="55"/>
+        </insert>
+
+        <insert tableName="quest_templates">
+            <column name="name" value="Убийца гоблинов"/>
+            <column name="description" value="Убить гоблинов"/>
+            <column name="quest_type" value="KILL_MONSTERS"/>
+            <column name="target_identifier" value="Гоблин"/>
+            <column name="target_count" valueNumeric="5"/>
+            <column name="reward_xp" valueNumeric="75"/>
+            <column name="reward_gold" valueNumeric="25"/>
+        </insert>
+
+        <insert tableName="quest_templates">
+            <column name="name" value="Охотник за кожей"/>
+            <column name="description" value="Собрать кожу"/>
+            <column name="quest_type" value="GATHER_ITEMS"/>
+            <column name="target_identifier" value="Кожа"/>
+            <column name="target_count" valueNumeric="10"/>
+            <column name="reward_xp" valueNumeric="25"/>
+            <column name="reward_gold" valueNumeric="20"/>
+        </insert>
+
+        <insert tableName="quest_templates">
+            <column name="name" value="Вдруг повезет"/>
+            <column name="description" value="Найти драконью чешую"/>
+            <column name="quest_type" value="GATHER_ITEMS"/>
+            <column name="target_identifier" value="Драконья чешуя"/>
+            <column name="target_count" valueNumeric="1"/>
+            <column name="reward_xp" valueNumeric="2500"/>
+            <column name="reward_gold" valueNumeric="3000"/>
+        </insert>
+
+    </changeSet>
+
 </databaseChangeLog>

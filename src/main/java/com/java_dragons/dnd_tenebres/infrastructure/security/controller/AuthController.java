@@ -27,7 +27,6 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final PlayerService playerService;
 
-    // Рекорд для регистрации (создает и аккаунт, и персонажа)
     public record RegisterRequest(String username, String password, PlayerCreationRequest playerRequest) {}
     public record AuthResponse(String token) {}
     public record LoginRequest(String username, String password) {}
