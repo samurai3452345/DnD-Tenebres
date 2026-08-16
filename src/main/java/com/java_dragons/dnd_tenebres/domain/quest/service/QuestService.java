@@ -18,14 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class QuestService {
+
     private final PlayerQuestRepository playerQuestRepository;
     private final QuestTemplateRepository questTemplateRepository;
-    private final Player player;
     private final PlayerRepository playerRepository;
 
     public PlayerQuest acceptQuest(Player player, QuestTemplate questTemplate) {
@@ -56,41 +55,36 @@ public class QuestService {
 
     @EventListener
     public void onMonsterKilled(MonsterKilledEvent event) {
-        List<PlayerQuest> quests = playerQuestRepository.findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(event.playerId(), QuestStatus.ACTIVE, QuestType.KILL_MONSTERS, event.monsterTemplateName());
+        List<PlayerQuest> quests = playerQuestRepository.findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(
+                event.playerId(), QuestStatus.ACTIVE, QuestType.KILL_MONSTERS, event.monsterTemplateName());
 
-        quests.forEach(playerQuest -> {
-            playerQuest.incrementProgress(1);
-        });
-
+        quests.forEach(playerQuest -> playerQuest.incrementProgress(1));
         playerQuestRepository.saveAll(quests);
     }
 
     @EventListener
     public void onItemLooted(ItemLootedEvent event) {
-        List<PlayerQuest> quests = playerQuestRepository.findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(event.playerId(), QuestStatus.ACTIVE, QuestType.GATHER_ITEMS, event.itemTemplateName());
+        List<PlayerQuest> quests = playerQuestRepository.findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(
+                event.playerId(), QuestStatus.ACTIVE, QuestType.GATHER_ITEMS, event.itemTemplateName());
 
-        quests.forEach(playerQuest -> {
-            playerQuest.incrementProgress(event.amount());
-        });
-
+        quests.forEach(playerQuest -> playerQuest.incrementProgress(event.amount()));
         playerQuestRepository.saveAll(quests);
     }
 
     @EventListener
     public void onLocationCleared(LocationClearedEvent event) {
-        List<PlayerQuest> quests = playerQuestRepository.findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(event.playerId(), QuestStatus.ACTIVE, QuestType.CLEAR_LOCATION, event.locationId());
+        List<PlayerQuest> quests = playerQuestRepository.findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(
+                event.playerId(), QuestStatus.ACTIVE, QuestType.CLEAR_LOCATION, event.locationId());
 
-        quests.forEach(playerQuest -> {
-            playerQuest.incrementProgress(1);
-        });
-
+        quests.forEach(playerQuest -> playerQuest.incrementProgress(1));
         playerQuestRepository.saveAll(quests);
-
     }
 
     public void turnInQuest(Long playerId, Long playerQuestId) {
         PlayerQuest playerQuest = playerQuestRepository.findByPlayerIdAndId(playerId, playerQuestId)
                 .orElseThrow(() -> new IllegalArgumentException("Not found!"));
+
+        Player player = playerQuest.getPlayer();
 
         player.addExperience(playerQuest.getRewardXp());
         player.addGold(playerQuest.getRewardGold());
@@ -98,33 +92,24 @@ public class QuestService {
         playerQuest.markAsRewarded();
 
         playerQuestRepository.save(playerQuest);
-
     }
 
     public List<QuestTemplate> getAvailableQuests(Long playerId) {
-
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Player not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
 
         if (player.getCurrentLocation() == null ||
                 !player.getCurrentLocation().getId().equals("city_adv_guild")) {
-            throw new IllegalStateException(
-                    "Player must be in Adventurers Guild"
-            );
+            throw new IllegalStateException("Player must be in Adventurers Guild");
         }
 
         return questTemplateRepository.findAvailableForPlayer(playerId);
     }
 
     public List<PlayerQuest> getActiveQuests(Long playerId) {
-
         return playerQuestRepository.findByPlayerIdAndQuestStatusIn(
                 playerId,
-                List.of(
-                        QuestStatus.ACTIVE,
-                        QuestStatus.COMPLETED
-                )
+                List.of(QuestStatus.ACTIVE, QuestStatus.COMPLETED)
         );
     }
 }

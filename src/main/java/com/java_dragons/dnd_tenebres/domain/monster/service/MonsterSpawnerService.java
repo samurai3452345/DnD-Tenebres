@@ -27,22 +27,18 @@ public class MonsterSpawnerService {
 
     @Transactional
     public Monster spawnRandomMonster(String locationId) {
-        // 1. Получаем список встреч для конкретной локации
         List<LocationRandomEncounter> encounters = randomEncounterRepository.findByLocationId(locationId);
 
         if (encounters.isEmpty()) {
             throw new IllegalArgumentException("В локации " + locationId + " нет случайных встреч!");
         }
 
-        // 2. Считаем общий вес шансов
         int totalWeight = encounters.stream().mapToInt(LocationRandomEncounter::getSpawnChance).sum();
 
-        // 3. Бросаем кубик от 0 до totalWeight - 1
         int roll = ThreadLocalRandom.current().nextInt(totalWeight);
         int currentSum = 0;
         String chosenMonsterName = null;
 
-        // 4. Определяем, кто выпал (алгоритм рулетки)
         for (LocationRandomEncounter encounter : encounters) {
             currentSum += encounter.getSpawnChance();
             if (roll < currentSum) {
@@ -51,14 +47,11 @@ public class MonsterSpawnerService {
             }
         }
 
-        // 5. Загружаем шаблон выпавшего монстра из БД
-        // Создаем финальную копию переменной специально для лямбды
         final String finalMonsterName = chosenMonsterName;
 
         MonsterTemplate template = monsterTemplateRepository.findByName(finalMonsterName)
                 .orElseThrow(() -> new IllegalStateException("Шаблон монстра не найден: " + finalMonsterName));
 
-        // 6. Создаем физического монстра
         Monster monster = Monster.builder()
                 .name(template.getName())
                 .templateName(template.getName())
