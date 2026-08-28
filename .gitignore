@@ -34,3 +34,7 @@ build/
 
 ### Environment Variables & Secrets ###
 .env
+
+### Node / Frontend ###
+node_modules/
+dist/
