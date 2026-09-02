@@ -24,6 +24,7 @@ export interface Player {
     totalWisdom: number;
     totalCharisma: number;
     armorClass: number;
+    activeCombatMonsterId: number | null;
 }
 
 export interface StatAllocationRequest {

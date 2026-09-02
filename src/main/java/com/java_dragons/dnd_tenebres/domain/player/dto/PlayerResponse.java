@@ -23,5 +23,5 @@ public class PlayerResponse {
     int totalWisdom;
     int totalCharisma;
     int armorClass;
-
+    Long activeCombatMonsterId;
 }

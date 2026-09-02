@@ -101,9 +101,11 @@ public class GameSimulationRunner implements CommandLineRunner {
 
 
             System.out.println("\n--- 🎬 СЦЕНА 1: ВХОД В СКЛЕП ---");
-            Location startLocation = locationService.getLocationById("crypt_entrance"); // Убедись что ID локации совпадает с твоим
+            Location startLocation = locationService.getLocationById("crypt_entrance");
             player.moveTo(startLocation);
-            explorationService.explore(player, startLocation, ExplorationAction.HUNT);
+            playerRepository.save(player);
+
+            explorationService.hunt(player.getId());
 
         } catch (Exception e) {
             System.err.println("\n❌ Симуляция прервана: " + e.getMessage());
