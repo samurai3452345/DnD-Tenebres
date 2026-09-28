@@ -5,6 +5,7 @@ import com.java_dragons.dnd_tenebres.core.event.LocationClearedEvent;
 import com.java_dragons.dnd_tenebres.core.event.MonsterKilledEvent;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
+import com.java_dragons.dnd_tenebres.domain.player.service.PlayerProgressionService;
 import com.java_dragons.dnd_tenebres.domain.quest.entity.PlayerQuest;
 import com.java_dragons.dnd_tenebres.domain.quest.entity.QuestTemplate;
 import com.java_dragons.dnd_tenebres.domain.quest.model.QuestStatus;
@@ -26,6 +27,7 @@ public class QuestService {
     private final PlayerQuestRepository playerQuestRepository;
     private final QuestTemplateRepository questTemplateRepository;
     private final PlayerRepository playerRepository;
+    private final PlayerProgressionService progressionService;
 
     public PlayerQuest acceptQuest(Player player, QuestTemplate questTemplate) {
         if (player.getCurrentLocation() == null || !player.getCurrentLocation().getId().equals("city_adv_guild")) {
@@ -86,7 +88,7 @@ public class QuestService {
 
         Player player = playerQuest.getPlayer();
 
-        player.addExperience(playerQuest.getRewardXp());
+        progressionService.grantExperience(player, playerQuest.getRewardXp());
         player.addGold(playerQuest.getRewardGold());
 
         playerQuest.markAsRewarded();

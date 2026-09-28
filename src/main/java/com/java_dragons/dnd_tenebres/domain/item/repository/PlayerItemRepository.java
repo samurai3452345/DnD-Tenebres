@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlayerItemRepository extends JpaRepository<PlayerItem, Long> {
     List<PlayerItem> findByPlayerId(Long playerId);
+    Optional<PlayerItem> findByIdAndPlayerId(Long id, Long playerId);
 }

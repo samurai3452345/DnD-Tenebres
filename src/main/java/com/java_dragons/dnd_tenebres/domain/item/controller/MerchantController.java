@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.List;
+import com.java_dragons.dnd_tenebres.domain.item.dto.ShopOfferResponse;
 
 @RestController
 @RequestMapping("/api/v1/merchant")
@@ -15,6 +17,17 @@ import java.util.Map;
 public class MerchantController {
 
     private final ShopService shopService;
+
+    @GetMapping("/offers")
+    public ResponseEntity<List<ShopOfferResponse>> offers(@CurrentPlayerId Long playerId) {
+        return ResponseEntity.ok(shopService.getAssortment(playerId));
+    }
+
+    @PostMapping("/buy-by-id")
+    public ResponseEntity<?> buyById(@CurrentPlayerId Long playerId, @RequestBody TradeRequest.BuyByIdRequest request) {
+        return ResponseEntity.ok(Map.of("status", "SUCCESS", "message",
+                shopService.buyItem(playerId, request.templateId(), request.amount())));
+    }
 
     @PostMapping("/buy")
     public ResponseEntity<?> buyItem(

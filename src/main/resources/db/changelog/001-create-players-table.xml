@@ -6,6 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="001-create-players-table" author="samurai3452345">
+        <validCheckSum>9:6f84baf2e2955dec5adbf3a0837ec4b2</validCheckSum>
         <createTable tableName="players">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>

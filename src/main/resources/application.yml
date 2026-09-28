@@ -1,20 +1,26 @@
 server:
   port: 8081
 
+game:
+  player:
+    start-location-id: city_square
+    respawn-location-id: city_tavern
+    start-gold: 50
+    death-gold-penalty-percent: 20
+    start-items:
+      - template: "Длинный меч"
+        amount: 1
+      - template: "Малое зелье лечения"
+        amount: 2
+      - template: "Припасы"
+        amount: 5
+
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/dnd_tenebres
-    username: postgres
-    password: 1
+  profiles:
+    default: local
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    open-in-view: false
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
-
-application:
-  security:
-    jwt:
-      # на проде он должен передаваться через переменные окружения!
-      secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970

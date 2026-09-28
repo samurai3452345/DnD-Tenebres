@@ -146,6 +146,43 @@ public class InventoryService {
         return playerItemRepository.findByPlayerId(playerId);
     }
 
+    @Transactional(readOnly = true)
+    public com.java_dragons.dnd_tenebres.domain.item.dto.InventoryResponse getInventoryResponse(Long playerId) {
+        List<com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse> items =
+                playerItemRepository.findByPlayerId(playerId).stream().map(this::toResponse).toList();
+        return new com.java_dragons.dnd_tenebres.domain.item.dto.InventoryResponse(items, items.size());
+    }
+
+    @Transactional(readOnly = true)
+    public com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse getItemResponse(Long playerId, Long itemId) {
+        return toResponse(requireOwnedItem(playerId, itemId));
+    }
+
+    @Transactional
+    public void setLocked(Long playerId, Long itemId, boolean locked) {
+        requireOwnedItem(playerId, itemId).setLocked(locked);
+    }
+
+    private PlayerItem requireOwnedItem(Long playerId, Long itemId) {
+        return playerItemRepository.findByIdAndPlayerId(itemId, playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден или не принадлежит игроку"));
+    }
+
+    private com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse toResponse(PlayerItem item) {
+        ItemTemplate t = item.getTemplate();
+        var template = new com.java_dragons.dnd_tenebres.domain.item.dto.ItemTemplateResponse(
+                t.getId(), t.getName(), t.getType(), t.getSlot(), t.getRarity(), t.getArmorType(),
+                t.getArmorClass(), t.getRequiredStrength(), t.getDamageDice(), t.getDiceCount(),
+                t.getPassiveEffect(), t.getConsumableAction());
+        var bonuses = new com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse.ItemBonuses(
+                item.getBonusStrength(), item.getBonusDexterity(), item.getBonusConstitution(),
+                item.getBonusIntelligence(), item.getBonusWisdom(), item.getBonusCharisma());
+        return new com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse(
+                item.getId(), template, item.getAmount(), item.isEquipped(), item.getEquippedSlot(),
+                item.isLocked(), item.getTier(), item.getItemXp(), bonuses,
+                item.getMagicEffect(), item.getMagicEffectElement());
+    }
+
     @Transactional
     public void equipItem(Long playerId, Long itemId, EquipmentSlot slot) {
         Player player = playerRepository.findById(playerId)

@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -27,12 +31,15 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final PlayerService playerService;
 
-    public record RegisterRequest(String username, String password, PlayerCreationRequest playerRequest) {}
+    public record RegisterRequest(@NotBlank @Size(max = 50) String username,
+                                  @NotBlank @Size(min = 8, max = 100) String password,
+                                  @Valid PlayerCreationRequest playerRequest) {}
     public record AuthResponse(String token) {}
     public record LoginRequest(String username, String password) {}
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    @Transactional
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
         if (userAccountRepository.findByUsername(request.username()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }

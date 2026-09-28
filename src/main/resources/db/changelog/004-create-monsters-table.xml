@@ -6,6 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="004-create-monsters-table" author="Sawaron">
+        <validCheckSum>9:19312b42b0020abe5dcf703260acc831</validCheckSum>
         <createTable tableName="monsters">
             <column name="id" type="BIGSERIAL">
                 <constraints primaryKey="true" nullable="false"/>

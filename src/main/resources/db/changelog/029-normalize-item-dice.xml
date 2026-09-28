@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="029-normalize-item-dice" author="codex">
+        <update tableName="item_templates">
+            <column name="damage_dice" valueComputed="NULL"/>
+            <where>damage_dice = ''</where>
+        </update>
+        <update tableName="item_templates">
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="RESTORE_MP"/>
+            <where>passive_effect = 'MANA_RESTORE'</where>
+        </update>
+        <update tableName="item_templates">
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="HEAL_HP"/>
+            <where>passive_effect = 'HEAL_INSTANT'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

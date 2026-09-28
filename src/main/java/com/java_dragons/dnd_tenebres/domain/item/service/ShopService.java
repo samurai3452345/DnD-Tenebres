@@ -10,6 +10,8 @@ import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import com.java_dragons.dnd_tenebres.domain.item.dto.ShopOfferResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class ShopService {
         ItemTemplate template = itemTemplateRepository.findByName(templateName)
                 .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
 
-        if (template.getType() != ItemType.CONSUMABLE) {
+        if (template.getType() != ItemType.CONSUMABLE && !template.getName().equals("Припасы")) {
             throw new IllegalArgumentException("Торговец продает только расходники и зелья!");
         }
 
@@ -46,6 +48,23 @@ public class ShopService {
 
         inventoryService.addItemToPlayer(player, templateName, amount);
         return String.format("Вы успешно купили %s (x%d) за %d золотых.", templateName, amount, price);
+    }
+
+    @Transactional
+    public String buyItem(Long playerId, Long templateId, int amount) {
+        ItemTemplate template = itemTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
+        return buyItem(playerId, template.getName(), amount);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ShopOfferResponse> getAssortment(Long playerId) {
+        Player player = playerRepository.findById(playerId).orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+        validateLocation(player);
+        return itemTemplateRepository.findByTypeIn(List.of(ItemType.CONSUMABLE, ItemType.RESOURCE)).stream()
+                .filter(t -> t.getType() == ItemType.CONSUMABLE || t.getName().equals("Припасы"))
+                .map(t -> new ShopOfferResponse(t.getId(), t.getName(), t.getType().name(), t.getRarity().name(), calculateBuyPrice(t)))
+                .toList();
     }
 
     @Transactional
@@ -65,6 +84,9 @@ public class ShopService {
         }
         if (item.isEquipped()) {
             throw new IllegalStateException("Сначала снимите предмет, прежде чем продавать его!");
+        }
+        if (item.isLocked()) {
+            throw new IllegalStateException("Заблокированный предмет нельзя продать");
         }
         if (item.getAmount() < amount) {
             throw new IllegalArgumentException("У вас нет такого количества предметов!");

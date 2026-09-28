@@ -1,5 +1,5 @@
 export interface RestReport {
     message: string;
-    currentHp: number;
-    maxHp: number;
+    status: "SUCCESS" | "AMBUSH";
+    monsterId?: number;
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="026-add-supplies" author="codex">
+        <insert tableName="item_templates">
+            <column name="name" value="Припасы"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="NONE"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

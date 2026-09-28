@@ -6,6 +6,9 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="015-populate-consumables" author="samurai3452345">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM item_templates WHERE name = 'Малое зелье маны'</sqlCheck>
+        </preConditions>
         <insert tableName="item_templates">
             <column name="name" value="Малое зелье маны"/>
             <column name="type" value="CONSUMABLE"/>
@@ -16,7 +19,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="25"/>
-            <column name="passive_effect" value="MANA_RESTORE"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="RESTORE_MP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Зелье маны"/>
@@ -28,7 +32,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="50"/>
-            <column name="passive_effect" value="MANA_RESTORE"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="RESTORE_MP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Королевское зелье маны"/>
@@ -40,7 +45,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="100"/>
-            <column name="passive_effect" value="MANA_RESTORE"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="RESTORE_MP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Малое зелье лечения"/>
@@ -52,7 +58,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="10"/>
-            <column name="passive_effect" value="HEAL_INSTANT"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="HEAL_HP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Зелье лечения"/>
@@ -64,7 +71,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="25"/>
-            <column name="passive_effect" value="HEAL_INSTANT"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="HEAL_HP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Королевское зелье лечения"/>
@@ -76,7 +84,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="62"/>
-            <column name="passive_effect" value="HEAL_INSTANT"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="HEAL_HP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Аурелиев эликсир"/>
@@ -88,7 +97,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="100"/>
-            <column name="passive_effect" value="HEAL_INSTANT"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="HEAL_HP"/>
         </insert>
         <insert tableName="item_templates">
             <column name="name" value="Амброзия"/>
@@ -100,7 +110,8 @@
             <column name="required_strength" value="0"/>
             <column name="damage_dice" value=""/>
             <column name="stat_budget" value="200"/>
-            <column name="passive_effect" value="HEAL_INSTANT"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="HEAL_HP"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

@@ -36,6 +36,7 @@ import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import com.java_dragons.dnd_tenebres.domain.player.service.PlayerService;
+import com.java_dragons.dnd_tenebres.domain.player.service.PlayerDeathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,7 @@ public class CombatServiceImpl implements CombatService {
     private final LocationClearService locationClearService;
     private final PlayerService playerService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final PlayerDeathService playerDeathService;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -78,7 +80,8 @@ public class CombatServiceImpl implements CombatService {
                              InventoryService inventoryService,
                              MonsterTemplateRepository monsterTemplateRepository,
                              LocationClearService locationClearService,
-                             PlayerService playerService, ApplicationEventPublisher applicationEventPublisher) {
+                             PlayerService playerService, ApplicationEventPublisher applicationEventPublisher,
+                             PlayerDeathService playerDeathService) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -96,6 +99,7 @@ public class CombatServiceImpl implements CombatService {
         this.locationClearService = locationClearService;
         this.playerService = playerService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.playerDeathService = playerDeathService;
     }
 
     @Override
@@ -131,8 +135,7 @@ public class CombatServiceImpl implements CombatService {
 
                     boolean isPlayerDead = player.getCurrentHp() <= 0;
                     if (isPlayerDead) {
-                        player.leaveCombat();
-                        playerService.respawnPlayer(player);
+                        playerDeathService.handleDeath(player);
                         events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0,
                                 "Вы погибли. Очнувшись в таверне 'Очаг Севера', вы обнаружили пропажу части золота..."));
                     }
@@ -152,8 +155,9 @@ public class CombatServiceImpl implements CombatService {
 
         boolean isPlayerDead = player.getCurrentHp() <= 0;
         if (isPlayerDead) {
-            player.leaveCombat();
-            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли"));
+            var death = playerDeathService.handleDeath(player);
+            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), (int) death.goldLost(),
+                    "Вы погибли и возродились в таверне"));
         }
 
         return new CombatReport(round, events, false, isPlayerDead);
@@ -189,6 +193,11 @@ public class CombatServiceImpl implements CombatService {
         }
 
         int manaCost = spellToCast.getManaCost();
+        if (player.getCurrentLocation() != null
+                && player.getCurrentLocation().getEffect() == com.java_dragons.dnd_tenebres.domain.location.model.LocationEffect.ANTI_MAGIC_FIELD) {
+            manaCost *= 2;
+            events.add(new CombatEvent("Локация", "ANTI_MAGIC", player.getName(), manaCost, "Антимагическое поле удвоило стоимость"));
+        }
         if (weaponEffect == MagicWeaponEffect.MANA_DISCOUNT) manaCost = (int) (manaCost * 0.8);
 
         if (!player.spendMp(manaCost)) {
@@ -227,7 +236,8 @@ public class CombatServiceImpl implements CombatService {
 
         double multiplier = 1.0;
         if (weapon.getMagicEffect() == MagicWeaponEffect.SPELL_POWER) multiplier += 0.10;
-        if (weapon.getMagicEffect() == MagicWeaponEffect.ELEMENTAL_MASTERY && spell.getElement() == weapon.getMagicEffectElement()) multiplier += 0.20;
+        if (weapon.getMagicEffect() == MagicWeaponEffect.ELEMENTAL_MASTERY && spell.getElement() == weapon.getMagicEffectElement())
+            multiplier += 0.20;
         if (weapon.getMagicEffect() == MagicWeaponEffect.CHAOS) multiplier += 0.40;
 
         if (monster.getCombatEffects().stream().anyMatch(e -> e.getType() == EffectType.LIGHT_MARK)) {
@@ -293,6 +303,14 @@ public class CombatServiceImpl implements CombatService {
 
         var attackResult = monster.performAttack(round, monsterSkillStrategies.get(monster.getSpecialSkill()));
         int damage = attackResult.totalDamage();
+        DamageType incomingType = monster.getElements().stream().findFirst().orElse(DamageType.PHYSICAL);
+
+        for (ItemPassive passive : player.getActivePassives()) {
+            ItemPassiveStrategy strategy = passiveStrategies.get(passive);
+            if (strategy != null) {
+                damage = Math.max(0, strategy.modifyIncomingDamage(player, monster, incomingType, damage, events));
+            }
+        }
 
         Optional<ActiveEffect> absShield = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.ABSOLUTE_SHIELD).findFirst();
         if (absShield.isPresent()) {
@@ -450,8 +468,8 @@ public class CombatServiceImpl implements CombatService {
 
         boolean isPlayerDead = player.getCurrentHp() <= 0;
         if (isPlayerDead) {
-            player.leaveCombat();
-            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0, "Вы погибли во сне..."));
+            var death = playerDeathService.handleDeath(player);
+            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), (int) death.goldLost(), "Вы погибли во сне и возродились в таверне"));
         }
 
         return new CombatReport(0, events, false, isPlayerDead);

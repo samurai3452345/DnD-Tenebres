@@ -17,13 +17,13 @@ export default function InventoryPage() {
         setLoading(true);
         setError(null);
         try {
-            const data: any = await inventoryApi.getInventory();
+            const data = await inventoryApi.getInventory();
             // Маппим данные с бэкенда под наш интерфейс
-            const mappedItems = data.map((pi: any) => ({
+            const mappedItems = data.items.map((pi: any) => ({
                 id: pi.id,
                 name: pi.template.name,
                 type: pi.template.type,
-                description: `Статы: ${pi.template.statBudget} | Экипировано: ${pi.isEquipped ? 'Да' : 'Нет'}`,
+                description: `Уровень: ${pi.tier} | Экипировано: ${pi.equipped ? 'Да' : 'Нет'}${pi.locked ? ' | 🔒' : ''}`,
                 quantity: pi.amount
             }));
             setItems(mappedItems);
