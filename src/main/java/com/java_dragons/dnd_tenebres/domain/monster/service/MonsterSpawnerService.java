@@ -81,7 +81,7 @@ public class MonsterSpawnerService {
 
         for (LocationFixedMonster fm : fixedMonsters) {
             MonsterTemplate template = monsterTemplateRepository.findByName(fm.getMonsterTemplateName())
-                    .orElseThrow(() -> new RuntimeException("Шаблон не найден: " + fm.getMonsterTemplateName()));
+                    .orElseThrow(() -> new IllegalStateException("Шаблон монстра не найден: " + fm.getMonsterTemplateName()));
 
             for (int i = 0; i < fm.getCount(); i++) {
                 Monster monster = Monster.builder()

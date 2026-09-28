@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,13 @@ public class ItemUpgradeService {
 
     @Transactional
     public void feedItems(Long playerId, Long targetItemId, List<Long> foodItemIds) {
+
+        if (foodItemIds == null || foodItemIds.isEmpty()) {
+            throw new IllegalArgumentException("Список предметов для поглощения не может быть пустым");
+        }
+        if (new HashSet<>(foodItemIds).size() != foodItemIds.size()) {
+            throw new IllegalArgumentException("Список предметов для поглощения содержит повторяющиеся ID");
+        }
 
         PlayerItem itemTarget = playerItemRepository.findById(targetItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Предмет не найден!"));
@@ -44,6 +52,10 @@ public class ItemUpgradeService {
 
         if(!foodItems.stream().allMatch(foodItem -> foodItem.getPlayer().getId().equals(playerId))){
             throw new IllegalArgumentException("Один из предметов для скармливания тебе не принадлежит!");
+        }
+
+        if (foodItems.stream().anyMatch(PlayerItem::isEquipped)) {
+            throw new IllegalStateException("Сначала снимите все предметы, выбранные для поглощения");
         }
 
         for(PlayerItem foodItem : foodItems){

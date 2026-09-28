@@ -19,6 +19,9 @@ services:
       - "8081:8081"
     environment:
       - JWT_SECRET=${JWT_SECRET}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/dnd_tenebres
     depends_on:
       - db

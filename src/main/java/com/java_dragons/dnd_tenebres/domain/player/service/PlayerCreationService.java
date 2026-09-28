@@ -38,7 +38,7 @@ public class PlayerCreationService {
                 anyMatch(upgrade -> upgrade < 8 || upgrade > 15);
 
         if (hasInvalidUpgrade) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Каждая характеристика должна находиться в диапазоне от 8 до 15");
         }
 
         int totalPointSpend = abilities.stream()
@@ -46,7 +46,7 @@ public class PlayerCreationService {
                 .sum();
 
         if(totalPointSpend != 27){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("На характеристики необходимо потратить ровно 27 очков");
         }
 
         PlayerStats stats = new PlayerStats(

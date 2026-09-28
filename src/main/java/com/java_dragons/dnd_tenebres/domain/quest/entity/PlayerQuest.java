@@ -4,6 +4,7 @@ package com.java_dragons.dnd_tenebres.domain.quest.entity;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.quest.model.QuestStatus;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class PlayerQuest {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
+    @JsonIgnore
     private Player player;
 
 
@@ -37,7 +39,7 @@ public class PlayerQuest {
 
     public void incrementProgress(int amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than zero");
+            throw new IllegalArgumentException("Количество должно быть больше нуля");
         }
         if (this.currentProgress >= questTemplate.getTargetCount()) {
             return;
@@ -51,7 +53,7 @@ public class PlayerQuest {
 
     public void markAsRewarded() {
         if (this.questStatus != QuestStatus.COMPLETED) {
-            throw new IllegalStateException("Quest status must be COMPLETED");
+            throw new IllegalStateException("Для получения награды квест должен быть завершён");
         }
         this.questStatus = QuestStatus.REWARDED;
     }
@@ -65,9 +67,7 @@ public class PlayerQuest {
 
     public static PlayerQuest create(Player player, QuestTemplate questTemplate) {
 
-        PlayerQuest playerQuest = new PlayerQuest(player, questTemplate);
-
-        return playerQuest;
+        return new PlayerQuest(player, questTemplate);
 
     }
     public int getRewardXp() {

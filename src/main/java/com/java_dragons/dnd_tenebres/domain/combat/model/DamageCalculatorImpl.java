@@ -14,15 +14,15 @@ public class DamageCalculatorImpl implements DamageCalculator {
     @Override
     public int calculateFinalDamage (int baseDamage, DamageType attackType, Set<DamageType> defenderTypes ) {
         if (baseDamage < 0) {
-            throw new IllegalArgumentException("baseDamage < 0");
+            throw new IllegalArgumentException("Базовый урон не может быть отрицательным");
         }
 
         if (defenderTypes == null) {
-            throw new IllegalArgumentException("defenderTypes == null");
+            throw new IllegalArgumentException("Список стихий защитника обязателен");
         }
 
         if (attackType == null) {
-            throw new IllegalArgumentException("attackType == null");
+            throw new IllegalArgumentException("Тип атаки обязателен");
         }
 
         double totalMultiplier = defenderTypes.stream()

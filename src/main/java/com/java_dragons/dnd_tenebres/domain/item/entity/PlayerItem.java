@@ -4,6 +4,7 @@ import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot;
 import com.java_dragons.dnd_tenebres.domain.item.model.MagicWeaponEffect;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,7 @@ public class PlayerItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
+    @JsonIgnore
     private Player player;
 
     @ManyToOne(fetch = FetchType.LAZY)
