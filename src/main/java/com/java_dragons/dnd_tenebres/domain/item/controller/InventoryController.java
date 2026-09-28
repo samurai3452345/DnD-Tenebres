@@ -5,6 +5,7 @@ import com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse;
 import com.java_dragons.dnd_tenebres.domain.item.dto.InventoryResponse;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class InventoryController {
     public ResponseEntity<?> equipItem(
             @CurrentPlayerId Long playerId,
             @PathVariable Long itemId,
-            @RequestBody EquipRequest request) {
+            @Valid @RequestBody EquipRequest request) {
 
         inventoryService.equipItem(playerId, itemId, request.slot());
 
@@ -45,7 +46,7 @@ public class InventoryController {
     @PostMapping("/slots/{slot}/unequip")
     public ResponseEntity<?> unequipItem(
             @CurrentPlayerId Long playerId,
-            @PathVariable com.java_dragons.dnd_tenebres.domain.item.model.EquipmentSlot slot) {
+            @Valid @RequestBody EquipRequest request) {
 
         inventoryService.unequipItem(playerId, slot);
 
@@ -53,18 +54,5 @@ public class InventoryController {
                 "status", "SUCCESS",
                 "message", "Предмет снят"
         ));
-    }
-
-
-    @PostMapping("/{itemId}/lock")
-    public ResponseEntity<?> lock(@CurrentPlayerId Long playerId, @PathVariable Long itemId) {
-        inventoryService.setLocked(playerId, itemId, true);
-        return ResponseEntity.ok(Map.of("status", "SUCCESS", "message", "Предмет заблокирован"));
-    }
-
-    @PostMapping("/{itemId}/unlock")
-    public ResponseEntity<?> unlock(@CurrentPlayerId Long playerId, @PathVariable Long itemId) {
-        inventoryService.setLocked(playerId, itemId, false);
-        return ResponseEntity.ok(Map.of("status", "SUCCESS", "message", "Блокировка снята"));
     }
 }

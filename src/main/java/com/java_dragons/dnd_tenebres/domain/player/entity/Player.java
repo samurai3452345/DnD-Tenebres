@@ -84,12 +84,12 @@ public class Player {
     private List<PlayerItem> inventory = new ArrayList<>();
 
     public void addExperience(long xp) {
-        if (xp < 0) throw new IllegalArgumentException();
+        if (xp < 0) throw new IllegalArgumentException("Опыт не может быть отрицательным");
         this.experience += xp;
     }
 
     public void addGold(long amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new IllegalArgumentException("Количество золота не может быть отрицательным");
         this.gold += amount;
     }
 
@@ -106,7 +106,7 @@ public class Player {
     }
 
     public boolean spendGold(long amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new IllegalArgumentException("Количество золота не может быть отрицательным");
         if (this.gold < amount) return false;
         this.gold -= amount;
         return true;
@@ -139,7 +139,7 @@ public class Player {
     }
 
     public void moveTo(Location newLocation) {
-        if (newLocation == null) throw new IllegalArgumentException();
+        if (newLocation == null) throw new IllegalArgumentException("Новая локация обязательна");
         this.currentLocation = newLocation;
     }
 
@@ -147,19 +147,19 @@ public class Player {
         PlayerItem itemToEquip = this.inventory.stream()
                 .filter(item -> Objects.equals(item.getId(), playerItemId))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден в инвентаре игрока"));
 
         ItemType type = itemToEquip.getTemplate().getType();
         if (type == ItemType.RESOURCE || type == ItemType.CONSUMABLE) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Расходники и ресурсы нельзя экипировать");
         }
 
         if (this.stats.getStrength() < itemToEquip.getTemplate().getRequiredStrength()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Недостаточно силы для экипировки предмета");
         }
 
         if (!isSlotCompatible(itemToEquip.getTemplate().getSlot(), targetSlot)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Предмет нельзя экипировать в выбранный слот");
         }
 
         this.inventory.stream()
@@ -264,17 +264,17 @@ public class Player {
     }
 
     public void heal(int amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new IllegalArgumentException("Количество лечения не может быть отрицательным");
         this.currentHp = Math.min(this.getMaxHp(), this.currentHp + amount);
     }
 
     public void restoreMp(int amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new IllegalArgumentException("Количество восстанавливаемой маны не может быть отрицательным");
         this.currentMp = Math.min(this.maxMp, this.currentMp + amount);
     }
 
     public boolean spendMp(int amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new IllegalArgumentException("Расход маны не может быть отрицательным");
         if (this.currentMp >= amount) {
             this.currentMp -= amount;
             return true;
@@ -283,7 +283,7 @@ public class Player {
     }
 
     public void addEffect(ActiveEffect effect) {
-        if (effect == null) throw new IllegalArgumentException();
+        if (effect == null) throw new IllegalArgumentException("Эффект обязателен");
         this.activeEffects.add(effect);
     }
 
@@ -356,7 +356,7 @@ public class Player {
 
         if (totalCost <= 0) return;
         if (totalCost > this.statPoints) {
-            throw new IllegalStateException("Недостаточно поинтов! У вас: " + this.statPoints);
+            throw new IllegalStateException("Недостаточно очков характеристик. Доступно: " + this.statPoints);
         }
 
         this.statPoints -= totalCost;
@@ -397,7 +397,7 @@ public class Player {
 
     public void enterCombat(Long monsterId) {
         if (monsterId == null) {
-            throw new IllegalArgumentException("ID монстра не может быть null при входе в бой");
+            throw new IllegalArgumentException("ID монстра не указан при входе в бой");
         }
         this.activeCombatMonsterId = monsterId;
     }

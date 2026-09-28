@@ -52,7 +52,7 @@ public abstract class Item {
     private ItemStats stats;
 
     public void addXp(int xp) {
-        if(xp <= 0) throw new IllegalArgumentException();
+        if(xp <= 0) throw new IllegalArgumentException("Добавляемый опыт должен быть больше нуля");
         this.currentXp += xp;
     }
 

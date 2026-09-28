@@ -8,6 +8,7 @@ import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatActionRequest;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatStateResponse;
 import jakarta.validation.Valid;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class CombatController {
     @PostMapping("/turn")
     public ResponseEntity<CombatReport> executeTurn(
             @CurrentPlayerId Long playerId,
-            @RequestBody CombatTurnRequest request) {
+            @Valid @RequestBody CombatTurnRequest request) {
 
         CombatReport report = combatService.executeTurnByIds(playerId, request);
 

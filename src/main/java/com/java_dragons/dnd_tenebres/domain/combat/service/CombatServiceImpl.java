@@ -485,12 +485,16 @@ public class CombatServiceImpl implements CombatService {
         Monster monster = monsterRepository.findById(request.monsterId())
                 .orElseThrow(() -> new IllegalArgumentException("Монстр не найден"));
 
-        if (player.isInCombat() && !player.getActiveCombatMonsterId().equals(monster.getId())) {
+        if (!player.isInCombat()) {
+            throw new IllegalStateException("Сначала найдите противника, прежде чем начинать бой");
+        }
+
+        if (!player.getActiveCombatMonsterId().equals(monster.getId())) {
             throw new IllegalStateException("Вы уже сражаетесь с другим противником!");
         }
 
-        if (!player.isInCombat()) {
-            player.enterCombat(monster.getId());
+        if (monster.isDead()) {
+            throw new IllegalStateException("Этот противник уже побеждён");
         }
 
         return executeTurn(

@@ -3,6 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.item.controller;
 import com.java_dragons.dnd_tenebres.domain.item.dto.TradeRequest;
 import com.java_dragons.dnd_tenebres.domain.item.service.ShopService;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class MerchantController {
     @PostMapping("/buy")
     public ResponseEntity<?> buyItem(
             @CurrentPlayerId Long playerId,
-            @RequestBody TradeRequest.BuyRequest request) {
+            @Valid @RequestBody TradeRequest.BuyRequest request) {
 
         String result = shopService.buyItem(playerId, request.templateName(), request.amount());
 
@@ -45,7 +46,7 @@ public class MerchantController {
     @PostMapping("/sell")
     public ResponseEntity<?> sellItem(
             @CurrentPlayerId Long playerId,
-            @RequestBody TradeRequest.SellRequest request) {
+            @Valid @RequestBody TradeRequest.SellRequest request) {
 
         String result = shopService.sellItem(playerId, request.playerItemId(), request.amount());
 
