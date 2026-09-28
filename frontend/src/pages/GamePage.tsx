@@ -52,7 +52,7 @@ export default function GamePage() {
             const res: any = type === 'short' ? await restApi.shortRest() : await restApi.longRest();
             setActionLog(res.message);
             if (res.status === 'AMBUSH' && res.combatLog) {
-                setActiveMonsterId(999); // Условный ID для засады
+                setActiveMonsterId(res.monsterId);
                 resetCombat();
             }
             refreshPlayer();
@@ -61,9 +61,9 @@ export default function GamePage() {
         }
     };
 
-    const handleCombatAction = async (action: any, targetName?: string) => {
+    const handleCombatAction = async (action: any, targetId?: number) => {
         if (!activeMonsterId) return;
-        await executeTurn(activeMonsterId, action, targetName);
+        await executeTurn(activeMonsterId, action, targetId);
         refreshPlayer();
     };
 

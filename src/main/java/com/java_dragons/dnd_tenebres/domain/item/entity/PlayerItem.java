@@ -80,6 +80,10 @@ public class PlayerItem {
     @Builder.Default
     private int tier = 1;
 
+    @Column(name = "locked", nullable = false)
+    @Builder.Default
+    private boolean locked = false;
+
     public void addXp(int xp, int newTier) {
         if (xp < 0) throw new IllegalArgumentException("Опыт не может быть отрицательным");
         this.itemXp += xp;

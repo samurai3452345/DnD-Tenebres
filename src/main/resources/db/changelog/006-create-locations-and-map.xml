@@ -6,6 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="006-create-locations-schema" author="Sawaron">
+        <validCheckSum>9:fad5da72bbba5c3cafc22ac86179bdaa</validCheckSum>
         <createTable tableName="locations">
             <column name="id" type="VARCHAR(100)">
                 <constraints primaryKey="true" nullable="false"/>
@@ -65,6 +66,7 @@
     </changeSet>
 
     <changeSet id="006-populate-locations" author="Sawaron">
+        <validCheckSum>9:5a9a47198ea97d3ff1f540f486ac017f</validCheckSum>
         <!-- Зона 1: talmiria (Город) -->
         <insert tableName="locations">
             <column name="id" value="city_square"/><column name="name" value="Центральная площадь"/><column name="level" valueNumeric="1"/><column name="zone_id" value="talmiria"/><column name="type" value="SAFE_ZONE"/><column name="biome" value="CITY"/>

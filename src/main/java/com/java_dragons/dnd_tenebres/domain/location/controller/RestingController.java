@@ -1,7 +1,7 @@
 package com.java_dragons.dnd_tenebres.domain.location.controller;
 
-import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatReport;
-import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
+import com.java_dragons.dnd_tenebres.domain.combat.service.CombatEncounterService;
+import com.java_dragons.dnd_tenebres.domain.combat.model.EncounterReason;
 import com.java_dragons.dnd_tenebres.domain.location.service.RestingService;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/rest")
@@ -19,8 +20,8 @@ import java.util.Map;
 public class RestingController {
 
     private final RestingService restingService;
-    private final CombatService combatService;
     private final MonsterSpawnerService monsterSpawnerService;
+    private final CombatEncounterService encounterService;
 
     @PostMapping("/short")
     public ResponseEntity<?> takeShortRest(@CurrentPlayerId Long playerId) {
@@ -30,13 +31,15 @@ public class RestingController {
         if (report.isAmbushed()) {
 
             Monster ambushingMonster = monsterSpawnerService.spawnRandomMonster(report.locationId());
-            CombatReport ambushReport = combatService.executeAmbushTurn(playerId, ambushingMonster);
+            encounterService.startEncounter(playerId, List.of(ambushingMonster), EncounterReason.REST_AMBUSH);
+            var combatState = encounterService.applyAmbushOpening(playerId, ambushingMonster);
 
             return ResponseEntity.ok(Map.of(
                     "status", "AMBUSH",
                     "message", report.message(),
                     "monster", ambushingMonster.getName(),
-                    "combatLog", ambushReport
+                    "monsterId", ambushingMonster.getId(),
+                    "encounter", combatState
             ));
         }
 

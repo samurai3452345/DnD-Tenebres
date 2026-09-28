@@ -14,7 +14,7 @@
             drop_chance
             )
             VALUES (
-            (SELECT id FROM monster_templates WHERE name = 'Лесной Гоблин'),
+            (SELECT id FROM monster_templates WHERE name = 'Гоблин'),
             (SELECT id FROM item_templates WHERE name = 'Кровоцвет'),
             1,
             3,

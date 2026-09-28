@@ -93,6 +93,18 @@ public class Player {
         this.gold += amount;
     }
 
+    public long removeGoldPercent(int percent) {
+        if (percent < 0 || percent > 100) throw new IllegalArgumentException("Percent must be between 0 and 100");
+        long lost = (gold * percent) / 100;
+        gold -= lost;
+        return lost;
+    }
+
+    public void restoreAfterDeath() {
+        currentHp = Math.max(1, getMaxHp() / 2);
+        currentMp = Math.max(0, getMaxMp() / 2);
+    }
+
     public boolean spendGold(long amount) {
         if (amount < 0) throw new IllegalArgumentException("Количество золота не может быть отрицательным");
         if (this.gold < amount) return false;

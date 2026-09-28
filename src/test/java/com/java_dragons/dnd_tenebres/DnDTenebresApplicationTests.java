@@ -2,6 +2,7 @@ package com.java_dragons.dnd_tenebres;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:dnd_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",

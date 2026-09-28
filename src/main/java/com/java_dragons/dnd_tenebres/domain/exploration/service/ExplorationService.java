@@ -15,6 +15,8 @@ import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
+import com.java_dragons.dnd_tenebres.domain.combat.service.CombatEncounterService;
+import com.java_dragons.dnd_tenebres.domain.combat.model.EncounterReason;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ public class ExplorationService {
     private final LocationClearService locationClearService;
     private final LocationFixedMonsterRepository fixedMonsterRepository;
     private final LocationLootEntryRepository locationLootEntryRepository;
+    private final CombatEncounterService combatEncounterService;
 
     @Transactional
     public ExplorationReport travel(Long playerId, String targetLocationId) {
@@ -54,6 +57,10 @@ public class ExplorationService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Вы не можете попасть туда отсюда!"));
 
+        if (player.getLevel() < targetLocation.getLevel()) {
+            throw new IllegalStateException("Для перехода требуется уровень " + targetLocation.getLevel());
+        }
+
         player.moveTo(targetLocation);
         playerRepository.save(player);
         log.info("Игрок {} перешел в локацию {}", player.getName(), targetLocation.getName());
@@ -67,7 +74,7 @@ public class ExplorationService {
                 if (hasEnemies) {
                     List<Monster> squad = monsterSpawnerService.spawnFixedMonstersForLocation(targetLocation.getId());
 
-                    player.enterCombat(squad.get(0).getId());
+                    combatEncounterService.startEncounter(playerId, squad, EncounterReason.TRAVEL);
 
                     log.info("Засада в локации {}! Врагов: {}", targetLocation.getName(), squad.size());
 
@@ -107,7 +114,7 @@ public class ExplorationService {
         if (totalCheck >= difficultyClass) {
             Monster monster = monsterSpawnerService.spawnRandomMonster(location.getId());
 
-            player.enterCombat(monster.getId());
+            combatEncounterService.startEncounter(playerId, List.of(monster), EncounterReason.HUNT);
 
             log.info("Игрок {} нашел монстра: {}", player.getName(), monster.getName());
             return ExplorationReport.combat("Из теней появляется " + monster.getName() + "!", monster.getId());

@@ -5,11 +5,10 @@ export type CombatAction =
     | "FLEE";
 
 export interface CombatTurnRequest {
-    monsterId: number;
-    round: number;
-    aliveEnemyCount: number;
     action: CombatAction;
-    actionTargetName: string | null;
+    targetId: number | null;
+    abilityId: number | null;
+    itemId: number | null;
 }
 
 export interface CombatEvent {
@@ -20,9 +19,12 @@ export interface CombatEvent {
     description: string;
 }
 
-export interface CombatReport {
+export interface CombatState {
+    encounterId: number;
+    status: "ACTIVE" | "VICTORY" | "DEFEAT" | "FLED" | "CANCELLED";
     round: number;
+    player: { currentHp: number; maxHp: number; currentMp: number; maxMp: number };
+    currentEnemy: { id: number; name: string; currentHp: number; maxHp: number } | null;
+    remainingEnemies: number;
     events: CombatEvent[];
-    isEnemyDead: boolean;
-    isPlayerDead: boolean;
 }

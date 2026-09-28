@@ -32,7 +32,9 @@ public class RestingService {
             throw new IllegalStateException("Вы не можете разбить привал во время боя!");
         }
 
+        if (player.getCurrentLocation() == null) throw new IllegalStateException("У игрока нет текущей локации");
         LocationType locType = player.getCurrentLocation().getType();
+        LocationEffect locationEffect = player.getCurrentLocation().getEffect();
 
         if (!player.consumeItemByName("Припасы")) {
             throw new IllegalStateException("Для привала нужны 'Припасы'!");
@@ -48,6 +50,7 @@ public class RestingService {
         } else if (locType == LocationType.DANGEROUS && d20 <= 15) {
             isAmbushed = true;
         }
+        if (locationEffect == LocationEffect.DARKNESS && d20 <= 12) isAmbushed = true;
 
         if (isAmbushed) {
             log.warn("Отдых прерван! Засада!");
@@ -58,13 +61,16 @@ public class RestingService {
             return new RestReport("Ваш отдых был прерван внезапным нападением!", true, locationId);
         }
 
-        player.heal(player.getMaxHp() / 2);
+        if (locationEffect != LocationEffect.TOXIC_FUMES) player.heal(player.getMaxHp() / 2);
         player.restoreMp(player.getMaxMp() / 2);
         player.removeEffect(EffectType.POISON);
         player.removeEffect(EffectType.BLEEDING);
         player.removeEffect(EffectType.BURN);
 
-        return new RestReport("Вы немного отдохнули и перевели дух.", false);
+        String message = locationEffect == LocationEffect.TOXIC_FUMES
+                ? "Ядовитые испарения не дали восстановить здоровье."
+                : "Вы немного отдохнули и перевели дух.";
+        return new RestReport(message, false);
     }
 
     @Transactional

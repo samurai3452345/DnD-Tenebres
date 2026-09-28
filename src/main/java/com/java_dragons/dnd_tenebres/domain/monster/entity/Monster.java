@@ -127,7 +127,8 @@ public class Monster {
         return new MonsterAttackResult(this.attackName, totalDamage);
     }
 
-    @Transient
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "monster_combat_effects", joinColumns = @JoinColumn(name = "monster_id"))
     @Builder.Default
     private List<ActiveEffect> combatEffects = new ArrayList<>();
 
