@@ -6,9 +6,7 @@ import lombok.*;
 @Entity
 @Table(name = "user_accounts")
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAccount {
 
     @Id
@@ -24,6 +22,17 @@ public class UserAccount {
     @Column(name = "player_id")
     private Long playerId;
 
+    public static UserAccount create(String username, String encodedPassword, Long playerId) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Имя пользователя не может быть пустым");
+        }
+        UserAccount account = new UserAccount();
+        account.username = username;
+        account.changePassword(encodedPassword);
+        account.linkPlayer(playerId);
+        return account;
+    }
+
     public void changePassword(String encodedNewPassword) {
         if (encodedNewPassword == null || encodedNewPassword.isBlank()) {
             throw new IllegalArgumentException("Пароль не может быть пустым");
@@ -33,7 +42,7 @@ public class UserAccount {
 
     public void linkPlayer(Long newPlayerId) {
         if (newPlayerId == null) {
-            throw new IllegalArgumentException("ID персонажа не может быть null");
+            throw new IllegalArgumentException("ID персонажа не указан");
         }
         if (this.playerId != null) {
             throw new IllegalStateException("К этому аккаунту уже привязан персонаж!");

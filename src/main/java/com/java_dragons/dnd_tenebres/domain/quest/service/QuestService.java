@@ -29,13 +29,13 @@ public class QuestService {
 
     public PlayerQuest acceptQuest(Player player, QuestTemplate questTemplate) {
         if (player.getCurrentLocation() == null || !player.getCurrentLocation().getId().equals("city_adv_guild")) {
-            throw new IllegalStateException("You cant accept a quest outside the Adventurers Guild");
+            throw new IllegalStateException("Принять квест можно только в Гильдии искателей приключений");
         }
         if (player.isInCombat()) {
-            throw new IllegalStateException("cant accept a quest while in combat");
+            throw new IllegalStateException("Нельзя принять квест во время боя");
         }
         if (playerQuestRepository.existsByPlayerIdAndQuestTemplateId(player.getId(), questTemplate.getId())) {
-            throw new IllegalStateException("quest already exists");
+            throw new IllegalStateException("Этот квест уже принят");
         }
 
         PlayerQuest playerQuest = PlayerQuest.create(player, questTemplate);
@@ -48,7 +48,7 @@ public class QuestService {
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
         QuestTemplate questTemplate = questTemplateRepository.findById(questTemplateId)
-                .orElseThrow(() -> new IllegalArgumentException("Not found quest template"));
+                .orElseThrow(() -> new IllegalArgumentException("Шаблон квеста не найден"));
 
         return acceptQuest(player, questTemplate);
     }
@@ -82,7 +82,7 @@ public class QuestService {
 
     public void turnInQuest(Long playerId, Long playerQuestId) {
         PlayerQuest playerQuest = playerQuestRepository.findByPlayerIdAndId(playerId, playerQuestId)
-                .orElseThrow(() -> new IllegalArgumentException("Not found!"));
+                .orElseThrow(() -> new IllegalArgumentException("Квест игрока не найден"));
 
         Player player = playerQuest.getPlayer();
 
@@ -96,11 +96,11 @@ public class QuestService {
 
     public List<QuestTemplate> getAvailableQuests(Long playerId) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
         if (player.getCurrentLocation() == null ||
                 !player.getCurrentLocation().getId().equals("city_adv_guild")) {
-            throw new IllegalStateException("Player must be in Adventurers Guild");
+            throw new IllegalStateException("Игрок должен находиться в Гильдии искателей приключений");
         }
 
         return questTemplateRepository.findAvailableForPlayer(playerId);

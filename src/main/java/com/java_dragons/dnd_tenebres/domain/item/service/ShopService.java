@@ -38,7 +38,7 @@ public class ShopService {
             throw new IllegalArgumentException("Торговец продает только расходники и зелья!");
         }
 
-        int price = calculateBuyPrice(template) * amount;
+        long price = (long) calculateBuyPrice(template) * amount;
 
         if (!player.spendGold(price)) {
             throw new IllegalStateException("Недостаточно золота! Требуется: " + price);
@@ -70,7 +70,7 @@ public class ShopService {
             throw new IllegalArgumentException("У вас нет такого количества предметов!");
         }
 
-        int price = calculateSellPrice(item.getTemplate()) * amount;
+        long price = (long) calculateSellPrice(item.getTemplate()) * amount;
         player.addGold(price);
 
         item.setAmount(item.getAmount() - amount);
