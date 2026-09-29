@@ -30,14 +30,17 @@ public class PlayerService {
     private final InventoryService inventoryService;
     private final PlayerProgressionService progressionService;
     private final GamePlayerProperties gamePlayerProperties;
+    private final com.java_dragons.dnd_tenebres.domain.economy.service.WalletService walletService;
 
 
     @Transactional
     public PlayerResponse createPlayer(PlayerCreationRequest request) {
         Player newPlayer = playerCreationService.createCharacter(request);
         newPlayer.moveTo(locationService.getLocationById(gamePlayerProperties.getStartLocationId()));
-        newPlayer.addGold(gamePlayerProperties.getStartGold());
         Player savedPlayer = playerRepository.save(newPlayer);
+        walletService.credit(savedPlayer, gamePlayerProperties.getStartGold(),
+                com.java_dragons.dnd_tenebres.domain.economy.model.WalletReason.STARTING_GOLD,
+                "PLAYER", savedPlayer.getId().toString());
         gamePlayerProperties.getStartItems().forEach(item ->
                 inventoryService.addItemToPlayer(savedPlayer, item.getTemplate(), item.getAmount()));
         return playerMapper.toResponse(savedPlayer);

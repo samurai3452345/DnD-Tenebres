@@ -67,6 +67,11 @@ public class CombatServiceImpl implements CombatService {
     private final PlayerService playerService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final PlayerDeathService playerDeathService;
+    private final CombatEffectService combatEffectService;
+    private final com.java_dragons.dnd_tenebres.core.random.RandomSource randomSource;
+    private final com.java_dragons.dnd_tenebres.core.config.GameBalanceProperties balance;
+    private final com.java_dragons.dnd_tenebres.domain.economy.service.WalletService walletService;
+    private final com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterAiStrategy monsterAiStrategy;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -81,7 +86,11 @@ public class CombatServiceImpl implements CombatService {
                              MonsterTemplateRepository monsterTemplateRepository,
                              LocationClearService locationClearService,
                              PlayerService playerService, ApplicationEventPublisher applicationEventPublisher,
-                             PlayerDeathService playerDeathService) {
+                             PlayerDeathService playerDeathService, CombatEffectService combatEffectService,
+                             com.java_dragons.dnd_tenebres.core.random.RandomSource randomSource,
+                             com.java_dragons.dnd_tenebres.core.config.GameBalanceProperties balance,
+                             com.java_dragons.dnd_tenebres.domain.economy.service.WalletService walletService,
+                             com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterAiStrategy monsterAiStrategy) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -100,6 +109,11 @@ public class CombatServiceImpl implements CombatService {
         this.playerService = playerService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.playerDeathService = playerDeathService;
+        this.combatEffectService = combatEffectService;
+        this.randomSource = randomSource;
+        this.balance = balance;
+        this.walletService = walletService;
+        this.monsterAiStrategy = monsterAiStrategy;
     }
 
     @Override
@@ -113,14 +127,16 @@ public class CombatServiceImpl implements CombatService {
             }
         }
 
-        player.processTurnEffects(events);
-        processMonsterTurnEffects(monster, events);
+        combatEffectService.onRoundStart(player, monster, events);
 
         if (monster.isDead()) {
+            combatEffectService.onRoundEnd(player, monster);
             return handleMonsterDeath(player, monster, aliveEnemyCount, round, events, "Монстр погиб от периодического урона!");
         }
 
-        switch (action) {
+        if (combatEffectService.blocksAction(player.getActiveEffects())) {
+            events.add(new CombatEvent(player.getName(), "SKIP_TURN", monster.getName(), 0, "Игрок пропускает ход из-за эффекта контроля"));
+        } else switch (action) {
             case ATTACK -> handlePlayerAttack(player, monster, aliveEnemyCount, events);
             case USE_POTION -> handlePotionUse(player, actionTargetName, events);
             case CAST_SPELL -> handlePlayerCastSpell(player, monster, actionTargetName, events);
@@ -140,6 +156,7 @@ public class CombatServiceImpl implements CombatService {
                                 "Вы погибли. Очнувшись в таверне 'Очаг Севера', вы обнаружили пропажу части золота..."));
                     }
 
+                    combatEffectService.onRoundEnd(player, monster);
                     return new CombatReport(round, events, false, isPlayerDead);
                 } else {
                     events.add(new CombatEvent(player.getName(), "FLEE_FAIL", monster.getName(), fleeRoll, "Путь к отступлению отрезан! Враг атакует!"));
@@ -148,10 +165,12 @@ public class CombatServiceImpl implements CombatService {
         }
 
         if (monster.isDead()) {
+            combatEffectService.onRoundEnd(player, monster);
             return handleMonsterDeath(player, monster, aliveEnemyCount, round, events, "Враг повержен!");
         }
 
         handleEnemyTurn(player, monster, round, events);
+        combatEffectService.onRoundEnd(player, monster);
 
         boolean isPlayerDead = player.getCurrentHp() <= 0;
         if (isPlayerDead) {
@@ -181,7 +200,7 @@ public class CombatServiceImpl implements CombatService {
         if (weaponEffect == MagicWeaponEffect.CHAOS) {
             List<Spell> chaosSpells = spellRepository.findByTier(maxTier);
             if (chaosSpells.isEmpty()) return;
-            spellToCast = chaosSpells.get(ThreadLocalRandom.current().nextInt(chaosSpells.size()));
+            spellToCast = chaosSpells.get(randomSource.nextInt(0, chaosSpells.size()));
             events.add(new CombatEvent(player.getName(), "CHAOS_PROC", monster.getName(), 0, "Магия Хаоса выбрала: " + spellToCast.getName()));
         } else {
             Optional<Spell> spellOpt = spellRepository.findByName(spellName);
@@ -217,6 +236,13 @@ public class CombatServiceImpl implements CombatService {
 
         boolean isCrit = (d20 == 20);
         int finalDamage = calculateSpellDamage(spellToCast, player, monster, weapon, isCrit, events);
+        finalDamage = combatEffectService.modifyOutgoing(player, finalDamage, events);
+        if (player.getCurrentLocation() != null && player.getCurrentLocation().getEffect() ==
+                com.java_dragons.dnd_tenebres.domain.location.model.LocationEffect.ANTI_MAGIC_FIELD) {
+            finalDamage = finalDamage * balance.antiMagicDamagePercent() / 100;
+            events.add(new CombatEvent("Локация", "ANTI_MAGIC_DAMAGE", monster.getName(), finalDamage,
+                    "Антимагическое поле ослабило заклинание"));
+        }
 
         if (finalDamage > 0) {
             monster.takeDamage(finalDamage, spellToCast.getElement());
@@ -270,8 +296,7 @@ public class CombatServiceImpl implements CombatService {
     }
 
     private void handleEnemyTurn(Player player, Monster monster, int round, List<CombatEvent> events) {
-        boolean isStunned = monster.getCombatEffects().stream()
-                .anyMatch(e -> e.getType() == EffectType.FREEZE || e.getType() == EffectType.SUPPRESSION || e.getType() == EffectType.BLIND);
+        boolean isStunned = combatEffectService.blocksAction(monster.getCombatEffects());
 
         if (isStunned) {
             events.add(new CombatEvent(monster.getName(), "SKIP_TURN", player.getName(), 0, "Монстр пропускает ход из-за эффекта контроля"));
@@ -301,7 +326,11 @@ public class CombatServiceImpl implements CombatService {
             return;
         }
 
-        var attackResult = monster.performAttack(round, monsterSkillStrategies.get(monster.getSpecialSkill()));
+        var decision = monsterAiStrategy.decide(player, monster, round);
+        var selectedSkill = decision.action() == com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterDecision.Action.SPECIAL_ABILITY
+                ? monsterSkillStrategies.get(monster.getSpecialSkill()) : null;
+        var attackResult = monster.performAttack(round, selectedSkill);
+        events.add(new CombatEvent(monster.getName(), "AI_DECISION", player.getName(), 0, decision.action().name()));
         int damage = attackResult.totalDamage();
         DamageType incomingType = monster.getElements().stream().findFirst().orElse(DamageType.PHYSICAL);
 
@@ -311,6 +340,7 @@ public class CombatServiceImpl implements CombatService {
                 damage = Math.max(0, strategy.modifyIncomingDamage(player, monster, incomingType, damage, events));
             }
         }
+        damage = combatEffectService.modifyIncoming(player, damage, events);
 
         Optional<ActiveEffect> absShield = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.ABSOLUTE_SHIELD).findFirst();
         if (absShield.isPresent()) {
@@ -318,12 +348,6 @@ public class CombatServiceImpl implements CombatService {
             absShield.get().decrementDuration();
             if (absShield.get().getDuration() <= 0) player.removeEffect(EffectType.ABSOLUTE_SHIELD);
             return;
-        }
-
-        if (player.hasEffect(EffectType.DAMAGE_REDUCTION)) {
-            int originalDamage = damage;
-            damage = (int) (damage * 0.1);
-            events.add(new CombatEvent(player.getName(), "EFFECT_TRIGGER", monster.getName(), originalDamage - damage, "Аура Неприкосновенности поглощает 90% урона!"));
         }
 
         Optional<ActiveEffect> shieldHpOpt = player.getActiveEffects().stream().filter(e -> e.getType() == EffectType.SHIELD_HP).findFirst();
@@ -358,6 +382,7 @@ public class CombatServiceImpl implements CombatService {
 
         if (damage > 0) {
             player.takeDamage(damage);
+            combatEffectService.preventDeath(player, events);
             events.add(new CombatEvent(monster.getName(), "ATTACK", player.getName(), damage, attackResult.attackName()));
 
             if (player.hasEffect(EffectType.THORNS)) {
@@ -430,15 +455,19 @@ public class CombatServiceImpl implements CombatService {
         }
 
         int finalDamage = damageCalculator.calculateFinalDamage(totalBaseDamage, playerDamageType, monster.getElements());
+        finalDamage = combatEffectService.modifyOutgoing(player, finalDamage, events);
         monster.takeDamage(finalDamage, playerDamageType);
 
         events.add(new CombatEvent(player.getName(), isCrit ? "CRIT_ATTACK" : "ATTACK", monster.getName(), finalDamage, "Нанесение урона"));
     }
 
-    private void handlePotionUse(Player player, String potionTargetName, List<CombatEvent> events) {
+    private void handlePotionUse(Player player, String potionItemId, List<CombatEvent> events) {
+        Long requestedId;
+        try { requestedId = Long.valueOf(potionItemId); }
+        catch (RuntimeException ex) { events.add(new CombatEvent(player.getName(), "FAIL", player.getName(), 0, "Некорректный ID предмета")); return; }
         Optional<PlayerItem> potionOpt = player.getInventory().stream()
+                .filter(item -> item.getId().equals(requestedId))
                 .filter(item -> item.getTemplate().getType() == ItemType.CONSUMABLE)
-                .filter(item -> item.getTemplate().getName().equalsIgnoreCase(potionTargetName))
                 .filter(item -> item.getAmount() > 0)
                 .findFirst();
 
@@ -512,7 +541,9 @@ public class CombatServiceImpl implements CombatService {
         applicationEventPublisher.publishEvent(new MonsterKilledEvent(player.getId(), monster.getTemplateName()));
 
         playerService.addExperienceToPlayer(player, monster.getXpReward());
-        player.addGold(monster.getGoldReward());
+        if (monster.getGoldReward() > 0) walletService.credit(player, monster.getGoldReward(),
+                com.java_dragons.dnd_tenebres.domain.economy.model.WalletReason.COMBAT_REWARD,
+                "MONSTER", monster.getId().toString());
 
         events.add(new CombatEvent("Система", "REWARD", player.getName(), monster.getXpReward(), "Получен опыт"));
         if (monster.getGoldReward() > 0) {

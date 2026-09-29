@@ -133,6 +133,8 @@ public class Monster {
     private List<ActiveEffect> combatEffects = new ArrayList<>();
 
     public void addCombatEffect(ActiveEffect effect) {
-        this.combatEffects.add(effect);
+        this.combatEffects.stream().filter(existing -> existing.getType() == effect.getType()).findFirst()
+                .ifPresentOrElse(existing -> existing.refresh(effect.getDuration(), effect.getPower()),
+                        () -> this.combatEffects.add(effect));
     }
 }

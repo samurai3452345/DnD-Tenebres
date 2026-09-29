@@ -21,6 +21,8 @@ public class LocationService {
     private final LocationRepository locationRepository;
     private final PlayerRepository playerRepository;
     private final PlayerClearedLocationRepository clearedLocationRepository;
+    private final LocationUnlockService unlockService;
+    private final com.java_dragons.dnd_tenebres.domain.location.repository.LocationLootEntryRepository lootRepository;
 
     @Transactional(readOnly = true)
     public Location getLocationById(String id){
@@ -43,14 +45,20 @@ public class LocationService {
         Location location = locationRepository.findByIdWithConnections(player.getCurrentLocation().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Current location is missing"));
         boolean cleared = clearedLocationRepository.existsByPlayerIdAndLocationId(playerId, location.getId());
-        List<String> actions = location.getType() == LocationType.SAFE_ZONE
-                ? List.of("TRAVEL", "LONG_REST") : List.of("TRAVEL", "HUNT", "SEARCH", "SHORT_REST");
+        var loot = lootRepository.findByLocationId(location.getId());
+        List<String> actions;
+        if (location.getType() == LocationType.SAFE_ZONE) actions = List.of("TRAVEL", "LONG_REST");
+        else if (loot.isEmpty()) actions = List.of("TRAVEL", "HUNT", "SHORT_REST");
+        else actions = List.of("TRAVEL", "HUNT", "SEARCH", "SHORT_REST");
         var connections = location.getConnectedLocations().stream().map(target -> {
-            boolean open = player.getLevel() >= target.getLevel();
-            return new LocationResponse.ConnectionResponse(target.getId(), target.getName(), target.getLevel(), open,
-                    open ? null : "Требуется уровень " + target.getLevel());
+            var access = unlockService.check(player, location, target);
+            return new LocationResponse.ConnectionResponse(target.getId(), target.getName(), target.getLevel(),
+                    access.open(), access.blockedReasons());
         }).toList();
-        return new LocationResponse(location.getId(), location.getName(), location.getName(), location.getType(),
-                location.getBiome(), location.getLevel(), location.getEffect(), cleared, actions, connections);
+        var resources = loot.stream().map(entry -> new LocationResponse.ResourceResponse(
+                entry.getItemTemplate().getId(), entry.getItemTemplate().getName(), entry.getMinAmount(),
+                entry.getMaxAmount(), entry.getFindChance())).toList();
+        return new LocationResponse(location.getId(), location.getName(), location.getDescription(), location.getType(),
+                location.getBiome(), location.getLevel(), location.getEffect(), cleared, actions, connections, resources);
     }
 }

@@ -7,17 +7,21 @@ import lombok.RequiredArgsConstructor;
 import com.java_dragons.dnd_tenebres.core.config.GamePlayerProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.java_dragons.dnd_tenebres.domain.economy.service.WalletService;
+import com.java_dragons.dnd_tenebres.domain.economy.model.WalletReason;
 
 @Service
 @RequiredArgsConstructor
 public class PlayerDeathService {
     private final LocationRepository locationRepository;
     private final GamePlayerProperties gamePlayerProperties;
+    private final WalletService walletService;
 
     @Transactional
     public PlayerDeathReport handleDeath(Player player) {
         if (player.getCurrentHp() > 0) throw new IllegalStateException("Cannot respawn a living player");
-        long lost = player.removeGoldPercent(gamePlayerProperties.getDeathGoldPenaltyPercent());
+        long lost = (player.getGold() * gamePlayerProperties.getDeathGoldPenaltyPercent()) / 100;
+        if (lost > 0) walletService.debit(player, lost, WalletReason.DEATH_PENALTY, "PLAYER", player.getId().toString());
         player.leaveCombat();
         player.clearEffects();
         String respawnLocationId = gamePlayerProperties.getRespawnLocationId();

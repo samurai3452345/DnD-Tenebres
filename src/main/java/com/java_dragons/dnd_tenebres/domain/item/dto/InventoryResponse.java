@@ -4,5 +4,8 @@ import java.util.List;
 
 public record InventoryResponse(
         List<InventoryItemResponse> items,
-        int occupiedSlots) {
+        int occupiedSlots,
+        List<EquipmentResponse> equipment,
+        List<ItemSetBonusResponse> activeSetBonuses) {
+    public record ItemSetBonusResponse(String setCode, int equippedPieces, List<String> activeBonuses) {}
 }

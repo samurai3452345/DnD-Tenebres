@@ -38,4 +38,28 @@ public class QuestTemplate {
     @Column(name = "reward_gold", nullable = false)
     private int rewardGold;
 
+    @Column(name = "min_level", nullable = false)
+    private int minLevel;
+
+    @Column(name = "accept_location_id")
+    private String acceptLocationId;
+
+    @Column(name = "turn_in_location_id")
+    private String turnInLocationId;
+
+    @Column(name = "prerequisite_quest_id")
+    private Long prerequisiteQuestId;
+
+    @Column(name = "repeatable", nullable = false)
+    private boolean repeatable;
+
+    @Column(name = "remote_turn_in", nullable = false)
+    private boolean remoteTurnIn;
+
+    @Column(name = "reward_item_template_id")
+    private Long rewardItemTemplateId;
+
+    @Column(name = "reward_item_amount", nullable = false)
+    private int rewardItemAmount;
+
 }

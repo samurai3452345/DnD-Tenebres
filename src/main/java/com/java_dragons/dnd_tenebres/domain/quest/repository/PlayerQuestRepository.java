@@ -20,4 +20,7 @@ public interface PlayerQuestRepository extends JpaRepository<PlayerQuest, Long> 
    List<PlayerQuest> findByPlayerIdAndQuestStatusAndQuestTemplateQuestTypeAndQuestTemplateTargetIdentifier(Long playerId, QuestStatus questStatus, QuestType questType, String targetIdentifier);
 
    Optional<PlayerQuest> findByPlayerIdAndId(Long playerId, Long playerQuestId);
+   boolean existsByPlayerIdAndQuestTemplateIdAndQuestStatus(Long playerId, Long questTemplateId, QuestStatus status);
+   long countByPlayerIdAndQuestStatusIn(Long playerId, List<QuestStatus> statuses);
+   boolean existsByPlayerIdAndQuestTemplateIdAndQuestStatusIn(Long playerId, Long questTemplateId, List<QuestStatus> statuses);
 }

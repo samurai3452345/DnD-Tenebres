@@ -20,6 +20,10 @@ public class PlayerQuest {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Version
+    @Column(name = "version")
+    private Integer version;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id", nullable = false)
     @JsonIgnore

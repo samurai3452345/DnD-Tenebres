@@ -15,4 +15,9 @@ public interface CombatEncounterRepository extends JpaRepository<CombatEncounter
 
     @Query("select distinct e from CombatEncounter e left join fetch e.participants p left join fetch p.monster where e.player.id=:playerId and e.status=:status")
     Optional<CombatEncounter> findCurrent(@Param("playerId") Long playerId, @Param("status") EncounterStatus status);
+
+    Optional<CombatEncounter> findByIdAndPlayerId(Long id, Long playerId);
+
+    Optional<CombatEncounter> findFirstByPlayerIdOrderByCreatedAtDesc(Long playerId);
+    long countByStatus(EncounterStatus status);
 }

@@ -42,6 +42,15 @@ public class ItemTemplate {
     @Column(name = "required_strength", nullable = false)
     private int requiredStrength;
 
+    @Column(name = "required_level", nullable = false)
+    private int requiredLevel = 1;
+
+    @Column(name = "max_durability", nullable = false)
+    private int maxDurability = 100;
+
+    @Column(name = "set_code")
+    private String setCode;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "damage_dice")
     private DiceType damageDice;

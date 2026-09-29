@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface SpellRepository extends JpaRepository<Spell, Long> {
     Optional<Spell> findByName(String name);
     List<Spell> findByTier(int tier);
+    List<Spell> findByTierLessThanEqualOrderByTierAscNameAsc(int tier);
 }

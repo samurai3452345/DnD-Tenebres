@@ -36,4 +36,9 @@ public class ActiveEffect {
         }
         this.power = Math.max(0, this.power - amount);
     }
+
+    public void refresh(int newDuration, int newPower) {
+        this.duration = Math.max(this.duration, newDuration);
+        this.power = Math.max(this.power, newPower);
+    }
 }

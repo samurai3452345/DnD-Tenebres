@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+ <changeSet id="031-01-world-and-items" author="codex">
+  <addColumn tableName="locations"><column name="description" type="VARCHAR(2000)" defaultValue=""><constraints nullable="false"/></column></addColumn>
+  <sql>UPDATE locations SET description = name WHERE description = ''</sql>
+  <addColumn tableName="players">
+   <column name="travel_sequence" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+   <column name="last_short_rest_sequence" type="BIGINT" defaultValueNumeric="-1"><constraints nullable="false"/></column>
+  </addColumn>
+  <addColumn tableName="item_templates">
+   <column name="required_level" type="INTEGER" defaultValueNumeric="1"><constraints nullable="false"/></column>
+   <column name="max_durability" type="INTEGER" defaultValueNumeric="100"><constraints nullable="false"/></column>
+   <column name="set_code" type="VARCHAR(100)"/>
+  </addColumn>
+  <addColumn tableName="player_items"><column name="durability" type="INTEGER" defaultValueNumeric="100"><constraints nullable="false"/></column></addColumn>
+  <sql>UPDATE item_templates SET set_code = passive_effect WHERE type = 'ARMOR' AND passive_effect &lt;&gt; 'NONE'</sql>
+  <createTable tableName="location_unlock_requirements">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+   <column name="from_location_id" type="VARCHAR(100)"><constraints nullable="false" referencedTableName="locations" referencedColumnNames="id" foreignKeyName="fk_unlock_from"/></column>
+   <column name="to_location_id" type="VARCHAR(100)"><constraints nullable="false" referencedTableName="locations" referencedColumnNames="id" foreignKeyName="fk_unlock_to"/></column>
+   <column name="requirement_type" type="VARCHAR(50)"><constraints nullable="false"/></column>
+   <column name="requirement_value" type="VARCHAR(255)"><constraints nullable="false"/></column>
+   <column name="blocked_reason" type="VARCHAR(500)"><constraints nullable="false"/></column>
+  </createTable>
+  <insert tableName="location_unlock_requirements">
+   <column name="from_location_id" value="crypt_central"/><column name="to_location_id" value="crypt_boss_room"/>
+   <column name="requirement_type" value="LOCATION_CLEARED"/><column name="requirement_value" value="crypt_training"/>
+   <column name="blocked_reason" value="Сначала зачистите тренировочную комнату"/>
+  </insert>
+  <createTable tableName="player_story_flags">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+   <column name="player_id" type="BIGINT"><constraints nullable="false" referencedTableName="players" referencedColumnNames="id" foreignKeyName="fk_story_player"/></column>
+   <column name="flag_code" type="VARCHAR(100)"><constraints nullable="false"/></column>
+   <column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+  </createTable>
+  <addUniqueConstraint tableName="player_story_flags" columnNames="player_id,flag_code" constraintName="uq_player_story_flag"/>
+ </changeSet>
+
+ <changeSet id="031-02-combat-log" author="codex">
+  <createTable tableName="combat_log_entries">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+   <column name="encounter_id" type="BIGINT"><constraints nullable="false" referencedTableName="combat_encounters" referencedColumnNames="id" foreignKeyName="fk_log_encounter"/></column>
+   <column name="round" type="INTEGER"><constraints nullable="false"/></column>
+   <column name="actor" type="VARCHAR(255)"><constraints nullable="false"/></column>
+   <column name="action_type" type="VARCHAR(100)"><constraints nullable="false"/></column>
+   <column name="target" type="VARCHAR(255)"><constraints nullable="false"/></column>
+   <column name="value" type="INTEGER"><constraints nullable="false"/></column>
+   <column name="description" type="VARCHAR(1000)"><constraints nullable="false"/></column>
+   <column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+  </createTable>
+  <createIndex tableName="combat_log_entries" indexName="idx_combat_log_encounter"><column name="encounter_id"/><column name="id"/></createIndex>
+ </changeSet>
+ <changeSet id="031-03-unique-active-combat" author="codex" dbms="postgresql">
+  <sql>CREATE UNIQUE INDEX uq_active_encounter_player ON combat_encounters(player_id) WHERE status = 'ACTIVE'</sql>
+ </changeSet>
+
+ <changeSet id="031-04-quests" author="codex">
+  <addColumn tableName="quest_templates">
+   <column name="min_level" type="INTEGER" defaultValueNumeric="1"><constraints nullable="false"/></column>
+   <column name="accept_location_id" type="VARCHAR(100)" defaultValue="city_adv_guild"/>
+   <column name="turn_in_location_id" type="VARCHAR(100)" defaultValue="city_adv_guild"/>
+   <column name="prerequisite_quest_id" type="BIGINT"/>
+   <column name="repeatable" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+   <column name="remote_turn_in" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+   <column name="reward_item_template_id" type="BIGINT"/>
+   <column name="reward_item_amount" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+  </addColumn>
+  <addColumn tableName="player_quests"><column name="version" type="INTEGER" defaultValueNumeric="0"/></addColumn>
+  <addForeignKeyConstraint baseTableName="quest_templates" baseColumnNames="prerequisite_quest_id" referencedTableName="quest_templates" referencedColumnNames="id" constraintName="fk_quest_prerequisite"/>
+  <addForeignKeyConstraint baseTableName="quest_templates" baseColumnNames="reward_item_template_id" referencedTableName="item_templates" referencedColumnNames="id" constraintName="fk_quest_reward_item"/>
+ </changeSet>
+
+ <changeSet id="031-05-economy" author="codex">
+  <createTable tableName="wallet_transactions">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+   <column name="player_id" type="BIGINT"><constraints nullable="false" referencedTableName="players" referencedColumnNames="id" foreignKeyName="fk_wallet_player"/></column>
+   <column name="amount" type="BIGINT"><constraints nullable="false"/></column><column name="balance_before" type="BIGINT"><constraints nullable="false"/></column><column name="balance_after" type="BIGINT"><constraints nullable="false"/></column>
+   <column name="reason" type="VARCHAR(50)"><constraints nullable="false"/></column><column name="reference_type" type="VARCHAR(100)"/><column name="reference_id" type="VARCHAR(100)"/><column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+  </createTable>
+  <createIndex tableName="wallet_transactions" indexName="idx_wallet_player"><column name="player_id"/><column name="id"/></createIndex>
+  <createTable tableName="merchant_offers">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column><column name="merchant_code" type="VARCHAR(100)"><constraints nullable="false"/></column><column name="location_id" type="VARCHAR(100)"><constraints nullable="false"/></column><column name="template_id" type="BIGINT"><constraints nullable="false" referencedTableName="item_templates" referencedColumnNames="id" foreignKeyName="fk_offer_template"/></column><column name="unit_price" type="INTEGER"><constraints nullable="false"/></column><column name="available_quantity" type="INTEGER" defaultValueNumeric="-1"><constraints nullable="false"/></column><column name="min_level" type="INTEGER" defaultValueNumeric="1"><constraints nullable="false"/></column><column name="enabled" type="BOOLEAN" defaultValueBoolean="true"><constraints nullable="false"/></column>
+  </createTable>
+  <sql>INSERT INTO merchant_offers(merchant_code,location_id,template_id,unit_price,available_quantity,min_level,enabled) SELECT 'TALMIRIA_GENERAL','city_merch_guild',id,(stat_budget * 2 + 5),-1,1,true FROM item_templates WHERE type = 'CONSUMABLE' OR name = 'Припасы'</sql>
+  <createTable tableName="forge_operations">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column><column name="player_id" type="BIGINT"><constraints nullable="false"/></column><column name="operation_id" type="VARCHAR(100)"><constraints nullable="false"/></column><column name="target_item_id" type="BIGINT"><constraints nullable="false"/></column><column name="gained_xp" type="INTEGER"><constraints nullable="false"/></column><column name="resulting_xp" type="BIGINT"><constraints nullable="false"/></column><column name="resulting_tier" type="INTEGER"><constraints nullable="false"/></column><column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+  </createTable>
+  <addUniqueConstraint tableName="forge_operations" columnNames="player_id,operation_id" constraintName="uq_forge_operation"/>
+  <createTable tableName="trade_operations">
+   <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column><column name="player_id" type="BIGINT"><constraints nullable="false"/></column><column name="operation_id" type="VARCHAR(100)"><constraints nullable="false"/></column><column name="operation_type" type="VARCHAR(20)"><constraints nullable="false"/></column><column name="result" type="VARCHAR(1000)"><constraints nullable="false"/></column><column name="created_at" type="TIMESTAMP WITH TIME ZONE"><constraints nullable="false"/></column>
+  </createTable>
+  <addUniqueConstraint tableName="trade_operations" columnNames="player_id,operation_id" constraintName="uq_trade_operation"/>
+ </changeSet>
+
+ <changeSet id="031-06-account" author="codex">
+  <addColumn tableName="user_accounts"><column name="token_version" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column><column name="enabled" type="BOOLEAN" defaultValueBoolean="true"><constraints nullable="false"/></column></addColumn>
+ </changeSet>
+</databaseChangeLog>

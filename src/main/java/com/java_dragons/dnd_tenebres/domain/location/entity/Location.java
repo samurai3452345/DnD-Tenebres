@@ -26,6 +26,9 @@ public class Location {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "description", nullable = false, length = 2000)
+    private String description;
+
     @Column(name = "level", nullable = false)
     private int level;
 

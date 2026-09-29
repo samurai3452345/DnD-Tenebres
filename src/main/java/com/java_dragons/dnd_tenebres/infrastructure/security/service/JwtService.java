@@ -54,6 +54,7 @@ public class JwtService {
         if (userAccount.getPlayerId() != null) {
             extraClaims.put("playerId", userAccount.getPlayerId());
         }
+        extraClaims.put("tokenVersion", userAccount.getTokenVersion());
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
@@ -66,6 +67,11 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    public int extractTokenVersion(String token) {
+        Integer version = extractClaim(token, claims -> claims.get("tokenVersion", Integer.class));
+        return version == null ? 0 : version;
     }
 
     private boolean isTokenExpired(String token) {

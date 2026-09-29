@@ -14,8 +14,20 @@ game:
         amount: 2
       - template: "Припасы"
         amount: 5
+  balance:
+    tavern-cost: 50
+    death-gold-penalty-percent: 20
+    short-rest-neutral-ambush-percent: 35
+    short-rest-dangerous-ambush-percent: 75
+    darkness-ambush-bonus-percent: 25
+    anti-magic-mana-multiplier: 2
+    anti-magic-damage-percent: 70
+    max-active-quests: 5
+    max-combat-log-page-size: 100
 
 spring:
+  profiles:
+    default: local
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/dnd_tenebres}
     username: ${DB_USERNAME:postgres}
@@ -35,3 +47,16 @@ application:
       expiration: ${JWT_EXPIRATION:PT24H}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

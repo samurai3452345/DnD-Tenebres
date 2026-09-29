@@ -1,7 +1,6 @@
 package com.java_dragons.dnd_tenebres.domain.quest.controller;
 
-import com.java_dragons.dnd_tenebres.domain.quest.entity.PlayerQuest;
-import com.java_dragons.dnd_tenebres.domain.quest.entity.QuestTemplate;
+import com.java_dragons.dnd_tenebres.domain.quest.dto.*;
 import com.java_dragons.dnd_tenebres.domain.quest.service.QuestService;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import lombok.RequiredArgsConstructor;
@@ -19,34 +18,28 @@ public class PlayerQuestController {
     private final QuestService questService;
 
     @GetMapping("/available")
-    public ResponseEntity<List<QuestTemplate>> getAvailable(@CurrentPlayerId Long playerId) {
+    public ResponseEntity<List<QuestTemplateResponse>> getAvailable(@CurrentPlayerId Long playerId) {
         return ResponseEntity.ok(questService.getAvailableQuests(playerId));
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<PlayerQuest>> getActive(@CurrentPlayerId Long playerId) {
+    public ResponseEntity<List<PlayerQuestResponse>> getActive(@CurrentPlayerId Long playerId) {
         return ResponseEntity.ok(questService.getActiveQuests(playerId));
     }
 
     @PostMapping("/accept/{questTemplateId}")
-    public ResponseEntity<PlayerQuest> acceptQuest(
+    public ResponseEntity<PlayerQuestResponse> acceptQuest(
             @CurrentPlayerId Long playerId,
             @PathVariable Long questTemplateId) {
 
-        PlayerQuest quest = questService.acceptQuestById(playerId, questTemplateId);
-        return ResponseEntity.ok(quest);
+        return ResponseEntity.ok(questService.acceptQuestById(playerId, questTemplateId));
     }
 
     @PostMapping("/turn-in/{playerQuestId}")
-    public ResponseEntity<?> turnIn(
+    public ResponseEntity<QuestRewardResponse> turnIn(
             @CurrentPlayerId Long playerId,
             @PathVariable Long playerQuestId) {
 
-        questService.turnInQuest(playerId, playerQuestId);
-
-        return ResponseEntity.ok(Map.of(
-                "status", "SUCCESS",
-                "message", "Квест успешно сдан, награда получена!"
-        ));
+        return ResponseEntity.ok(questService.turnInQuest(playerId, playerQuestId));
     }
 }

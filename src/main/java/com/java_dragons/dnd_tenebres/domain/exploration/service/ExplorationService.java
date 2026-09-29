@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import org.springframework.context.ApplicationEventPublisher;
+import com.java_dragons.dnd_tenebres.core.event.LocationVisitedEvent;
+import com.java_dragons.dnd_tenebres.core.random.RandomSource;
 
 @Slf4j
 @Service
@@ -40,6 +43,10 @@ public class ExplorationService {
     private final LocationFixedMonsterRepository fixedMonsterRepository;
     private final LocationLootEntryRepository locationLootEntryRepository;
     private final CombatEncounterService combatEncounterService;
+    private final com.java_dragons.dnd_tenebres.domain.location.service.LocationUnlockService locationUnlockService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final RandomSource randomSource;
+    private final com.java_dragons.dnd_tenebres.domain.location.service.LocationEffectService locationEffectService;
 
     @Transactional
     public ExplorationReport travel(Long playerId, String targetLocationId) {
@@ -56,13 +63,12 @@ public class ExplorationService {
                 .filter(loc -> loc.getId().equals(targetLocationId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Вы не можете попасть туда отсюда!"));
-
-        if (player.getLevel() < targetLocation.getLevel()) {
-            throw new IllegalStateException("Для перехода требуется уровень " + targetLocation.getLevel());
-        }
+        locationUnlockService.requireAccess(player, currentLocation, targetLocation);
 
         player.moveTo(targetLocation);
+        locationEffectService.onEnter(player);
         playerRepository.save(player);
+        eventPublisher.publishEvent(new LocationVisitedEvent(playerId, targetLocation.getId()));
         log.info("Игрок {} перешел в локацию {}", player.getName(), targetLocation.getName());
 
         if (targetLocation.getType() == LocationType.DANGEROUS) {
@@ -135,8 +141,9 @@ public class ExplorationService {
 
         // 1. Бросаем кубик на успешность обыска
         int roll = DiceRoller.rollD20();
-        if (roll < location.getSearchDifficulty()) {
-            return ExplorationReport.nothing("Вы ничего не нашли (Провал проверки обыска: " + roll + " < " + location.getSearchDifficulty() + ").");
+        int searchDifficulty = locationEffectService.searchDifficulty(player, location.getSearchDifficulty());
+        if (roll < searchDifficulty) {
+            return ExplorationReport.nothing("Вы ничего не нашли (Провал проверки обыска: " + roll + " < " + searchDifficulty + ").");
         }
 
         List<LocationLootEntry> lootTable = locationLootEntryRepository.findByLocationId(location.getId());
@@ -150,7 +157,7 @@ public class ExplorationService {
 
         for (LocationLootEntry entry : lootTable) {
             if (DiceRoller.rollD100() <= entry.getFindChance()) {
-                int amount = ThreadLocalRandom.current().nextInt(entry.getMinAmount(), entry.getMaxAmount() + 1);
+                int amount = randomSource.nextInt(entry.getMinAmount(), entry.getMaxAmount() + 1);
 
                 inventoryService.addItemToPlayer(player, entry.getItemTemplate().getName(), amount);
 
