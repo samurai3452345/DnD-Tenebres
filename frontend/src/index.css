@@ -361,3 +361,90 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* The supplied artwork is the real frame. The opaque surface only replaces the
+   baked-in sample labels, leaving the dragon, metal and banners untouched. */
+.auth-card--ornate {
+    width: min(94vw, 46rem, calc(100svh * 1.03));
+    aspect-ratio: 1280 / 1190;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    clip-path: none;
+    box-shadow: none;
+    animation: frame-arrive .65s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.auth-card--ornate::before,
+.auth-card--ornate::after { display: none; }
+
+.auth-card__frame {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 1.7rem 2.1rem rgba(0, 0, 0, .76));
+}
+
+.auth-card__surface {
+    position: absolute;
+    z-index: 2;
+    inset: 25.5% 24% 10.5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: .15rem .25rem;
+    background:
+        radial-gradient(ellipse at 50% 35%, rgba(28, 18, 14, .98), rgba(8, 8, 7, .995) 72%);
+    box-shadow: 0 0 1.5rem 1.15rem rgba(8, 8, 7, .99);
+}
+
+.auth-card--ornate .auth-card__eyebrow,
+.auth-card--ornate .auth-card__header p { display: none; }
+
+.auth-card--ornate .auth-card__header h1 {
+    margin: 0 0 .45rem;
+    font-size: clamp(2rem, 5.2vw, 3.25rem);
+    letter-spacing: .035em;
+}
+
+.auth-card--ornate .auth-divider { margin-bottom: .9rem; }
+.auth-card--ornate .auth-form { gap: .62rem; }
+.auth-card--ornate .auth-field { min-height: 3.15rem; }
+.auth-card--ornate .auth-field input { height: 3rem; }
+.auth-card--ornate .auth-submit { min-height: 3.3rem; }
+.auth-card--ornate .auth-options { margin: 0; }
+.auth-card--ornate .auth-card__footer { margin-top: .8rem; padding-top: .75rem; gap: .45rem; }
+.auth-card--ornate .auth-secondary { padding-top: .42rem; padding-bottom: .42rem; }
+.auth-card--ornate .auth-hint { font-size: .66rem; }
+
+@keyframes frame-arrive {
+    from { opacity: 0; transform: translateY(1rem) scale(.96); filter: brightness(.65); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+
+@media (max-width: 600px) {
+    .auth-scene { padding: .75rem .2rem; }
+    .auth-card--ornate {
+        width: min(103vw, calc(100svh * .93));
+        min-width: 24rem;
+    }
+    .auth-card__surface { inset: 25% 23.5% 9.5%; padding: 0; }
+    .auth-card--ornate .auth-card__header h1 { font-size: 1.9rem; }
+    .auth-card--ornate .auth-divider { margin-bottom: .55rem; }
+    .auth-card--ornate .auth-form { gap: .42rem; }
+    .auth-card--ornate .auth-field { min-height: 2.75rem; }
+    .auth-card--ornate .auth-field input { height: 2.65rem; font-size: 1rem; }
+    .auth-card--ornate .auth-field__icon { width: 1.2rem; height: 1.2rem; margin-left: .7rem; }
+    .auth-card--ornate .auth-field__action { width: 2.6rem; }
+    .auth-card--ornate .auth-submit { min-height: 2.85rem; font-size: 1rem; }
+    .auth-card--ornate .auth-options { font-size: .72rem; }
+    .auth-card--ornate .auth-link { font-size: .82rem; }
+    .auth-card--ornate .auth-card__footer { margin-top: .45rem; padding-top: .45rem; font-size: .82rem; }
+    .auth-card--ornate .auth-secondary { min-width: 9.5rem; padding: .35rem .7rem; font-size: .8rem; }
+    .auth-card--ornate .auth-hint { display: none; }
+}
