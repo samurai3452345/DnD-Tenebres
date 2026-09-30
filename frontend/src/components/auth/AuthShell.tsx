@@ -6,13 +6,21 @@ interface AuthShellProps {
     title: string;
     subtitle: string;
     wide?: boolean;
+    variant?: "login" | "register" | "neutral";
 }
 
-export default function AuthShell({ children, eyebrow, title, subtitle, wide = false }: AuthShellProps) {
+export default function AuthShell({
+    children,
+    eyebrow,
+    title,
+    subtitle,
+    wide = false,
+    variant = "neutral",
+}: AuthShellProps) {
     return (
         <main className="auth-scene">
             <div className="auth-scene__veil" />
-            <section className={`auth-card auth-card--ornate${wide ? " auth-card--wide" : ""}`}>
+            <section className={`auth-card auth-card--ornate auth-card--${variant}${wide ? " auth-card--wide" : ""}`}>
                 <img
                     className="auth-card__frame"
                     src="/assets/auth/dragon-auth-frame.png"

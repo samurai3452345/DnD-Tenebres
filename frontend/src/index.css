@@ -422,6 +422,83 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .auth-card--ornate .auth-secondary { padding-top: .42rem; padding-bottom: .42rem; }
 .auth-card--ornate .auth-hint { font-size: .66rem; }
 
+.auth-card--login .auth-card__surface {
+    inset: 17% 12% 3%;
+    justify-content: flex-start;
+    padding: 27% 12% 4%;
+    background:
+        url("/assets/auth/auth-inner-panel.png") center / 100% 100% no-repeat,
+        linear-gradient(#080807 0 0) center / 76% 88% no-repeat;
+    box-shadow: none;
+}
+
+.auth-card--login .auth-card__header { display: none; }
+
+.auth-card--register .auth-card__surface {
+    background:
+        linear-gradient(rgba(7, 7, 6, .2), rgba(7, 7, 6, .52)),
+        url("/assets/auth/auth-inner-panel.png") center bottom / 112% 170% no-repeat,
+        #080807;
+}
+
+.auth-card--ornate .auth-field {
+    min-height: 3.45rem;
+    padding: 0 1.55rem;
+    background: transparent url("/assets/auth/auth-field-frame.png") center / 100% auto no-repeat;
+    border: 0;
+    clip-path: none;
+    box-shadow: none;
+}
+
+.auth-card--ornate .auth-field:focus-within {
+    border: 0;
+    box-shadow: 0 0 1.25rem rgba(229, 48, 20, .3);
+    filter: brightness(1.12);
+}
+
+.auth-card--ornate .auth-field__icon { margin-left: .55rem; }
+.auth-card--ornate .auth-field__action { margin-right: .3rem; }
+
+.auth-card--ornate .auth-submit,
+.auth-card--ornate .auth-secondary {
+    background-color: transparent;
+    background-position: center;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    border: 0;
+    clip-path: none;
+    box-shadow: none;
+}
+
+.auth-card--ornate .auth-submit { min-height: 4rem; margin-top: 0; }
+.auth-card--ornate .auth-submit--red,
+.auth-card--ornate .auth-secondary--red {
+    background-image: url("/assets/auth/auth-button-login.png");
+}
+.auth-card--ornate .auth-submit--blue,
+.auth-card--ornate .auth-secondary:not(.auth-secondary--red) {
+    background-image: url("/assets/auth/auth-button-register.png");
+}
+
+.auth-card--ornate .auth-submit:hover:not(:disabled),
+.auth-card--ornate .auth-secondary:hover {
+    filter: brightness(1.2) drop-shadow(0 0 .65rem rgba(224, 63, 23, .28));
+}
+
+.auth-card--login .auth-card__footer {
+    margin-top: .4rem;
+    padding-top: .45rem;
+    border-top: 0;
+}
+
+.auth-card--login .auth-secondary { min-height: 3.35rem; display: grid; place-items: center; }
+.auth-card--ornate .auth-secondary--red {
+    min-width: 9rem;
+    min-height: 2.4rem;
+    display: grid;
+    place-items: center;
+}
+
 @keyframes frame-arrive {
     from { opacity: 0; transform: translateY(1rem) scale(.96); filter: brightness(.65); }
     to { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
@@ -447,4 +524,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     .auth-card--ornate .auth-card__footer { margin-top: .45rem; padding-top: .45rem; font-size: .82rem; }
     .auth-card--ornate .auth-secondary { min-width: 9.5rem; padding: .35rem .7rem; font-size: .8rem; }
     .auth-card--ornate .auth-hint { display: none; }
+    .auth-card--login .auth-card__surface { inset: 17% 11% 3%; padding: 27% 12% 4%; }
+    .auth-card--ornate .auth-field { min-height: 3rem; padding: 0 .8rem; }
+    .auth-card--ornate .auth-submit { min-height: 3.35rem; }
 }

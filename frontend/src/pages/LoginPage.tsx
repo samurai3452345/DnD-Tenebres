@@ -36,7 +36,7 @@ export default function LoginPage() {
 
     return (
         <AuthShell eyebrow="Врата в Тенебрис" title="Вход"
-            subtitle="Назовите своё имя, странник, и продолжите путь.">
+            subtitle="Назовите своё имя, странник, и продолжите путь." variant="login">
             <form className="auth-form" onSubmit={handleSubmit} noValidate>
                 <label className="auth-field" htmlFor="login-username">
                     <span className="sr-only">Имя пользователя</span>

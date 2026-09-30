@@ -55,7 +55,7 @@ export default function RegisterPage() {
 
     return (
         <AuthShell eyebrow="Новая клятва" title="Регистрация"
-            subtitle="Создайте аккаунт. Своего героя вы сможете создать отдельно.">
+            subtitle="Создайте аккаунт. Своего героя вы сможете создать отдельно." variant="register">
             <form className="auth-form" onSubmit={handleSubmit} noValidate>
                 <label className="auth-field" htmlFor="register-username">
                     <span className="sr-only">Имя пользователя</span>
