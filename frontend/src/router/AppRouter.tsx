@@ -8,6 +8,7 @@ import InventoryPage from "../pages/InventoryPage";
 import QuestsPage from "../pages/QuestsPage";
 import ShopPage from "../pages/ShopPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import AccountReadyPage from "../pages/AccountReadyPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -29,6 +30,11 @@ export default function AppRouter() {
                 />
 
                 <Route element={<ProtectedRoute />}>
+
+                    <Route
+                        path="/account-ready"
+                        element={<AccountReadyPage />}
+                    />
 
                     <Route
                         path="/"

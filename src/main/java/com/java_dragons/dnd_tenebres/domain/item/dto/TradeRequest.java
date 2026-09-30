@@ -31,6 +31,11 @@ public class TradeRequest {
             int amount
     ) {}
 
+    public record BuyByIdRequest(
+            @NotNull(message = "ID шаблона предмета обязателен") Long templateId,
+            @Positive(message = "Количество должно быть больше нуля") int amount
+    ) {}
+
     public record SellRequest(
             @NotBlank(message = "ID операции обязателен")
             @Size(max = 100, message = "ID операции не должен быть длиннее 100 символов")
