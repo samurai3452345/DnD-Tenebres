@@ -1,6 +1,6 @@
 package com.java_dragons.dnd_tenebres.infrastructure.security.filter;
 
-import com.java_dragons.dnd_tenebres.infrastructure.security.auth.PlayerAuthenticationDetails;
+import com.java_dragons.dnd_tenebres.infrastructure.security.model.PlayerAuthenticationDetails;
 import com.java_dragons.dnd_tenebres.infrastructure.security.entity.UserAccount;
 import com.java_dragons.dnd_tenebres.infrastructure.security.repository.UserAccountRepository;
 import com.java_dragons.dnd_tenebres.infrastructure.security.service.JwtService;
@@ -75,8 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 );
 
                         authentication.setDetails(
-                                new PlayerAuthenticationDetails(playerId)
-                        );
+                                new PlayerAuthenticationDetails(request, playerId)                        );
 
                         SecurityContextHolder.getContext()
                                 .setAuthentication(authentication);
