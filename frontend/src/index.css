@@ -35,7 +35,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     place-items: center;
     overflow: hidden;
     padding: .5rem 1rem;
-    background: #110b09 url("/assets/auth/tenebres-auth-background.png") center / cover fixed no-repeat;
+    background: #110b09 url("../public/assets/auth/tenebres-auth-background.png") center / cover fixed no-repeat;
 }
 
 .auth-scene::before {
@@ -44,8 +44,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
     inset: 0;
     z-index: -2;
     background:
-        radial-gradient(circle at 50% 45%, transparent 0 22%, rgba(5, 3, 3, .34) 62%, rgba(3, 2, 2, .82) 100%),
-        linear-gradient(90deg, rgba(9, 5, 4, .42), transparent 35% 65%, rgba(9, 5, 4, .42));
+        radial-gradient(circle at 50% 45%, transparent 22%, rgba(5, 3, 3, .34) 62%, rgba(3, 2, 2, .82) 100%),
+        linear-gradient(90deg, rgba(9, 5, 4, .42), transparent 35%, transparent 65%, rgba(9, 5, 4, .42));
 }
 
 .auth-scene__veil {
@@ -404,7 +404,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .auth-card__panel--register {
     background:
         radial-gradient(ellipse at 50% 42%, rgba(34, 21, 16, .18), rgba(5, 5, 5, .48) 74%),
-        url("/assets/auth/auth-inner-panel.png") center bottom / 112% 205% no-repeat,
+        url("../public/assets/auth/auth-inner-panel.png") center bottom / 112% 205% no-repeat,
         #080807;
     filter: drop-shadow(0 0 1rem #080807);
 }
@@ -484,7 +484,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .auth-card--ornate .auth-field {
     min-height: 3.45rem;
     padding: 0 1.55rem;
-    background: transparent url("/assets/auth/auth-field-frame.png") center / 100% auto no-repeat;
+    background: transparent url("../public/assets/auth/auth-field-frame.png") center / 100% auto no-repeat;
     border: 0;
     clip-path: none;
     box-shadow: none;
@@ -513,11 +513,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .auth-card--ornate .auth-submit { min-height: 4rem; margin-top: 0; }
 .auth-card--ornate .auth-submit--red,
 .auth-card--ornate .auth-secondary--red {
-    background-image: url("/assets/auth/auth-button-login.png");
+    background-image: url("../public/assets/auth/auth-button-login.png");
 }
 .auth-card--ornate .auth-submit--blue,
 .auth-card--ornate .auth-secondary:not(.auth-secondary--red) {
-    background-image: url("/assets/auth/auth-button-register.png");
+    background-image: url("../public/assets/auth/auth-button-register.png");
 }
 
 .auth-card--ornate .auth-submit:hover:not(:disabled),
