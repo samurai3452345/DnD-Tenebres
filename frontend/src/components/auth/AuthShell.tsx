@@ -27,6 +27,17 @@ export default function AuthShell({
                     alt=""
                     aria-hidden="true"
                 />
+                {variant === "login" && (
+                    <img
+                        className="auth-card__panel"
+                        src="/assets/auth/auth-inner-panel.png"
+                        alt=""
+                        aria-hidden="true"
+                    />
+                )}
+                {variant === "register" && (
+                    <div className="auth-card__panel auth-card__panel--register" aria-hidden="true" />
+                )}
                 <div className="auth-card__surface">
                     <header className="auth-card__header">
                         <span className="auth-card__eyebrow">{eyebrow}</span>

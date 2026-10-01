@@ -34,7 +34,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     display: grid;
     place-items: center;
     overflow: hidden;
-    padding: 2rem 1rem;
+    padding: .5rem 1rem;
     background: #110b09 url("/assets/auth/tenebres-auth-background.png") center / cover fixed no-repeat;
 }
 
@@ -365,8 +365,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 /* The supplied artwork is the real frame. The opaque surface only replaces the
    baked-in sample labels, leaving the dragon, metal and banners untouched. */
 .auth-card--ornate {
-    width: min(94vw, 46rem, calc(100svh * 1.03));
-    aspect-ratio: 1280 / 1190;
+    width: min(96vw, 57rem, calc(100svh * 1.27));
+    aspect-ratio: 1448 / 1086;
     padding: 0;
     background: transparent;
     border: 0;
@@ -381,7 +381,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .auth-card__frame {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 3;
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -390,17 +390,36 @@ button, a { -webkit-tap-highlight-color: transparent; }
     filter: drop-shadow(0 1.7rem 2.1rem rgba(0, 0, 0, .76));
 }
 
+.auth-card__panel {
+    position: absolute;
+    inset: 20% 18% 7%;
+    z-index: 1;
+    width: 64%;
+    height: 73%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.auth-card__panel--register {
+    background:
+        radial-gradient(ellipse at 50% 42%, rgba(34, 21, 16, .18), rgba(5, 5, 5, .48) 74%),
+        url("/assets/auth/auth-inner-panel.png") center bottom / 112% 205% no-repeat,
+        #080807;
+    filter: drop-shadow(0 0 1rem #080807);
+}
+
 .auth-card__surface {
     position: absolute;
-    z-index: 2;
-    inset: 25.5% 24% 10.5%;
+    z-index: 4;
+    inset: 22% 26% 5%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: .15rem .25rem;
     background:
         radial-gradient(ellipse at 50% 35%, rgba(28, 18, 14, .98), rgba(8, 8, 7, .995) 72%);
-    box-shadow: 0 0 1.5rem 1.15rem rgba(8, 8, 7, .99);
+    box-shadow: 0 0 1.2rem .8rem rgba(8, 8, 7, .96);
 }
 
 .auth-card--ornate .auth-card__eyebrow,
@@ -423,23 +442,44 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .auth-card--ornate .auth-hint { font-size: .66rem; }
 
 .auth-card--login .auth-card__surface {
-    inset: 17% 12% 3%;
+    inset: 27% 27% 7%;
     justify-content: flex-start;
-    padding: 27% 12% 4%;
-    background:
-        url("/assets/auth/auth-inner-panel.png") center / 100% 100% no-repeat,
-        linear-gradient(#080807 0 0) center / 76% 88% no-repeat;
+    padding: 15% 0 0;
+    background: transparent;
     box-shadow: none;
 }
 
 .auth-card--login .auth-card__header { display: none; }
 
+.auth-card--login .auth-form { gap: .32rem; }
+.auth-card--login .auth-field { min-height: 2.8rem; }
+.auth-card--login .auth-field input { height: 2.7rem; }
+.auth-card--login .auth-submit { min-height: 3.15rem; }
+.auth-card--login .auth-options { font-size: .76rem; }
+
 .auth-card--register .auth-card__surface {
-    background:
-        linear-gradient(rgba(7, 7, 6, .2), rgba(7, 7, 6, .52)),
-        url("/assets/auth/auth-inner-panel.png") center bottom / 112% 170% no-repeat,
-        #080807;
+    inset: 25% 26% 7%;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
 }
+
+.auth-card--register .auth-card__header h1 {
+    margin-bottom: .15rem;
+    font-size: 2.55rem;
+}
+.auth-card--register .auth-divider { margin-bottom: .35rem; }
+.auth-card--register .auth-form { gap: .28rem; }
+.auth-card--register .auth-field { min-height: 2.7rem; }
+.auth-card--register .auth-field input { height: 2.6rem; }
+.auth-card--register .auth-submit { min-height: 3rem; }
+.auth-card--register .auth-card__footer {
+    margin-top: .25rem;
+    padding-top: .25rem;
+    gap: .35rem;
+    transform: translateY(-.35rem);
+}
+.auth-card--register .auth-secondary--red { min-height: 2.2rem; }
 
 .auth-card--ornate .auth-field {
     min-height: 3.45rem;
@@ -486,12 +526,23 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .auth-card--login .auth-card__footer {
-    margin-top: .4rem;
-    padding-top: .45rem;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    margin-top: .18rem;
+    padding-top: .2rem;
+    gap: .25rem;
     border-top: 0;
+    transform: translateY(-.8rem);
 }
 
-.auth-card--login .auth-secondary { min-height: 3.35rem; display: grid; place-items: center; }
+.auth-card--login .auth-secondary {
+    min-width: 10.5rem;
+    min-height: 2.55rem;
+    display: grid;
+    place-items: center;
+    padding: .2rem .65rem;
+    font-size: .78rem;
+}
 .auth-card--ornate .auth-secondary--red {
     min-width: 9rem;
     min-height: 2.4rem;
@@ -507,10 +558,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 600px) {
     .auth-scene { padding: .75rem .2rem; }
     .auth-card--ornate {
-        width: min(103vw, calc(100svh * .93));
-        min-width: 24rem;
+        width: min(112vw, calc(100svh * 1.2));
+        min-width: 26rem;
     }
-    .auth-card__surface { inset: 25% 23.5% 9.5%; padding: 0; }
+    .auth-card__panel { inset: 20% 17% 6%; width: 66%; height: 74%; }
+    .auth-card__surface { inset: 22% 25% 4%; padding: 3% 0; }
     .auth-card--ornate .auth-card__header h1 { font-size: 1.9rem; }
     .auth-card--ornate .auth-divider { margin-bottom: .55rem; }
     .auth-card--ornate .auth-form { gap: .42rem; }
@@ -524,7 +576,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     .auth-card--ornate .auth-card__footer { margin-top: .45rem; padding-top: .45rem; font-size: .82rem; }
     .auth-card--ornate .auth-secondary { min-width: 9.5rem; padding: .35rem .7rem; font-size: .8rem; }
     .auth-card--ornate .auth-hint { display: none; }
-    .auth-card--login .auth-card__surface { inset: 17% 11% 3%; padding: 27% 12% 4%; }
+    .auth-card--login .auth-card__surface { inset: 27% 26% 6%; padding: 15% 0 0; }
     .auth-card--ornate .auth-field { min-height: 3rem; padding: 0 .8rem; }
     .auth-card--ornate .auth-submit { min-height: 3.35rem; }
 }
