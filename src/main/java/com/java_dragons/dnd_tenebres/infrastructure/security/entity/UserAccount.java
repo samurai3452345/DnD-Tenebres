@@ -46,6 +46,15 @@ public class UserAccount {
             String encodedPassword,
             Long playerId
     ) {
+        UserAccount account = create(username, encodedPassword);
+        account.linkPlayer(playerId);
+        return account;
+    }
+
+    public static UserAccount create(
+            String username,
+            String encodedPassword
+    ) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException(
                     "Имя пользователя не может быть пустым"
@@ -55,8 +64,6 @@ public class UserAccount {
         UserAccount account = new UserAccount();
         account.username = username.trim();
         account.changePassword(encodedPassword);
-        account.linkPlayer(playerId);
-
         return account;
     }
 

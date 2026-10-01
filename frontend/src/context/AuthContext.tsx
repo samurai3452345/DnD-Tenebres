@@ -9,7 +9,7 @@ import {
 interface AuthContextType {
     token: string | null;
     isAuthenticated: boolean;
-    login: (token: string) => void;
+    login: (token: string, remember?: boolean) => void;
     logout: () => void;
 }
 
@@ -21,21 +21,24 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const [token, setToken] = useState<string | null>(
-        localStorage.getItem("token")
+        localStorage.getItem("token") ?? sessionStorage.getItem("token")
     );
 
-    const login = (newToken: string) => {
-        localStorage.setItem("token", newToken);
+    const login = (newToken: string, remember = true) => {
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        (remember ? localStorage : sessionStorage).setItem("token", newToken);
         setToken(newToken);
     };
 
     const logout = () => {
         localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         setToken(null);
     };
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("token");
+        const storedToken = localStorage.getItem("token") ?? sessionStorage.getItem("token");
 
         if (storedToken) {
             setToken(storedToken);
