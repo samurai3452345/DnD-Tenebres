@@ -1,12 +1,23 @@
 package com.java_dragons.dnd_tenebres.infrastructure.security.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_accounts")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAccount {
 
     @Id
@@ -22,31 +33,65 @@ public class UserAccount {
     @Column(name = "player_id")
     private Long playerId;
 
-    public static UserAccount create(String username, String encodedPassword, Long playerId) {
+    @Builder.Default
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion = 0;
+
+    @Builder.Default
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
+    public static UserAccount create(
+            String username,
+            String encodedPassword,
+            Long playerId
+    ) {
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Имя пользователя не может быть пустым");
+            throw new IllegalArgumentException(
+                    "Имя пользователя не может быть пустым"
+            );
         }
+
         UserAccount account = new UserAccount();
-        account.username = username;
+        account.username = username.trim();
         account.changePassword(encodedPassword);
         account.linkPlayer(playerId);
+
         return account;
     }
 
     public void changePassword(String encodedNewPassword) {
         if (encodedNewPassword == null || encodedNewPassword.isBlank()) {
-            throw new IllegalArgumentException("Пароль не может быть пустым");
+            throw new IllegalArgumentException(
+                    "Пароль не может быть пустым"
+            );
         }
+
         this.password = encodedNewPassword;
     }
 
     public void linkPlayer(Long newPlayerId) {
         if (newPlayerId == null) {
-            throw new IllegalArgumentException("ID персонажа не указан");
+            throw new IllegalArgumentException(
+                    "ID персонажа не указан"
+            );
         }
+
         if (this.playerId != null) {
-            throw new IllegalStateException("К этому аккаунту уже привязан персонаж!");
+            throw new IllegalStateException(
+                    "К этому аккаунту уже привязан персонаж!"
+            );
         }
+
         this.playerId = newPlayerId;
+    }
+
+    public void revokeAllTokens() {
+        this.tokenVersion++;
+    }
+
+    public void disable() {
+        this.enabled = false;
+        this.tokenVersion++;
     }
 }

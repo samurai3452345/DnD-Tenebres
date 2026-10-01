@@ -18,9 +18,24 @@ public class AccountUserDetailsService implements UserDetailsService {
     private final UserAccountRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(
+            String username
+    ) throws UsernameNotFoundException {
         UserAccount account = repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-        return new User(account.getUsername(), account.getPassword(), Collections.emptyList());
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Пользователь не найден"
+                ));
+
+        if (!account.isEnabled()) {
+            throw new UsernameNotFoundException(
+                    "Пользователь не найден"
+            );
+        }
+
+        return new User(
+                account.getUsername(),
+                account.getPassword(),
+                Collections.emptyList()
+        );
     }
 }

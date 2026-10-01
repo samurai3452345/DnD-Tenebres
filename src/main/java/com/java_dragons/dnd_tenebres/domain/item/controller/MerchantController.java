@@ -1,58 +1,80 @@
 package com.java_dragons.dnd_tenebres.domain.item.controller;
 
+import com.java_dragons.dnd_tenebres.domain.item.dto.MerchantResponse;
+import com.java_dragons.dnd_tenebres.domain.item.dto.ShopOfferResponse;
 import com.java_dragons.dnd_tenebres.domain.item.dto.TradeRequest;
 import com.java_dragons.dnd_tenebres.domain.item.service.ShopService;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 import java.util.List;
-import com.java_dragons.dnd_tenebres.domain.item.dto.ShopOfferResponse;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/merchant")
+@RequestMapping("/api/v1/merchants/current")
 @RequiredArgsConstructor
 public class MerchantController {
 
     private final ShopService shopService;
 
-    @GetMapping("/offers")
-    public ResponseEntity<List<ShopOfferResponse>> offers(@CurrentPlayerId Long playerId) {
-        return ResponseEntity.ok(shopService.getAssortment(playerId));
+    @GetMapping
+    public ResponseEntity<MerchantResponse> current(
+            @CurrentPlayerId Long playerId
+    ) {
+        return ResponseEntity.ok(
+                shopService.currentMerchant(playerId)
+        );
     }
 
-    @PostMapping("/buy-by-id")
-    public ResponseEntity<?> buyById(@CurrentPlayerId Long playerId, @RequestBody TradeRequest.BuyByIdRequest request) {
-        return ResponseEntity.ok(Map.of("status", "SUCCESS", "message",
-                shopService.buyItem(playerId, request.templateId(), request.amount())));
+    @GetMapping("/offers")
+    public ResponseEntity<List<ShopOfferResponse>> offers(
+            @CurrentPlayerId Long playerId
+    ) {
+        return ResponseEntity.ok(
+                shopService.getAssortment(playerId)
+        );
     }
 
     @PostMapping("/buy")
-    public ResponseEntity<?> buyItem(
+    public ResponseEntity<Map<String, String>> buy(
             @CurrentPlayerId Long playerId,
-            @Valid @RequestBody TradeRequest.BuyRequest request) {
-
-        String result = shopService.buyItem(playerId, request.templateName(), request.amount());
+            @Valid @RequestBody TradeRequest.BuyByIdRequest request
+    ) {
+        String message = shopService.buyItem(
+                playerId,
+                request.operationId(),
+                request.offerId(),
+                request.amount()
+        );
 
         return ResponseEntity.ok(Map.of(
                 "status", "SUCCESS",
-                "message", result
+                "message", message
         ));
     }
 
     @PostMapping("/sell")
-    public ResponseEntity<?> sellItem(
+    public ResponseEntity<Map<String, String>> sell(
             @CurrentPlayerId Long playerId,
-            @Valid @RequestBody TradeRequest.SellRequest request) {
-
-        String result = shopService.sellItem(playerId, request.playerItemId(), request.amount());
+            @Valid @RequestBody TradeRequest.SellRequest request
+    ) {
+        String message = shopService.sellItem(
+                playerId,
+                request.operationId(),
+                request.playerItemId(),
+                request.amount()
+        );
 
         return ResponseEntity.ok(Map.of(
                 "status", "SUCCESS",
-                "message", result
+                "message", message
         ));
     }
 }

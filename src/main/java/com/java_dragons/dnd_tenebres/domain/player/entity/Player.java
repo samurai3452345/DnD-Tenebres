@@ -71,6 +71,14 @@ public class Player {
     private Location currentLocation;
 
     @Builder.Default
+    @Column(name = "travel_sequence", nullable = false)
+    private long travelSequence = 0;
+
+    @Builder.Default
+    @Column(name = "last_short_rest_sequence", nullable = false)
+    private long lastShortRestSequence = -1;
+
+    @Builder.Default
     @Column(name = "stat_points", nullable = false)
     private int statPoints = 0;
 
@@ -141,7 +149,11 @@ public class Player {
     public void moveTo(Location newLocation) {
         if (newLocation == null) throw new IllegalArgumentException("Новая локация обязательна");
         this.currentLocation = newLocation;
+        this.travelSequence++;
     }
+
+    public boolean canTakeShortRest() { return lastShortRestSequence != travelSequence; }
+    public void markShortRestUsed() { this.lastShortRestSequence = this.travelSequence; }
 
     public void equipItem(Long playerItemId, EquipmentSlot targetSlot) {
         PlayerItem itemToEquip = this.inventory.stream()
@@ -283,29 +295,23 @@ public class Player {
     }
 
     public void addEffect(ActiveEffect effect) {
-        if (effect == null) throw new IllegalArgumentException("Эффект обязателен");
-        this.activeEffects.add(effect);
-    }
-
-    public void processTurnEffects(List<CombatEvent> events) {
-        Iterator<ActiveEffect> iterator = this.activeEffects.iterator();
-        while (iterator.hasNext()) {
-            ActiveEffect effect = iterator.next();
-
-            if (effect.getType() == EffectType.REGENERATION) {
-                int oldHp = this.currentHp;
-                this.heal(effect.getPower());
-                int healed = this.currentHp - oldHp;
-                events.add(new CombatEvent(this.name, "EFFECT_HEAL", this.name, healed, "Регенерация"));
-            }
-
-            effect.decrementDuration();
-
-            if (effect.getDuration() <= 0) {
-                iterator.remove();
-            }
+        if (effect == null) {
+            throw new IllegalArgumentException("Эффект обязателен");
         }
+
+        this.activeEffects.stream()
+                .filter(existing -> existing.getType() == effect.getType())
+                .findFirst()
+                .ifPresentOrElse(
+                        existing -> existing.refresh(
+                                effect.getDuration(),
+                                effect.getPower()
+                        ),
+                        () -> this.activeEffects.add(effect)
+                );
     }
+
+    public void surviveAtOneHp() { this.currentHp = 1; }
 
     public void consumeItem(PlayerItem item) {
         if (item.getAmount() > 0) {
@@ -356,7 +362,7 @@ public class Player {
 
         if (totalCost <= 0) return;
         if (totalCost > this.statPoints) {
-            throw new IllegalStateException("Недостаточно очков характеристик. Доступно: " + this.statPoints);
+            throw new IllegalStateException("Недостаточно поинтов! У вас: " + this.statPoints);
         }
 
         this.statPoints -= totalCost;

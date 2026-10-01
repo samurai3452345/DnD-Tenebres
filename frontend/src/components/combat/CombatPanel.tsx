@@ -9,7 +9,7 @@ interface CombatPanelProps {
     isPlayerDead: boolean;
     isEnemyDead: boolean;
     isLoading: boolean;
-    onAction: (action: CombatAction, targetId?: number) => void;
+    onAction: (action: CombatAction, targetName?: string) => void;
 }
 
 export default function CombatPanel({ monsterName, events, isPlayerDead, isEnemyDead, isLoading, onAction }: CombatPanelProps) {

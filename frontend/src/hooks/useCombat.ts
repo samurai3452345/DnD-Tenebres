@@ -9,22 +9,23 @@ export function useCombat() {
     const [isPlayerDead, setIsPlayerDead] = useState(false);
     const [isEnemyDead, setIsEnemyDead] = useState(false);
 
-    const executeTurn = async (monsterId: number, action: CombatAction, actionTargetId?: number) => {
+    const executeTurn = async (monsterId: number, action: CombatAction, actionTargetName?: string) => {
         setLoading(true);
         try {
             const request: CombatTurnRequest = {
+                monsterId,
+                round,
+                aliveEnemyCount: 1, // Для MVP считаем, что враг один
                 action,
-                targetId: monsterId,
-                abilityId: action === 'CAST_SPELL' ? actionTargetId ?? null : null,
-                itemId: action === 'USE_POTION' ? actionTargetId ?? null : null
+                actionTargetName: actionTargetName || null
             };
 
-            const report = action === 'FLEE' ? await combatApi.flee() : await combatApi.executeTurn(request);
+            const report = await combatApi.executeTurn(request);
 
             setEvents(prev => [...prev, ...report.events]);
-            setRound(report.round);
-            setIsPlayerDead(report.status === 'DEFEAT');
-            setIsEnemyDead(report.status === 'VICTORY' || report.status === 'FLED');
+            setRound(report.round + 1);
+            setIsPlayerDead(report.isPlayerDead);
+            setIsEnemyDead(report.isEnemyDead);
 
             return report;
         } catch (err: any) {

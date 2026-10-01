@@ -1,6 +1,12 @@
 package com.java_dragons.dnd_tenebres.domain.location.service;
 
-import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
+import com.java_dragons.dnd_tenebres.core.random.RandomSource;
+import com.java_dragons.dnd_tenebres.core.config.GameBalanceProperties;
+import com.java_dragons.dnd_tenebres.domain.economy.service.WalletService;
+import com.java_dragons.dnd_tenebres.domain.economy.model.WalletReason;
+import com.java_dragons.dnd_tenebres.domain.monster.service.MonsterSpawnerService;
+import com.java_dragons.dnd_tenebres.domain.combat.service.CombatEncounterService;
+import com.java_dragons.dnd_tenebres.domain.combat.model.EncounterReason;
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectCategory;
 import com.java_dragons.dnd_tenebres.domain.effect.model.EffectType;
@@ -20,8 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestingService {
 
     private final PlayerRepository playerRepository;
-
-    private static final int TAVERN_COST = 50;
+    private final RandomSource randomSource;
+    private final GameBalanceProperties balance;
+    private final WalletService walletService;
+    private final MonsterSpawnerService monsterSpawnerService;
+    private final CombatEncounterService encounterService;
+    private final LocationEffectService locationEffectService;
 
     @Transactional
     public RestReport takeShortRest(Long playerId) {
@@ -36,21 +46,18 @@ public class RestingService {
         LocationType locType = player.getCurrentLocation().getType();
         LocationEffect locationEffect = player.getCurrentLocation().getEffect();
 
+        if (!player.canTakeShortRest()) throw new IllegalStateException("Короткий отдых уже использован в это посещение");
         if (!player.consumeItemByName("Припасы")) {
             throw new IllegalStateException("Для привала нужны 'Припасы'!");
         }
 
         player.removeEffect(EffectType.WELL_RESTED);
 
-        int d20 = DiceRoller.rollD20();
-        boolean isAmbushed = false;
-
-        if (locType == LocationType.NEUTRAL && d20 <= 7) {
-            isAmbushed = true;
-        } else if (locType == LocationType.DANGEROUS && d20 <= 15) {
-            isAmbushed = true;
-        }
-        if (locationEffect == LocationEffect.DARKNESS && d20 <= 12) isAmbushed = true;
+        player.markShortRestUsed();
+        int chance = locType == LocationType.DANGEROUS ? balance.shortRestDangerousAmbushPercent()
+                : locType == LocationType.NEUTRAL ? balance.shortRestNeutralAmbushPercent() : 0;
+        chance = Math.min(100, chance + locationEffectService.ambushBonus(player));
+        boolean isAmbushed = randomSource.chance(chance);
 
         if (isAmbushed) {
             log.warn("Отдых прерван! Засада!");
@@ -58,7 +65,10 @@ public class RestingService {
             // Берем ID локации вместо биома и уровня
             String locationId = player.getCurrentLocation().getId();
 
-            return new RestReport("Ваш отдых был прерван внезапным нападением!", true, locationId);
+            var monster = monsterSpawnerService.spawnRandomMonster(locationId);
+            encounterService.startEncounter(playerId, java.util.List.of(monster), EncounterReason.REST_AMBUSH);
+            var state = encounterService.applyAmbushOpening(playerId, monster);
+            return new RestReport("Ваш отдых был прерван внезапным нападением!", true, locationId, state);
         }
 
         if (locationEffect != LocationEffect.TOXIC_FUMES) player.heal(player.getMaxHp() / 2);
@@ -89,9 +99,7 @@ public class RestingService {
             throw new IllegalArgumentException("Здесь нельзя безопасно переночевать!");
         }
 
-        if (!player.spendGold(TAVERN_COST)) {
-            throw new IllegalArgumentException("Недостаточно золота для ночевки!");
-        }
+        walletService.debit(player, balance.tavernCost(), WalletReason.REST, "LOCATION", player.getCurrentLocation().getId());
 
         player.healToFull();
         player.restoreMp(player.getMaxMp());

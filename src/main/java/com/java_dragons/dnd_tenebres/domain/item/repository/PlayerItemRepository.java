@@ -13,4 +13,5 @@ public interface PlayerItemRepository extends JpaRepository<PlayerItem, Long> {
     @EntityGraph(attributePaths = "template")
     List<PlayerItem> findByPlayerId(Long playerId);
     Optional<PlayerItem> findByIdAndPlayerId(Long id, Long playerId);
+    boolean existsByPlayerIdAndTemplateNameAndAmountGreaterThan(Long playerId, String templateName, int amount);
 }

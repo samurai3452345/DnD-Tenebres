@@ -1,129 +1,104 @@
 package com.java_dragons.dnd_tenebres.domain.item.service;
 
-import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
-import com.java_dragons.dnd_tenebres.domain.item.entity.PlayerItem;
-import com.java_dragons.dnd_tenebres.domain.item.model.ItemType;
-import com.java_dragons.dnd_tenebres.domain.item.repository.ItemTemplateRepository;
-import com.java_dragons.dnd_tenebres.domain.item.repository.PlayerItemRepository;
+import com.java_dragons.dnd_tenebres.core.event.QuestProgressEvent;
+import com.java_dragons.dnd_tenebres.domain.economy.model.WalletReason;
+import com.java_dragons.dnd_tenebres.domain.economy.service.WalletService;
+import com.java_dragons.dnd_tenebres.domain.item.dto.*;
+import com.java_dragons.dnd_tenebres.domain.item.entity.*;
+import com.java_dragons.dnd_tenebres.domain.item.repository.*;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
+import com.java_dragons.dnd_tenebres.domain.quest.model.QuestType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import com.java_dragons.dnd_tenebres.domain.item.dto.ShopOfferResponse;
+import java.time.Instant;
+import java.util.*;
 
-@Service
-@RequiredArgsConstructor
+@Service @RequiredArgsConstructor
 public class ShopService {
-
+    public static final String MERCHANT_LOCATION_ID = "city_merch_guild";
     private final PlayerRepository playerRepository;
     private final PlayerItemRepository playerItemRepository;
-    private final ItemTemplateRepository itemTemplateRepository;
+    private final MerchantOfferRepository offerRepository;
+    private final TradeOperationRepository operationRepository;
     private final InventoryService inventoryService;
+    private final WalletService walletService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final com.java_dragons.dnd_tenebres.infrastructure.audit.AuditService auditService;
 
-    private static final String MERCHANT_LOCATION_ID = "city_merch_guild";
-
-    @Transactional
-    public String buyItem(Long playerId, String templateName, int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Количество должно быть больше нуля");
-
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
-
-        validateLocation(player);
-
-        ItemTemplate template = itemTemplateRepository.findByName(templateName)
-                .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
-
-        if (template.getType() != ItemType.CONSUMABLE && !template.getName().equals("Припасы")) {
-            throw new IllegalArgumentException("Торговец продает только расходники и зелья!");
-        }
-
-        long price = (long) calculateBuyPrice(template) * amount;
-
-        if (!player.spendGold(price)) {
-            throw new IllegalStateException("Недостаточно золота! Требуется: " + price);
-        }
-
-        inventoryService.addItemToPlayer(player, templateName, amount);
-        return String.format("Вы успешно купили %s (x%d) за %d золотых.", templateName, amount, price);
-    }
-
-    @Transactional
-    public String buyItem(Long playerId, Long templateId, int amount) {
-        ItemTemplate template = itemTemplateRepository.findById(templateId)
-                .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
-        return buyItem(playerId, template.getName(), amount);
+    @Transactional(readOnly = true)
+    public MerchantResponse currentMerchant(Long playerId) {
+        Player player = player(playerId); validateLocation(player);
+        return new MerchantResponse("TALMIRIA_GENERAL", "Торговец Гильдии", MERCHANT_LOCATION_ID);
     }
 
     @Transactional(readOnly = true)
     public List<ShopOfferResponse> getAssortment(Long playerId) {
-        Player player = playerRepository.findById(playerId).orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
-        validateLocation(player);
-        return itemTemplateRepository.findByTypeIn(List.of(ItemType.CONSUMABLE, ItemType.RESOURCE)).stream()
-                .filter(t -> t.getType() == ItemType.CONSUMABLE || t.getName().equals("Припасы"))
-                .map(t -> new ShopOfferResponse(t.getId(), t.getName(), t.getType().name(), t.getRarity().name(), calculateBuyPrice(t)))
-                .toList();
+        Player player = player(playerId); validateLocation(player);
+        return offerRepository.findByLocationIdAndEnabledTrueOrderById(player.getCurrentLocation().getId()).stream()
+                .map(offer -> new ShopOfferResponse(offer.getId(), offer.getTemplate().getId(), offer.getTemplate().getName(),
+                        offer.getTemplate().getType().name(), offer.getTemplate().getRarity().name(), offer.getUnitPrice(),
+                        offer.getAvailableQuantity(), offer.getMinLevel(), player.getLevel() >= offer.getMinLevel() &&
+                        (offer.getAvailableQuantity() < 0 || offer.getAvailableQuantity() > 0))).toList();
     }
 
     @Transactional
-    public String sellItem(Long playerId, Long playerItemId, int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Количество должно быть больше нуля");
+    public String buyItem(Long playerId, String operationId, Long offerId, int amount) {
+        validateOperation(operationId, amount);
+        Optional<TradeOperation> old = operationRepository.findByPlayerIdAndOperationId(playerId, operationId);
+        if (old.isPresent()) return old.get().getResult();
+        Player player = player(playerId); validateLocation(player);
+        MerchantOffer offer = offerRepository.findByIdAndLocationIdAndEnabledTrue(offerId, player.getCurrentLocation().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Товар отсутствует у этого торговца"));
+        if (player.getLevel() < offer.getMinLevel()) throw new IllegalStateException("Требуется уровень " + offer.getMinLevel());
+        long price = Math.multiplyExact((long) offer.getUnitPrice(), amount);
+        walletService.debit(player, price, WalletReason.PURCHASE, "MERCHANT_OFFER", offerId.toString());
+        offer.take(amount);
+        inventoryService.addItemToPlayer(player, offer.getTemplate().getName(), amount);
+        String result = "Куплено: " + offer.getTemplate().getName() + " x" + amount + " за " + price;
+        remember(playerId, operationId, "BUY", result);
+        auditService.record(player.getName(), playerId, "PURCHASE", "SUCCESS", result);
+        eventPublisher.publishEvent(new QuestProgressEvent(playerId, QuestType.TRADE, "BUY", amount));
+        return result;
+    }
 
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
-
-        validateLocation(player);
-
-        PlayerItem item = playerItemRepository.findById(playerItemId)
+    @Transactional
+    public String sellItem(Long playerId, String operationId, Long playerItemId, int amount) {
+        validateOperation(operationId, amount);
+        Optional<TradeOperation> old = operationRepository.findByPlayerIdAndOperationId(playerId, operationId);
+        if (old.isPresent()) return old.get().getResult();
+        Player player = player(playerId); validateLocation(player);
+        PlayerItem item = playerItemRepository.findByIdAndPlayerId(playerItemId, playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Предмет не найден"));
-
-        if (!item.getPlayer().getId().equals(playerId)) {
-            throw new IllegalArgumentException("Это не ваш предмет!");
-        }
-        if (item.isEquipped()) {
-            throw new IllegalStateException("Сначала снимите предмет, прежде чем продавать его!");
-        }
-        if (item.isLocked()) {
-            throw new IllegalStateException("Заблокированный предмет нельзя продать");
-        }
-        if (item.getAmount() < amount) {
-            throw new IllegalArgumentException("У вас нет такого количества предметов!");
-        }
-
-        long price = (long) calculateSellPrice(item.getTemplate()) * amount;
-        player.addGold(price);
-
+        if (item.isEquipped()) throw new IllegalStateException("Сначала снимите предмет");
+        if (item.isLocked()) throw new IllegalStateException("Заблокированный предмет нельзя продать");
+        if (item.getAmount() < amount) throw new IllegalArgumentException("Недостаточное количество");
+        int unitPrice = Math.max(1, item.getTemplate().getRarity().getTierIndex() * 10 + item.getTemplate().getStatBudget() / 2);
+        long price = Math.multiplyExact((long) unitPrice, amount);
+        walletService.credit(player, price, WalletReason.SALE, "PLAYER_ITEM", playerItemId.toString());
         item.setAmount(item.getAmount() - amount);
-        if (item.getAmount() <= 0) {
-            player.getInventory().remove(item);
-            playerItemRepository.delete(item);
-        }
-
-        return String.format("Вы продали %s (x%d) за %d золотых.", item.getTemplate().getName(), amount, price);
+        if (item.getAmount() == 0) { player.getInventory().remove(item); playerItemRepository.delete(item); }
+        String result = "Продано: " + item.getTemplate().getName() + " x" + amount + " за " + price;
+        remember(playerId, operationId, "SELL", result);
+        auditService.record(player.getName(), playerId, "SALE", "SUCCESS", result);
+        eventPublisher.publishEvent(new QuestProgressEvent(playerId, QuestType.TRADE, "SELL", amount));
+        return result;
     }
 
-    private void validateLocation(Player player) {
-        if (!player.getCurrentLocation().getId().equals(MERCHANT_LOCATION_ID)) {
-            throw new IllegalStateException("Для торговли нужно находиться в Гильдии Торговцев (city_merch_guild)!");
-        }
-        if (player.isInCombat()) {
-            throw new IllegalStateException("Нельзя торговать во время боя!");
-        }
+    private Player player(Long id) { return playerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Игрок не найден")); }
+    private void validateLocation(Player p) {
+        if (p.isInCombat()) throw new IllegalStateException("Нельзя торговать во время боя");
+        if (p.getCurrentLocation() == null || !MERCHANT_LOCATION_ID.equals(p.getCurrentLocation().getId()))
+            throw new IllegalStateException("Торговец недоступен в текущей локации");
     }
-
-    private int calculateBuyPrice(ItemTemplate template) {
-        return template.getStatBudget() * 2 + 5;
+    private void validateOperation(String id, int amount) {
+        if (id == null || id.isBlank() || id.length() > 100) throw new IllegalArgumentException("operationId is required");
+        if (amount <= 0 || amount > 1000) throw new IllegalArgumentException("Некорректное количество");
     }
-
-    private int calculateSellPrice(ItemTemplate template) {
-        int basePrice = template.getStatBudget() * 2 + 5;
-
-        if (template.getType() == ItemType.RESOURCE) {
-            return template.getRarity().getTierIndex() * 10;
-        }
-
-        return Math.max(1, (basePrice / 4) + (template.getRarity().getTierIndex() * 15));
+    private void remember(Long playerId, String id, String type, String result) {
+        operationRepository.save(TradeOperation.builder().playerId(playerId).operationId(id).operationType(type)
+                .result(result).createdAt(Instant.now()).build());
     }
 }

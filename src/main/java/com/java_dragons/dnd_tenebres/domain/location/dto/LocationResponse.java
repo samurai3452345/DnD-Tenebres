@@ -6,6 +6,9 @@ import java.util.List;
 public record LocationResponse(String id, String name, String description, LocationType type,
                                BiomeType biome, int recommendedLevel, LocationEffect effect,
                                boolean cleared, List<String> availableActions,
-                               List<ConnectionResponse> connections) {
-    public record ConnectionResponse(String id, String name, int recommendedLevel, boolean open, String blockedReason) {}
+                               List<ConnectionResponse> connections,
+                               List<ResourceResponse> resources) {
+    public record ConnectionResponse(String id, String name, int recommendedLevel, boolean open,
+                                     List<String> blockedReasons) {}
+    public record ResourceResponse(Long templateId, String name, int minAmount, int maxAmount, int findChance) {}
 }

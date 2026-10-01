@@ -1,0 +1,20 @@
+package com.java_dragons.dnd_tenebres.domain.item.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.Instant;
+
+@Entity
+@Table(name = "forge_operations", uniqueConstraints = @UniqueConstraint(name = "uq_forge_operation", columnNames = {"player_id", "operation_id"}))
+@Getter @Builder @NoArgsConstructor @AllArgsConstructor
+public class ForgeOperation {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "player_id", nullable = false) private Long playerId;
+    @Column(name = "operation_id", nullable = false) private String operationId;
+    @Column(name = "target_item_id", nullable = false) private Long targetItemId;
+    @Column(name = "gained_xp", nullable = false) private int gainedXp;
+    @Column(name = "resulting_xp", nullable = false) private long resultingXp;
+    @Column(name = "resulting_tier", nullable = false) private int resultingTier;
+    @Column(name = "created_at", nullable = false) private Instant createdAt;
+}
