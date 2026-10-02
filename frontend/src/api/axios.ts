@@ -8,6 +8,12 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+    const isPublicAuthRequest = config.url === "/auth/login" || config.url === "/auth/register";
+    if (isPublicAuthRequest) {
+        delete config.headers.Authorization;
+        return config;
+    }
+
     const token = localStorage.getItem("token") ?? sessionStorage.getItem("token");
 
     if (token && token !== "undefined") {

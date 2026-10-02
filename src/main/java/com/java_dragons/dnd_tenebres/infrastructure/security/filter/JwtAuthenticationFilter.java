@@ -65,21 +65,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (accountIsValid) {
                     Long playerId = jwtService.extractPlayerId(jwt);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                    if (playerId != null) {
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities()
-                                );
+                    authentication.setDetails(
+                            new PlayerAuthenticationDetails(request, playerId)
+                    );
 
-                        authentication.setDetails(
-                                new PlayerAuthenticationDetails(request, playerId)                        );
-
-                        SecurityContextHolder.getContext()
-                                .setAuthentication(authentication);
-                    }
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
                 }
             }
         } catch (JwtException
