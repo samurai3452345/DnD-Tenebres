@@ -29,6 +29,8 @@ const STAT_KEYS: Array<keyof PlayerStats> = [
     "charisma",
 ];
 
+const STAT_TOPS = [23.15, 36.3, 49.3, 62.3, 75.1, 87.9];
+
 const INITIAL_STATS: PlayerStats = {
     strength: MIN_STAT,
     dexterity: MIN_STAT,
@@ -126,7 +128,7 @@ export default function CharacterCreationPage() {
                     {STAT_KEYS.map((key, index) => (
                         <div
                             className="character-stat-control"
-                            style={{ "--stat-top": `${22.9 + index * 13.15}%` } as CSSProperties}
+                            style={{ "--stat-top": `${STAT_TOPS[index]}%` } as CSSProperties}
                             key={key}
                         >
                             <output aria-label={`Значение характеристики ${key}`}>{stats[key]}</output>
