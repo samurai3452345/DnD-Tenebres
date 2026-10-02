@@ -20,11 +20,17 @@ export default function LoginPage() {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const submittedUsername = String(formData.get("username") ?? "").trim();
+        const submittedPassword = String(formData.get("password") ?? "");
         setError(null);
         setNotice(null);
         setLoading(true);
         try {
-            const response = await authApi.login({ username: username.trim(), password });
+            const response = await authApi.login({
+                username: submittedUsername,
+                password: submittedPassword,
+            });
             login(response.token, remember);
             navigate(response.hasCharacter ? "/" : "/create-character", { replace: true });
         } catch (requestError) {
@@ -41,10 +47,10 @@ export default function LoginPage() {
                 <label className="auth-field" htmlFor="login-username">
                     <span className="sr-only">Имя пользователя</span>
                     <UserIcon className="auth-field__icon" />
-                    <input id="login-username" value={username} onChange={(event) => setUsername(event.target.value)}
+                    <input id="login-username" name="username" value={username} onChange={(event) => setUsername(event.target.value)}
                         placeholder="Имя пользователя" autoComplete="username" maxLength={32} required autoFocus />
                 </label>
-                <PasswordField id="login-password" label="Пароль" value={password}
+                <PasswordField id="login-password" name="password" label="Пароль" value={password}
                     onChange={setPassword} autoComplete="current-password" />
 
                 <div className="auth-options">

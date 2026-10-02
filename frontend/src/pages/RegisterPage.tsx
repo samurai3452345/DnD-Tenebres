@@ -17,33 +17,44 @@ export default function RegisterPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const validate = () => {
-        const normalized = username.trim();
+    const validate = (submittedUsername: string, submittedPassword: string, submittedConfirmation: string) => {
+        const normalized = submittedUsername.trim();
         if (normalized.length < 3 || normalized.length > 32) {
             return "Имя пользователя должно содержать от 3 до 32 символов.";
         }
         if (!/^[\p{L}\p{N}_.-]+$/u.test(normalized)) {
             return "В имени можно использовать буквы, цифры, точку, дефис и подчёркивание.";
         }
-        if (password.length < 8 || password.length > 72) {
+        if (submittedPassword.length < 8 || submittedPassword.length > 72) {
             return "Пароль должен содержать от 8 до 72 символов.";
         }
-        if (!/\p{L}/u.test(password) || !/\d/.test(password)) {
+        if (!/\p{L}/u.test(submittedPassword) || !/\d/.test(submittedPassword)) {
             return "Добавьте в пароль хотя бы одну букву и одну цифру.";
         }
-        if (password !== confirmPassword) return "Пароли не совпадают.";
+        if (submittedPassword !== submittedConfirmation) return "Пароли не совпадают.";
         return null;
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const validationError = validate();
+        const formData = new FormData(event.currentTarget);
+        const submittedUsername = String(formData.get("username") ?? "").trim();
+        const submittedPassword = String(formData.get("password") ?? "");
+        const submittedConfirmation = String(formData.get("passwordConfirmation") ?? "");
+        const validationError = validate(
+            submittedUsername,
+            submittedPassword,
+            submittedConfirmation,
+        );
         setError(validationError);
         if (validationError) return;
 
         setLoading(true);
         try {
-            const response = await authApi.register({ username: username.trim(), password });
+            const response = await authApi.register({
+                username: submittedUsername,
+                password: submittedPassword,
+            });
             login(response.token, true);
             navigate("/create-character", { replace: true });
         } catch (requestError) {
@@ -60,12 +71,12 @@ export default function RegisterPage() {
                 <label className="auth-field" htmlFor="register-username">
                     <span className="sr-only">Имя пользователя</span>
                     <UserIcon className="auth-field__icon" />
-                    <input id="register-username" value={username} onChange={(event) => setUsername(event.target.value)}
+                    <input id="register-username" name="username" value={username} onChange={(event) => setUsername(event.target.value)}
                         placeholder="Имя пользователя" autoComplete="username" minLength={3} maxLength={32} required autoFocus />
                 </label>
-                <PasswordField id="register-password" label="Пароль" value={password}
+                <PasswordField id="register-password" name="password" label="Пароль" value={password}
                     onChange={setPassword} autoComplete="new-password" />
-                <PasswordField id="register-password-confirm" label="Подтвердите пароль" value={confirmPassword}
+                <PasswordField id="register-password-confirm" name="passwordConfirmation" label="Подтвердите пароль" value={confirmPassword}
                     onChange={setConfirmPassword} autoComplete="new-password" />
 
                 <p className="auth-hint">Минимум 8 символов, хотя бы одна буква и одна цифра.</p>
