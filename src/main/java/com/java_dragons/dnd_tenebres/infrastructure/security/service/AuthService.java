@@ -52,7 +52,7 @@ public class AuthService {
         return createResponse(account);
     }
 
-    private AuthResponse createResponse(UserAccount account) {
+    public AuthResponse createResponse(UserAccount account) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(account.getUsername());
         return new AuthResponse(jwtService.generateToken(account, userDetails), account.getPlayerId() != null);
     }

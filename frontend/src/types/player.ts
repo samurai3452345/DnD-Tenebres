@@ -35,3 +35,7 @@ export interface StatAllocationRequest {
     addWisdom: number;
     addCharisma: number;
 }
+
+export interface PlayerCreationRequest extends PlayerStats {
+    name: string;
+}

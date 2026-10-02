@@ -26,7 +26,7 @@ export default function LoginPage() {
         try {
             const response = await authApi.login({ username: username.trim(), password });
             login(response.token, remember);
-            navigate(response.hasCharacter ? "/" : "/account-ready", { replace: true });
+            navigate(response.hasCharacter ? "/" : "/create-character", { replace: true });
         } catch (requestError) {
             setError(getAuthError(requestError, "Неверное имя пользователя или пароль."));
         } finally {

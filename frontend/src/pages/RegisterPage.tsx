@@ -45,7 +45,7 @@ export default function RegisterPage() {
         try {
             const response = await authApi.register({ username: username.trim(), password });
             login(response.token, true);
-            navigate("/account-ready", { replace: true });
+            navigate("/create-character", { replace: true });
         } catch (requestError) {
             setError(getAuthError(requestError, "Не удалось создать аккаунт. Попробуйте другое имя."));
         } finally {
