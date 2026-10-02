@@ -69,7 +69,9 @@ export default function RegisterPage() {
                     onChange={setConfirmPassword} autoComplete="new-password" />
 
                 <p className="auth-hint">Минимум 8 символов, хотя бы одна буква и одна цифра.</p>
-                {error && <div className="auth-message auth-message--error" role="alert">{error}</div>}
+                <div className="auth-message-slot" aria-live="polite" aria-atomic="true">
+                    {error && <div className="auth-message auth-message--error" role="alert">{error}</div>}
+                </div>
                 <button className="auth-submit auth-submit--blue" type="submit" disabled={loading}>
                     <span>{loading ? "Создаём аккаунт…" : "Зарегистрироваться"}</span>
                 </button>
