@@ -111,12 +111,13 @@ export default function CharacterCreationPage() {
                             setName(event.target.value.slice(0, 16));
                             setError(null);
                         }}
-                        placeholder="Имя героя"
                         autoComplete="off"
                         maxLength={16}
                         autoFocus
                     />
-                    <span className="character-name-field__count">{name.length}/16</span>
+                    {name.length > 0 && (
+                        <span className="character-name-field__count">{name.length}/16</span>
+                    )}
                 </div>
 
                 <div className="character-stats-panel">
