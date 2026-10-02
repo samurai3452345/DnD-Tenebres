@@ -58,8 +58,10 @@ export default function LoginPage() {
                     </button>
                 </div>
 
-                {error && <div className="auth-message auth-message--error" role="alert">{error}</div>}
-                {notice && <div className="auth-message" role="status">{notice}</div>}
+                <div className="auth-message-slot" aria-live="polite" aria-atomic="true">
+                    {error && <div className="auth-message auth-message--error" role="alert">{error}</div>}
+                    {notice && <div className="auth-message" role="status">{notice}</div>}
+                </div>
                 <button className="auth-submit auth-submit--red" type="submit" disabled={loading}>
                     <span>{loading ? "Открываем врата…" : "Войти"}</span>
                 </button>
