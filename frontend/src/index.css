@@ -428,10 +428,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .character-name-field input {
     position: absolute;
-    top: 31%;
+    top: 25%;
     left: 17.5%;
     width: 74%;
-    height: 27%;
+    height: 23%;
     padding: 0 .7rem;
     color: #ead9bd;
     font-family: "Cormorant Garamond", Georgia, serif;
@@ -442,7 +442,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .character-name-field input::placeholder { color: #817b75; }
-.character-name-field input:focus { box-shadow: inset 0 -.08rem 0 #d6944a, 0 0 .9rem rgba(224, 63, 23, .25); }
+.character-name-field input:focus { box-shadow: none; }
 
 .character-name-field__count {
     position: absolute;
@@ -454,7 +454,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: clamp(.72rem, 1vw, .95rem);
     text-align: right;
-    background: transparent;
+    background: linear-gradient(90deg, rgba(15, 12, 9, .96), rgba(9, 8, 6, .98));
+    box-shadow: 0 0 .22rem .14rem rgba(10, 8, 6, .94);
     text-shadow: 0 0 .22rem #120d09, 0 0 .35rem #120d09;
 }
 
@@ -502,6 +503,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     font-family: "Cormorant Garamond", Georgia, serif;
     font-size: clamp(.95rem, 1.65vw, 1.35rem);
     text-shadow: 0 0 .35rem #000;
+    transform: translateY(-12%);
 }
 
 .character-stat-control button {
@@ -546,7 +548,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     z-index: 3;
     left: 24%;
     right: 24%;
-    bottom: 8.4%;
+    bottom: 10.8%;
     min-height: 0;
     aspect-ratio: 4.8 / 1;
     display: grid;
