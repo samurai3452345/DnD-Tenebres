@@ -23,7 +23,9 @@ export default function AuthShell({
             <section className={`auth-card auth-card--ornate auth-card--${variant}${wide ? " auth-card--wide" : ""}`}>
                 <img
                     className="auth-card__frame"
-                    src="/assets/auth/dragon-auth-frame.png"
+                    src={variant === "register"
+                        ? "/assets/auth/register-dragon-frame.png"
+                        : "/assets/auth/dragon-auth-frame.png"}
                     alt=""
                     aria-hidden="true"
                 />
@@ -36,7 +38,12 @@ export default function AuthShell({
                     />
                 )}
                 {variant === "register" && (
-                    <div className="auth-card__panel auth-card__panel--register" aria-hidden="true" />
+                    <img
+                        className="auth-card__panel auth-card__panel--register"
+                        src="/assets/auth/register-inner-panel.png"
+                        alt=""
+                        aria-hidden="true"
+                    />
                 )}
                 <div className="auth-card__surface">
                     <header className="auth-card__header">
