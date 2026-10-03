@@ -101,9 +101,10 @@ export default function CharacterSelectionPage() {
                 <button
                     className="character-selection__create"
                     type="button"
+                    aria-label="Создать персонажа"
                     onClick={() => navigate("/create-character")}
                 >
-                    <span>Создать персонажа</span>
+                    <span className="sr-only">Создать персонажа</span>
                 </button>
             </section>
         </main>

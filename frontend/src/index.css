@@ -671,18 +671,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
     white-space: nowrap;
     text-overflow: ellipsis;
     text-shadow: 0 .08rem .18rem #000, 0 0 .25rem rgba(0, 0, 0, .95);
+    transform: translateY(-50%);
 }
 
-.character-card__name { top: 16.5%; left: 38.1%; max-width: 24%; font-size: clamp(.74rem, 1.15vw, 1.12rem); }
-.character-card__level { top: 25.5%; left: 38.1%; }
-.character-card__location { top: 34.5%; left: 40.8%; max-width: 22%; }
-.character-card__gold { top: 43.5%; left: 38.1%; }
-.character-card__strength { top: 56%; left: 36.8%; }
-.character-card__dexterity { top: 56%; left: 59.2%; }
-.character-card__constitution { top: 56%; left: 84.6%; }
-.character-card__intelligence { top: 65.5%; left: 42.1%; }
-.character-card__wisdom { top: 65.5%; left: 60.7%; }
-.character-card__charisma { top: 65.5%; left: 81.3%; }
+.character-card__name { top: 22.3%; left: 38.2%; max-width: 23%; font-size: clamp(.74rem, 1.15vw, 1.12rem); }
+.character-card__level { top: 31.2%; left: 39%; }
+.character-card__location { top: 40.1%; left: 43%; max-width: 18%; }
+.character-card__gold { top: 49%; left: 38.2%; }
+.character-card__strength { top: 61.2%; left: 38%; }
+.character-card__dexterity { top: 61.2%; left: 63%; }
+.character-card__constitution { top: 61.2%; left: 85.5%; }
+.character-card__intelligence { top: 70.7%; left: 44%; }
+.character-card__wisdom { top: 70.7%; left: 64.1%; }
+.character-card__charisma { top: 70.7%; left: 85%; }
 
 .character-card__select {
     position: absolute;
@@ -722,9 +723,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
     position: absolute;
     z-index: 2;
     left: 31.1%;
-    bottom: 9.1%;
+    bottom: 7.9%;
     width: 37.8%;
-    height: 7.2%;
+    aspect-ratio: 618 / 86;
     display: grid;
     place-items: center;
     padding: .2rem 1.5rem;
@@ -734,7 +735,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     letter-spacing: .025em;
     text-transform: uppercase;
     cursor: pointer;
-    background: transparent url("/assets/auth/auth-button-login.png") center / 100% 100% no-repeat;
+    background: transparent url("/assets/character-selection/create-button.png") center / 100% 100% no-repeat;
     border: 0;
     text-shadow: 0 .12rem .2rem #000;
 }
