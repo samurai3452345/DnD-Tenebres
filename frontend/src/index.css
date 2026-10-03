@@ -428,7 +428,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .character-name-field input {
     position: absolute;
-    top: 25%;
+    top: 29%;
     left: 17.5%;
     width: 74%;
     height: 23%;
