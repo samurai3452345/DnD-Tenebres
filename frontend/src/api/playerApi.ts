@@ -30,6 +30,10 @@ export const playerApi = {
         return response.data;
     },
 
+    deleteCharacter: async (playerId: number): Promise<void> => {
+        await api.delete(`/players/${playerId}`);
+    },
+
     allocateStats: async (
         request: StatAllocationRequest
     ): Promise<Player> => {

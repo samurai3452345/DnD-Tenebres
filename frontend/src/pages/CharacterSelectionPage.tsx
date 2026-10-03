@@ -14,6 +14,8 @@ export default function CharacterSelectionPage() {
     const [characters, setCharacters] = useState<CharacterSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectingId, setSelectingId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [pendingDelete, setPendingDelete] = useState<CharacterSummary | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -35,6 +37,17 @@ export default function CharacterSelectionPage() {
         };
     }, []);
 
+    useEffect(() => {
+        if (!pendingDelete) return;
+
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape" && deletingId === null) setPendingDelete(null);
+        };
+
+        window.addEventListener("keydown", closeOnEscape);
+        return () => window.removeEventListener("keydown", closeOnEscape);
+    }, [pendingDelete, deletingId]);
+
     const selectCharacter = async (playerId: number) => {
         setSelectingId(playerId);
         setError(null);
@@ -46,6 +59,24 @@ export default function CharacterSelectionPage() {
         } catch (requestError) {
             setError(getAuthError(requestError, "Не удалось выбрать персонажа."));
             setSelectingId(null);
+        }
+    };
+
+    const deleteCharacter = async () => {
+        if (!pendingDelete) return;
+
+        const playerId = pendingDelete.playerId;
+        setDeletingId(playerId);
+        setError(null);
+        try {
+            await playerApi.deleteCharacter(playerId);
+            setCharacters((current) => current.filter((character) => character.playerId !== playerId));
+            setPendingDelete(null);
+        } catch (requestError) {
+            setError(getAuthError(requestError, "Не удалось удалить персонажа."));
+            setPendingDelete(null);
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -94,6 +125,15 @@ export default function CharacterSelectionPage() {
                                     {selectingId === character.playerId ? "Выбираем персонажа" : "Выбрать персонажа"}
                                 </span>
                             </button>
+                            <button
+                                className="character-card__delete"
+                                type="button"
+                                aria-label={`Удалить персонажа ${character.playerName}`}
+                                disabled={selectingId !== null || deletingId !== null}
+                                onClick={() => setPendingDelete(character)}
+                            >
+                                <span className="sr-only">Удалить персонажа</span>
+                            </button>
                         </article>
                     ))}
                 </div>
@@ -107,6 +147,51 @@ export default function CharacterSelectionPage() {
                     <span className="character-selection__create-label">Создать персонажа</span>
                 </button>
             </section>
+
+            {pendingDelete && (
+                <div
+                    className="character-delete-modal"
+                    onMouseDown={() => deletingId === null && setPendingDelete(null)}
+                >
+                    <section
+                        className="character-delete-modal__dialog"
+                        role="alertdialog"
+                        aria-modal="true"
+                        aria-labelledby="character-delete-title"
+                        aria-describedby="character-delete-description"
+                        onMouseDown={(event) => event.stopPropagation()}
+                    >
+                        <h2 id="character-delete-title" className="sr-only">Удаление персонажа</h2>
+                        <p id="character-delete-description" className="sr-only">
+                            Вы действительно хотите удалить персонажа {pendingDelete.playerName}? Это действие нельзя отменить.
+                        </p>
+                        <img
+                            src="/assets/character-selection/delete-confirmation.png"
+                            alt=""
+                            aria-hidden="true"
+                        />
+                        <button
+                            className="character-delete-modal__cancel"
+                            type="button"
+                            autoFocus
+                            disabled={deletingId !== null}
+                            onClick={() => setPendingDelete(null)}
+                        >
+                            <span className="sr-only">Отмена</span>
+                        </button>
+                        <button
+                            className="character-delete-modal__confirm"
+                            type="button"
+                            disabled={deletingId !== null}
+                            onClick={deleteCharacter}
+                        >
+                            <span className="sr-only">
+                                {deletingId === pendingDelete.playerId ? "Удаление персонажа" : "Удалить персонажа"}
+                            </span>
+                        </button>
+                    </section>
+                </div>
+            )}
         </main>
     );
 }
