@@ -581,6 +581,181 @@ button, a { -webkit-tap-highlight-color: transparent; }
     .character-creator__submit { left: 22%; right: 22%; }
 }
 
+/* Character selection */
+.character-selection-scene {
+    position: relative;
+    box-sizing: border-box;
+    min-height: 100svh;
+    overflow: hidden;
+    background: #080b0f url("/assets/character-creation/background.png") center / cover no-repeat;
+}
+
+.character-selection-scene__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, .03), rgba(0, 0, 0, .06) 48%, rgba(0, 0, 0, .28));
+    pointer-events: none;
+}
+
+.character-selection {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: -11vw;
+    width: min(92vw, calc(98svh * 1.7779), 104.5rem);
+    aspect-ratio: 1672 / 941;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 1.45rem 2.5rem rgba(0, 0, 0, .86));
+}
+
+.character-selection__frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.character-selection__list {
+    position: absolute;
+    top: 27.4%;
+    left: 26.35%;
+    width: 47.3%;
+    height: 54.7%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(.25rem, .7svh, .48rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: .15rem .35rem .25rem;
+    scrollbar-color: #a34420 rgba(8, 5, 4, .55);
+    scrollbar-width: thin;
+}
+
+.character-selection__list::-webkit-scrollbar { width: .38rem; }
+.character-selection__list::-webkit-scrollbar-track { background: rgba(8, 5, 4, .55); }
+.character-selection__list::-webkit-scrollbar-thumb { background: linear-gradient(#d16c2c, #6f1b0d); border-radius: 1rem; }
+
+.character-card {
+    position: relative;
+    flex: 0 0 clamp(8.7rem, 21svh, 11.5rem);
+    width: 100%;
+    overflow: hidden;
+    color: #e9c884;
+}
+
+.character-card + .character-card { margin-top: -2.9rem; }
+
+.character-card > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+}
+
+.character-card__value {
+    position: absolute;
+    z-index: 1;
+    max-width: 25%;
+    overflow: hidden;
+    color: #e8c27b;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(.68rem, 1.05vw, 1.02rem);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-shadow: 0 .08rem .18rem #000, 0 0 .25rem rgba(0, 0, 0, .95);
+}
+
+.character-card__name { top: 16.5%; left: 38.1%; max-width: 24%; font-size: clamp(.74rem, 1.15vw, 1.12rem); }
+.character-card__level { top: 25.5%; left: 38.1%; }
+.character-card__location { top: 34.5%; left: 40.8%; max-width: 22%; }
+.character-card__gold { top: 43.5%; left: 38.1%; }
+.character-card__strength { top: 56%; left: 36.8%; }
+.character-card__dexterity { top: 56%; left: 59.2%; }
+.character-card__constitution { top: 56%; left: 84.6%; }
+.character-card__intelligence { top: 65.5%; left: 42.1%; }
+.character-card__wisdom { top: 65.5%; left: 60.7%; }
+.character-card__charisma { top: 65.5%; left: 81.3%; }
+
+.character-card__select {
+    position: absolute;
+    z-index: 2;
+    top: 20%;
+    left: 65.2%;
+    width: 18.8%;
+    height: 24%;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: .35rem;
+}
+
+.character-card__select:hover:not(:disabled) {
+    background: rgba(255, 79, 27, .09);
+    box-shadow: 0 0 1rem rgba(255, 71, 20, .45), inset 0 0 .65rem rgba(255, 180, 83, .14);
+}
+.character-card__select:focus-visible { outline: .12rem solid #ffd28a; outline-offset: -.15rem; }
+.character-card__select:disabled { cursor: wait; }
+
+.character-selection__status {
+    align-self: center;
+    margin: auto;
+    padding: .75rem 1.1rem;
+    color: #e9cf9b;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(.9rem, 1.35vw, 1.25rem);
+    text-align: center;
+    background: rgba(13, 9, 7, .72);
+    border: 1px solid rgba(157, 87, 40, .48);
+}
+.character-selection__status--error { color: #ffd4c5; border-color: rgba(199, 52, 24, .72); }
+
+.character-selection__create {
+    position: absolute;
+    z-index: 2;
+    left: 31.1%;
+    bottom: 9.1%;
+    width: 37.8%;
+    height: 7.2%;
+    display: grid;
+    place-items: center;
+    padding: .2rem 1.5rem;
+    color: #f4dfba;
+    font-family: "Cinzel", Georgia, serif;
+    font-size: clamp(.78rem, 1.45vw, 1.4rem);
+    letter-spacing: .025em;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: transparent url("/assets/auth/auth-button-login.png") center / 100% 100% no-repeat;
+    border: 0;
+    text-shadow: 0 .12rem .2rem #000;
+}
+
+.character-selection__create:hover { filter: brightness(1.2) drop-shadow(0 0 .7rem rgba(224, 63, 23, .45)); }
+.character-selection__create:focus-visible { outline: .12rem solid #ffd28a; outline-offset: -.25rem; }
+
+@media (max-width: 900px) {
+    .character-selection-scene { background-position: 38% center; }
+    .character-selection-scene__veil { background: rgba(0, 0, 0, .3); }
+    .character-selection {
+        right: 50%;
+        width: min(160vw, calc(98svh * 1.7779));
+        transform: translate(50%, -50%);
+    }
+    .character-selection__list { left: 25.6%; width: 48.7%; }
+    .character-card__value { font-size: clamp(.58rem, 2.2vw, .88rem); }
+    .character-card__name { font-size: clamp(.62rem, 2.45vw, .96rem); }
+    .character-selection__create { font-size: clamp(.68rem, 3vw, 1rem); }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

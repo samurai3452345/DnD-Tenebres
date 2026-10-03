@@ -10,6 +10,7 @@ import ShopPage from "../pages/ShopPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import AccountReadyPage from "../pages/AccountReadyPage";
 import CharacterCreationPage from "../pages/CharacterCreationPage";
+import CharacterSelectionPage from "../pages/CharacterSelectionPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -40,6 +41,11 @@ export default function AppRouter() {
                     <Route
                         path="/create-character"
                         element={<CharacterCreationPage />}
+                    />
+
+                    <Route
+                        path="/characters"
+                        element={<CharacterSelectionPage />}
                     />
 
                     <Route

@@ -39,3 +39,14 @@ export interface StatAllocationRequest {
 export interface PlayerCreationRequest extends PlayerStats {
     name: string;
 }
+
+export interface CharacterSummary {
+    playerId: number;
+    playerName: string;
+    level: number;
+    locationId: string | null;
+    locationName: string | null;
+    gold: number;
+    stats: PlayerStats;
+    statPoints: number;
+}
