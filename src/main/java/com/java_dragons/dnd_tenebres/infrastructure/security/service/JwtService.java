@@ -50,9 +50,13 @@ public class JwtService {
     }
 
     public String generateToken(UserAccount userAccount, UserDetails userDetails) {
+        return generateToken(userAccount, userDetails, null);
+    }
+
+    public String generateToken(UserAccount userAccount, UserDetails userDetails, Long playerId) {
         Map<String, Object> extraClaims = new HashMap<>();
-        if (userAccount.getPlayerId() != null) {
-            extraClaims.put("playerId", userAccount.getPlayerId());
+        if (playerId != null) {
+            extraClaims.put("playerId", playerId);
         }
         extraClaims.put("tokenVersion", userAccount.getTokenVersion());
         return Jwts.builder()

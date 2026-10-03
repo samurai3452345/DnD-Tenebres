@@ -1,7 +1,7 @@
 package com.java_dragons.dnd_tenebres.infrastructure.security.controller;
 
 import com.java_dragons.dnd_tenebres.infrastructure.security.repository.UserAccountRepository;
-import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +16,15 @@ public class AccountController {
     private final UserAccountRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final com.java_dragons.dnd_tenebres.infrastructure.audit.AuditService auditService;
-    public record AccountResponse(String username, Long playerId, int tokenVersion, boolean enabled) {}
+    private final PlayerRepository playerRepository;
+    public record AccountResponse(String username, long characterCount, int tokenVersion, boolean enabled) {}
     public record ChangePasswordRequest(@NotBlank String currentPassword,
                                         @NotBlank @Size(min=8,max=100) String newPassword) {}
 
     @GetMapping
     public ResponseEntity<AccountResponse> account(Authentication auth) {
         var a = repository.findByUsername(auth.getName()).orElseThrow();
-        return ResponseEntity.ok(new AccountResponse(a.getUsername(), a.getPlayerId(), a.getTokenVersion(), a.isEnabled()));
+        return ResponseEntity.ok(new AccountResponse(a.getUsername(), playerRepository.countByAccountId(a.getId()), a.getTokenVersion(), a.isEnabled()));
     }
 
     @PostMapping("/change-password") @Transactional
@@ -33,7 +34,7 @@ public class AccountController {
             throw new IllegalArgumentException("Неверный текущий пароль");
         a.changePassword(passwordEncoder.encode(request.newPassword()));
         a.revokeAllTokens();
-        auditService.record(a.getUsername(), a.getPlayerId(), "PASSWORD_CHANGE", "SUCCESS", "All tokens revoked");
+        auditService.record(a.getUsername(), null, "PASSWORD_CHANGE", "SUCCESS", "All tokens revoked");
         return ResponseEntity.noContent().build();
     }
 
@@ -41,7 +42,7 @@ public class AccountController {
     public ResponseEntity<Void> logoutAll(Authentication auth) {
         repository.findByUsername(auth.getName()).orElseThrow().revokeAllTokens();
         var a = repository.findByUsername(auth.getName()).orElseThrow();
-        auditService.record(a.getUsername(), a.getPlayerId(), "LOGOUT_ALL", "SUCCESS", "All tokens revoked");
+        auditService.record(a.getUsername(), null, "LOGOUT_ALL", "SUCCESS", "All tokens revoked");
         return ResponseEntity.noContent().build();
     }
 
@@ -49,7 +50,7 @@ public class AccountController {
     public ResponseEntity<Void> delete(Authentication auth) {
         var a = repository.findByUsername(auth.getName()).orElseThrow();
         a.disable();
-        auditService.record(a.getUsername(), a.getPlayerId(), "ACCOUNT_DELETE", "SUCCESS", "Account disabled");
+        auditService.record(a.getUsername(), null, "ACCOUNT_DELETE", "SUCCESS", "Account disabled");
         return ResponseEntity.noContent().build();
     }
 }

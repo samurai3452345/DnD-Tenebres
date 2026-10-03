@@ -4,6 +4,7 @@ import com.java_dragons.dnd_tenebres.infrastructure.security.model.PlayerAuthent
 import com.java_dragons.dnd_tenebres.infrastructure.security.entity.UserAccount;
 import com.java_dragons.dnd_tenebres.infrastructure.security.repository.UserAccountRepository;
 import com.java_dragons.dnd_tenebres.infrastructure.security.service.JwtService;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final UserAccountRepository accountRepository;
+    private final PlayerRepository playerRepository;
 
     @Override
     protected void doFilterInternal(
@@ -65,6 +67,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (accountIsValid) {
                     Long playerId = jwtService.extractPlayerId(jwt);
+                    if (playerId != null && !playerRepository.existsByIdAndAccountId(playerId, account.getId())) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,

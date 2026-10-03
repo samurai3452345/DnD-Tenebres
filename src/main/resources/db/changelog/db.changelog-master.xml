@@ -37,6 +37,7 @@
     <include file="/db/changelog/030-add-supplies-loot.xml"/>
     <include file="/db/changelog/031-complete-backend-systems.xml"/>
     <include file="/db/changelog/032-add-audit.xml"/>
+    <include file="/db/changelog/033-support-account-characters.xml"/>
 
 
 </databaseChangeLog>
