@@ -35,7 +35,7 @@ public class AuthController {
         UserAccount account = findAccount(request.username());
         auditService.record(
                 account.getUsername(),
-                account.getPlayerId(),
+                null,
                 "REGISTER",
                 "SUCCESS",
                 "Account created"
@@ -54,7 +54,7 @@ public class AuthController {
         UserAccount account = findAccount(request.username());
         auditService.record(
                 account.getUsername(),
-                account.getPlayerId(),
+                null,
                 "LOGIN",
                 "SUCCESS",
                 "Authentication successful"

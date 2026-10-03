@@ -30,9 +30,6 @@ public class UserAccount {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "player_id")
-    private Long playerId;
-
     @Builder.Default
     @Column(name = "token_version", nullable = false)
     private int tokenVersion = 0;
@@ -40,16 +37,6 @@ public class UserAccount {
     @Builder.Default
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
-
-    public static UserAccount create(
-            String username,
-            String encodedPassword,
-            Long playerId
-    ) {
-        UserAccount account = create(username, encodedPassword);
-        account.linkPlayer(playerId);
-        return account;
-    }
 
     public static UserAccount create(
             String username,
@@ -75,22 +62,6 @@ public class UserAccount {
         }
 
         this.password = encodedNewPassword;
-    }
-
-    public void linkPlayer(Long newPlayerId) {
-        if (newPlayerId == null) {
-            throw new IllegalArgumentException(
-                    "ID персонажа не указан"
-            );
-        }
-
-        if (this.playerId != null) {
-            throw new IllegalStateException(
-                    "К этому аккаунту уже привязан персонаж!"
-            );
-        }
-
-        this.playerId = newPlayerId;
     }
 
     public void revokeAllTokens() {

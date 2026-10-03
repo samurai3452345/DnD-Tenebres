@@ -5,6 +5,7 @@ import com.java_dragons.dnd_tenebres.infrastructure.security.dto.LoginRequest;
 import com.java_dragons.dnd_tenebres.infrastructure.security.dto.RegisterRequest;
 import com.java_dragons.dnd_tenebres.infrastructure.security.entity.UserAccount;
 import com.java_dragons.dnd_tenebres.infrastructure.security.repository.UserAccountRepository;
+import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final PlayerRepository playerRepository;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -53,7 +55,17 @@ public class AuthService {
     }
 
     public AuthResponse createResponse(UserAccount account) {
+        return createResponse(account, null);
+    }
+
+    public AuthResponse createResponse(UserAccount account, Long selectedPlayerId) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(account.getUsername());
-        return new AuthResponse(jwtService.generateToken(account, userDetails), account.getPlayerId() != null);
+        long characterCount = playerRepository.countByAccountId(account.getId());
+        return new AuthResponse(
+                jwtService.generateToken(account, userDetails, selectedPlayerId),
+                characterCount > 0,
+                characterCount,
+                selectedPlayerId
+        );
     }
 }

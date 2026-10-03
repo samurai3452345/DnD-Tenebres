@@ -18,13 +18,25 @@ class JwtServiceTest {
     @Test
     void создаётИПроверяетТокенСПерсонажем() {
         JwtService jwtService = new JwtService(TEST_SECRET, Duration.ofHours(1));
-        UserAccount account = UserAccount.create("игрок", "закодированный-пароль", 42L);
+        UserAccount account = UserAccount.create("игрок", "закодированный-пароль");
+        UserDetails userDetails = new User("игрок", "закодированный-пароль", Collections.emptyList());
+
+        String token = jwtService.generateToken(account, userDetails, 42L);
+
+        assertThat(jwtService.extractUsername(token)).isEqualTo("игрок");
+        assertThat(jwtService.extractPlayerId(token)).isEqualTo(42L);
+        assertThat(jwtService.isTokenValid(token, userDetails)).isTrue();
+    }
+
+    @Test
+    void создаётТокенАккаунтаБезВыбранногоПерсонажа() {
+        JwtService jwtService = new JwtService(TEST_SECRET, Duration.ofHours(1));
+        UserAccount account = UserAccount.create("игрок", "закодированный-пароль");
         UserDetails userDetails = new User("игрок", "закодированный-пароль", Collections.emptyList());
 
         String token = jwtService.generateToken(account, userDetails);
 
-        assertThat(jwtService.extractUsername(token)).isEqualTo("игрок");
-        assertThat(jwtService.extractPlayerId(token)).isEqualTo(42L);
+        assertThat(jwtService.extractPlayerId(token)).isNull();
         assertThat(jwtService.isTokenValid(token, userDetails)).isTrue();
     }
 

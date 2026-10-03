@@ -26,7 +26,14 @@ public class PlayerCreationService {
             15,9
     );
 
-    public Player createCharacter(PlayerCreationRequest request){
+    public Player createCharacter(Long accountId, PlayerCreationRequest request){
+        if (accountId == null) {
+            throw new IllegalArgumentException("ID аккаунта не указан");
+        }
+        String characterName = request.name().trim();
+        if (characterName.length() < 2 || characterName.length() > 16) {
+            throw new IllegalArgumentException("Имя должно содержать от 2 до 16 символов");
+        }
         List<Integer> abilities = List.of(request.strength(),
                 request.dexterity(),
                 request.constitution(),
@@ -61,7 +68,8 @@ public class PlayerCreationService {
         int initialMp = progressionCalculator.calculateMaxMp(1, request.intelligence());
 
         return Player.builder()
-                .name(request.name())
+                .name(characterName)
+                .accountId(accountId)
                 .stats(stats)
                 .maxHp(initialHp)
                 .currentHp(initialHp)

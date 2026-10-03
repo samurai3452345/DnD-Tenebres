@@ -36,6 +36,9 @@ public class Player {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "account_id")
+    private Long accountId;
+
     @Builder.Default
     @Column(name = "level")
     private int level = 1;
