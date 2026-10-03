@@ -675,15 +675,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .character-card__name { top: 22.3%; left: 38.2%; max-width: 23%; font-size: clamp(.74rem, 1.15vw, 1.12rem); }
-.character-card__level { top: 31.2%; left: 39%; }
-.character-card__location { top: 40.1%; left: 43%; max-width: 18%; }
-.character-card__gold { top: 49%; left: 38.2%; }
-.character-card__strength { top: 61.2%; left: 38%; }
-.character-card__dexterity { top: 61.2%; left: 63%; }
-.character-card__constitution { top: 61.2%; left: 85.5%; }
-.character-card__intelligence { top: 70.7%; left: 44%; }
-.character-card__wisdom { top: 70.7%; left: 64.1%; }
-.character-card__charisma { top: 70.7%; left: 85%; }
+.character-card__level { top: 33.7%; left: 41.5%; }
+.character-card__location { top: 42.6%; left: 43%; max-width: 18%; }
+.character-card__gold { top: 51.5%; left: 40.4%; }
+.character-card__strength { top: 63.7%; left: 40.5%; }
+.character-card__dexterity { top: 63.7%; left: 64.7%; }
+.character-card__constitution { top: 63.7%; left: 87.5%; }
+.character-card__intelligence { top: 73.2%; left: 45.7%; }
+.character-card__wisdom { top: 73.2%; left: 65.7%; }
+.character-card__charisma { top: 73.2%; left: 86.6%; }
 
 .character-card__select {
     position: absolute;
