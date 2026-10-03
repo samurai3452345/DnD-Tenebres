@@ -411,7 +411,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .character-name-field {
     position: absolute;
     z-index: 2;
-    top: 22.8%;
+    top: 23.7%;
     left: 18%;
     width: 64%;
     aspect-ratio: 3 / 1;
