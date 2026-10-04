@@ -616,6 +616,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     object-fit: contain;
     pointer-events: none;
     user-select: none;
+    transform: translateY(2%) scale(1.1);
 }
 
 .character-selection__list {
