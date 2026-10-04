@@ -39,6 +39,7 @@ export interface LocationResource {
 export interface Location {
     id: string;
     name: string;
+    zoneName: string;
     description: string;
     type: LocationType;
     biome: BiomeType;

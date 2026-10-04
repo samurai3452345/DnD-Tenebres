@@ -3,7 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.location.dto;
 import com.java_dragons.dnd_tenebres.domain.location.model.*;
 import java.util.List;
 
-public record LocationResponse(String id, String name, String description, LocationType type,
+public record LocationResponse(String id, String name, String zoneName, String description, LocationType type,
                                BiomeType biome, int recommendedLevel, LocationEffect effect,
                                boolean cleared, boolean bossRoom, List<String> availableActions,
                                List<ConnectionResponse> connections,

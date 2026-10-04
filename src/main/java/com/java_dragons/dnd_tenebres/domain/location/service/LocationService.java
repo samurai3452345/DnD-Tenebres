@@ -58,7 +58,7 @@ public class LocationService {
         var resources = loot.stream().map(entry -> new LocationResponse.ResourceResponse(
                 entry.getItemTemplate().getId(), entry.getItemTemplate().getName(), entry.getMinAmount(),
                 entry.getMaxAmount(), entry.getFindChance())).toList();
-        return new LocationResponse(location.getId(), location.getName(), location.getDescription(), location.getType(),
+        return new LocationResponse(location.getId(), location.getName(), location.getZoneName(), location.getDescription(), location.getType(),
                 location.getBiome(), location.getLevel(), location.getEffect(), cleared, location.isBossRoom(),
                 actions, connections, resources);
     }

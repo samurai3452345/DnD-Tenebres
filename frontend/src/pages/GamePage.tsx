@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { explorationApi } from "../api/explorationApi";
 import { locationApi } from "../api/locationApi";
@@ -12,14 +12,6 @@ import { useCombat } from "../hooks/useCombat";
 import { usePlayer } from "../hooks/usePlayer";
 import type { Location, LocationConnection } from "../types/location";
 import type { PlayerQuest, QuestSource } from "../types/quest";
-
-const biomeNames: Record<Location["biome"], string> = {
-    FOREST: "Лес",
-    CAVE: "Пещеры",
-    RUINS: "Руины",
-    CITY: "Город",
-    DUNGEON: "Подземелье",
-};
 
 const locationFrames: Record<Location["type"], string> = {
     SAFE_ZONE: "/assets/game/location-safe.png",
@@ -40,13 +32,19 @@ function requestErrorMessage(error: unknown, fallback: string) {
 
 export default function GamePage() {
     const navigate = useNavigate();
+    const routeLocation = useLocation();
+    const enteredFromCharacterSelection = useRef(
+        Boolean((routeLocation.state as { showWelcome?: boolean } | null)?.showWelcome)
+    );
     const { player, loading: playerLoading, error: playerError, refreshPlayer } = usePlayer();
     const { events, isPlayerDead, isEnemyDead, executeTurn, loading: combatLoading, resetCombat } = useCombat();
     const [location, setLocation] = useState<Location | null>(null);
     const [quests, setQuests] = useState<PlayerQuest[]>([]);
     const [worldLoading, setWorldLoading] = useState(true);
     const [worldError, setWorldError] = useState<string | null>(null);
-    const [message, setMessage] = useState("Добро пожаловать в мир Tenebres!");
+    const [message, setMessage] = useState<string | null>(
+        enteredFromCharacterSelection.current ? "Добро пожаловать в мир Tenebres!" : null
+    );
     const [activeMonsterId, setActiveMonsterId] = useState<number | null>(null);
     const [travelOpen, setTravelOpen] = useState(false);
     const [busyAction, setBusyAction] = useState<string | null>(null);
@@ -70,6 +68,19 @@ export default function GamePage() {
     useEffect(() => {
         refreshWorld();
     }, [refreshWorld]);
+
+    useEffect(() => {
+        if (enteredFromCharacterSelection.current) {
+            navigate("/", { replace: true, state: null });
+            enteredFromCharacterSelection.current = false;
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        if (!message) return;
+        const timeoutId = window.setTimeout(() => setMessage(null), 4500);
+        return () => window.clearTimeout(timeoutId);
+    }, [message]);
 
     useEffect(() => {
         if (player?.activeCombatMonsterId) setActiveMonsterId(player.activeCombatMonsterId);
@@ -158,7 +169,7 @@ export default function GamePage() {
 
             <section className="game-location" aria-label="Текущая локация">
                 <img src={location.bossRoom ? "/assets/game/location-boss.png" : locationFrames[location.type]} alt="" aria-hidden="true" />
-                <strong className="game-location__biome">{biomeNames[location.biome]}</strong>
+                <strong className="game-location__biome">{location.zoneName}</strong>
                 <span className="game-location__name">{location.name}</span>
             </section>
 

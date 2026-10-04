@@ -861,7 +861,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     overflow: hidden;
     color: #f5dfb4;
     font-family: "Cormorant Garamond", Georgia, serif;
-    background: #070a0d url("/assets/character-creation/background.png") center / cover no-repeat;
+    background: #070a0d url("/assets/game/main-background.png") center / cover no-repeat;
 }
 
 .game-dashboard--centered {
@@ -906,9 +906,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .game-player {
-    top: -.7%;
-    left: -.5%;
-    width: min(35vw, 42rem);
+    top: -.25%;
+    left: -.15%;
+    width: min(17.5vw, 21rem);
     aspect-ratio: 1774 / 887;
 }
 
@@ -922,7 +922,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     justify-content: space-between;
     gap: .5rem;
     color: #f0cf8e;
-    font-size: clamp(.78rem, 1.45vw, 1.45rem);
+    font-size: clamp(.52rem, .76vw, .76rem);
     line-height: 1;
     text-shadow: 0 .12rem .18rem #000;
 }
@@ -946,7 +946,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     place-items: center;
     overflow: hidden;
     color: #fff4dc;
-    font-size: clamp(.7rem, 1.3vw, 1.3rem);
+    font-size: clamp(.48rem, .7vw, .72rem);
     font-weight: 700;
     line-height: 1;
     text-shadow: 0 .1rem .18rem #000, 0 0 .22rem #000;
@@ -966,9 +966,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-player__bar span { position: relative; z-index: 1; }
 
 .game-location {
-    top: -1.6%;
+    top: 1.2%;
     left: 50%;
-    width: min(45vw, 54rem);
+    width: min(22.5vw, 27rem);
     aspect-ratio: 3 / 1;
     transform: translateX(-50%);
 }
@@ -988,20 +988,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-location__biome {
     top: 29%;
     color: #f2dfbc;
-    font-size: clamp(1rem, 2.2vw, 2.5rem);
+    font-size: clamp(.68rem, 1.1vw, 1.25rem);
     font-weight: 600;
 }
 
 .game-location__name {
     top: 56%;
     color: #b8e2f4;
-    font-size: clamp(.72rem, 1.45vw, 1.55rem);
+    font-size: clamp(.55rem, .76vw, .82rem);
 }
 
 .game-quests {
-    top: 18%;
-    left: -.7%;
-    width: min(28vw, 33rem);
+    top: 15.6%;
+    left: -.25%;
+    width: min(14vw, 16.5rem);
     aspect-ratio: 1200 / 1267;
 }
 
@@ -1013,7 +1013,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     margin: 0;
     overflow: hidden;
     color: #f2d7a2;
-    font-size: clamp(1rem, 2.6vw, 2.6rem);
+    font-size: clamp(.7rem, 1.3vw, 1.3rem);
     font-weight: 600;
     line-height: 1;
     text-align: center;
@@ -1051,7 +1051,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     justify-self: center;
     color: #ffe2a0;
     font-family: Georgia, serif;
-    font-size: clamp(.85rem, 2.2vw, 2rem);
+    font-size: clamp(.58rem, 1.1vw, 1rem);
     font-weight: 700;
     background: radial-gradient(circle, rgba(19, 12, 10, .98) 48%, rgba(7, 6, 5, .95) 72%, transparent 74%);
     text-shadow: 0 0 .45rem currentColor, 0 .12rem .15rem #000;
@@ -1059,7 +1059,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .game-quest__icon--main_story { color: #ffd154; }
 .game-quest__icon--npc { color: #ffbc73; }
-.game-quest__icon--guild { color: #f2cf9c; font-size: clamp(.65rem, 1.65vw, 1.55rem); }
+.game-quest__icon--guild { color: #f2cf9c; font-size: clamp(.5rem, .85vw, .8rem); }
 
 .game-quest__copy {
     min-width: 0;
@@ -1076,14 +1076,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
     text-overflow: ellipsis;
 }
 
-.game-quest__copy strong { color: #efcb87; font-size: clamp(.68rem, 1.25vw, 1.2rem); }
-.game-quest__copy span { color: #d4e6ea; font-size: clamp(.56rem, 1vw, .96rem); }
-.game-quest__progress { color: #eef8ff; font-size: clamp(.64rem, 1.1vw, 1.05rem); text-shadow: 0 .1rem .16rem #000; }
+.game-quest__copy strong { color: #efcb87; font-size: clamp(.48rem, .65vw, .62rem); }
+.game-quest__copy span { color: #d4e6ea; font-size: clamp(.42rem, .52vw, .5rem); }
+.game-quest__progress { color: #eef8ff; font-size: clamp(.46rem, .58vw, .55rem); text-shadow: 0 .1rem .16rem #000; }
 
 .game-side-menu {
     top: -.9%;
-    right: -.35%;
-    width: min(14.5vw, 12rem);
+    right: -1.6%;
+    width: min(21.75vw, 18rem);
     aspect-ratio: 768 / 1724;
 }
 
@@ -1231,10 +1231,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 900px), (max-height: 620px) {
-    .game-player { width: min(46vw, 31rem); }
-    .game-location { width: min(54vw, 38rem); }
-    .game-quests { top: 22%; width: min(34vw, 24rem); }
-    .game-side-menu { width: min(18vw, 9rem); }
+    .game-player { width: min(23vw, 16rem); }
+    .game-location { width: min(27vw, 19rem); }
+    .game-quests { top: 18%; width: min(18vw, 12rem); }
+    .game-side-menu { width: min(24vw, 13.5rem); }
     .game-actions { left: 4%; width: 78vw; }
     .game-rest { width: min(19vw, 11rem); }
     .game-dashboard__message { left: 28%; right: 19%; }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="036-add-location-zone-names" author="codex">
+        <addColumn tableName="locations">
+            <column name="zone_name" type="VARCHAR(150)" defaultValue="Неизвестные земли">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <update tableName="locations">
+            <column name="zone_name" value="Талмирия"/>
+            <where>zone_id = 'talmiria'</where>
+        </update>
+        <update tableName="locations">
+            <column name="zone_name" value="Зелёный лес"/>
+            <where>zone_id = 'green_forest'</where>
+        </update>
+        <update tableName="locations">
+            <column name="zone_name" value="Забытый склеп"/>
+            <where>zone_id = 'forgotten_crypt'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
