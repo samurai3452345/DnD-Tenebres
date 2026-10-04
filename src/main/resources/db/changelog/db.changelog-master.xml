@@ -39,6 +39,7 @@
     <include file="/db/changelog/032-add-audit.xml"/>
     <include file="/db/changelog/033-support-account-characters.xml"/>
     <include file="/db/changelog/034-cascade-character-deletion.xml"/>
+    <include file="/db/changelog/035-main-game-screen-data.xml"/>
 
 
 </databaseChangeLog>

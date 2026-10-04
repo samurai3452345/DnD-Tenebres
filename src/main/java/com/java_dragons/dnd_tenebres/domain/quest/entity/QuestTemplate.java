@@ -1,6 +1,7 @@
 package com.java_dragons.dnd_tenebres.domain.quest.entity;
 
 import com.java_dragons.dnd_tenebres.domain.quest.model.QuestType;
+import com.java_dragons.dnd_tenebres.domain.quest.model.QuestSource;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,10 @@ public class QuestTemplate {
     @Enumerated(EnumType.STRING)
     @Column(name = "quest_type", nullable = false)
     private QuestType questType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "quest_source", nullable = false)
+    private QuestSource questSource = QuestSource.GUILD;
 
     @Column(name = "target_identifier", nullable = false)
     private String targetIdentifier;

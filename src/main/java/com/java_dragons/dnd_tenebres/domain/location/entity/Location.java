@@ -53,6 +53,9 @@ public class Location {
     @Column(name = "search_difficulty", nullable = false)
     private int searchDifficulty = 15;
 
+    @Column(name = "boss_room", nullable = false)
+    private boolean bossRoom = false;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "location_connections",

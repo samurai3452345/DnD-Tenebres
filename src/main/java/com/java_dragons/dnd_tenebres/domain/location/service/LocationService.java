@@ -59,6 +59,7 @@ public class LocationService {
                 entry.getItemTemplate().getId(), entry.getItemTemplate().getName(), entry.getMinAmount(),
                 entry.getMaxAmount(), entry.getFindChance())).toList();
         return new LocationResponse(location.getId(), location.getName(), location.getDescription(), location.getType(),
-                location.getBiome(), location.getLevel(), location.getEffect(), cleared, actions, connections, resources);
+                location.getBiome(), location.getLevel(), location.getEffect(), cleared, location.isBossRoom(),
+                actions, connections, resources);
     }
 }

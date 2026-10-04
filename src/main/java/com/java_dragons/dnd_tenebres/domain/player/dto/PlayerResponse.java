@@ -13,6 +13,8 @@ public class PlayerResponse {
     long experience;
     int currentHp;
     int maxHp;
+    int currentMp;
+    int maxMp;
     int gold;
     PlayerStats stats;
     int statPoints;

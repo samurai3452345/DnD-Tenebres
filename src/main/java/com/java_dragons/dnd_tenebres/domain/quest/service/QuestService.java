@@ -157,6 +157,7 @@ public class QuestService {
 
     private QuestTemplateResponse map(QuestTemplate q) {
         return new QuestTemplateResponse(q.getId(), q.getName(), q.getDescription(), q.getQuestType().name(),
+                (q.getQuestSource() == null ? QuestSource.GUILD : q.getQuestSource()).name(),
                 q.getTargetIdentifier(), q.getTargetCount(), q.getRewardXp(), q.getRewardGold(), q.getMinLevel(),
                 q.getAcceptLocationId(), q.getTurnInLocationId(), q.getPrerequisiteQuestId(), q.isRepeatable(),
                 q.getRewardItemTemplateId(), q.getRewardItemAmount());

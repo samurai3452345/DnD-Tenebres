@@ -11,6 +11,7 @@ import NotFoundPage from "../pages/NotFoundPage";
 import AccountReadyPage from "../pages/AccountReadyPage";
 import CharacterCreationPage from "../pages/CharacterCreationPage";
 import CharacterSelectionPage from "../pages/CharacterSelectionPage";
+import GameSectionPlaceholderPage from "../pages/GameSectionPlaceholderPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -71,6 +72,16 @@ export default function AppRouter() {
                     <Route
                         path="/shop"
                         element={<ShopPage />}
+                    />
+
+                    <Route
+                        path="/forge"
+                        element={<GameSectionPlaceholderPage title="Кузница" />}
+                    />
+
+                    <Route
+                        path="/lore"
+                        element={<GameSectionPlaceholderPage title="Лор" />}
                     />
 
                 </Route>
