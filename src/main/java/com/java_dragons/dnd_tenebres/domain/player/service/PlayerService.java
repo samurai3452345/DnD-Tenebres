@@ -73,6 +73,13 @@ public class PlayerService {
         }
     }
 
+    @Transactional
+    public void deleteCharacter(Long accountId, Long playerId) {
+        Player player = playerRepository.findByIdAndAccountId(playerId, accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Персонаж не найден в этом аккаунте"));
+        playerRepository.delete(player);
+    }
+
     @Transactional(readOnly = true)
     public PlayerResponse getPlayerById(Long id) {
         Player player = playerRepository.findById(id)

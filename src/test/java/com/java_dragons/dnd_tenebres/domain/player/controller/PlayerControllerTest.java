@@ -77,6 +77,13 @@ class PlayerControllerTest {
         verify(playerService).getCharacters(7L);
     }
 
+    @Test
+    void удаляетПерсонажаТолькоИзТекущегоАккаунта() {
+        controller.deleteCharacter(authentication, 12L);
+
+        verify(playerService).deleteCharacter(7L, 12L);
+    }
+
     private PlayerCreationRequest request(String name) {
         return new PlayerCreationRequest(name, 15, 15, 15, 8, 8, 8);
     }

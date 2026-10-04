@@ -11,4 +11,6 @@ export interface RegisterRequest {
 export interface AuthResponse {
     token: string;
     hasCharacter: boolean;
+    characterCount: number;
+    selectedPlayerId: number | null;
 }

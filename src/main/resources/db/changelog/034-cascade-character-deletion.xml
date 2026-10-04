@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="034-cascade-character-deletion" author="codex">
+        <dropForeignKeyConstraint baseTableName="player_effects" constraintName="fk_player_effects_player"/>
+        <dropForeignKeyConstraint baseTableName="items" constraintName="fk_items_player"/>
+        <dropForeignKeyConstraint baseTableName="player_items" constraintName="fk_player_item_player"/>
+        <dropForeignKeyConstraint baseTableName="player_cleared_locations" constraintName="fk_cleared_player"/>
+        <dropForeignKeyConstraint baseTableName="player_quests" constraintName="fk_player_quests_player"/>
+        <dropForeignKeyConstraint baseTableName="combat_encounters" constraintName="fk_encounter_player"/>
+        <dropForeignKeyConstraint baseTableName="combat_participants" constraintName="fk_participant_encounter"/>
+        <dropForeignKeyConstraint baseTableName="combat_log_entries" constraintName="fk_log_encounter"/>
+        <dropForeignKeyConstraint baseTableName="player_story_flags" constraintName="fk_story_player"/>
+        <dropForeignKeyConstraint baseTableName="wallet_transactions" constraintName="fk_wallet_player"/>
+
+        <addForeignKeyConstraint baseTableName="player_effects" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_player_effects_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="items" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_items_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="player_items" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_player_item_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="player_cleared_locations" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_cleared_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="player_quests" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_player_quests_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="combat_encounters" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_encounter_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="combat_participants" baseColumnNames="encounter_id"
+                                 referencedTableName="combat_encounters" referencedColumnNames="id"
+                                 constraintName="fk_participant_encounter" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="combat_log_entries" baseColumnNames="encounter_id"
+                                 referencedTableName="combat_encounters" referencedColumnNames="id"
+                                 constraintName="fk_log_encounter" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="player_story_flags" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_story_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="wallet_transactions" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_wallet_player" onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="forge_operations" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_forge_operation_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="trade_operations" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_trade_operation_player" onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

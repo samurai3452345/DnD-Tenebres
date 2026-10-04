@@ -89,7 +89,7 @@ export default function CharacterCreationPage() {
             const response = await playerApi.create({ name: normalizedName, ...stats });
             const remembered = localStorage.getItem("token") !== null;
             login(response.token, remembered);
-            navigate("/", { replace: true });
+            navigate("/characters", { replace: true });
         } catch (requestError) {
             setError(getAuthError(requestError, "Не удалось создать персонажа."));
         } finally {

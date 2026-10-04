@@ -32,7 +32,7 @@ export default function LoginPage() {
                 password: submittedPassword,
             });
             login(response.token, remember);
-            navigate(response.hasCharacter ? "/" : "/create-character", { replace: true });
+            navigate(response.hasCharacter ? "/characters" : "/create-character", { replace: true });
         } catch (requestError) {
             setError(getAuthError(requestError, "Неверное имя пользователя или пароль."));
         } finally {

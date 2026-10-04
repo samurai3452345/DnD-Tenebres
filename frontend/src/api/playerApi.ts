@@ -1,6 +1,7 @@
 import { api } from "./axios";
 import type {
     Player,
+    CharacterSummary,
     PlayerCreationRequest,
     StatAllocationRequest,
 } from "../types/player";
@@ -17,6 +18,20 @@ export const playerApi = {
         const response = await api.get<Player>("/players/me");
 
         return response.data;
+    },
+
+    getCharacters: async (): Promise<CharacterSummary[]> => {
+        const response = await api.get<CharacterSummary[]>("/players");
+        return response.data;
+    },
+
+    selectCharacter: async (playerId: number): Promise<AuthResponse> => {
+        const response = await api.post<AuthResponse>(`/players/${playerId}/select`);
+        return response.data;
+    },
+
+    deleteCharacter: async (playerId: number): Promise<void> => {
+        await api.delete(`/players/${playerId}`);
     },
 
     allocateStats: async (

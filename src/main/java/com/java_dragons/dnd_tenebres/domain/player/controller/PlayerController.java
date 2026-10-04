@@ -11,6 +11,7 @@ import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentP
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,6 +52,14 @@ public class PlayerController {
                 .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
         playerService.verifyCharacterOwnership(account.getId(), playerId);
         return authService.createResponse(account, playerId);
+    }
+
+    @DeleteMapping("/{playerId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCharacter(Authentication authentication, @PathVariable Long playerId) {
+        var account = userAccountRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
+        playerService.deleteCharacter(account.getId(), playerId);
     }
 
     @GetMapping("/me")

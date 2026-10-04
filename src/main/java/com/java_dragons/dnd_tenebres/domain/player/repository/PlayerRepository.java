@@ -14,6 +14,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     boolean existsByIdAndAccountId(Long id, Long accountId);
 
+    Optional<Player> findByIdAndAccountId(Long id, Long accountId);
+
     @EntityGraph(attributePaths = "currentLocation")
     List<Player> findAllByAccountIdOrderByIdAsc(Long accountId);
 }
