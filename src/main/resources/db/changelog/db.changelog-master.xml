@@ -41,6 +41,7 @@
     <include file="/db/changelog/034-cascade-character-deletion.xml"/>
     <include file="/db/changelog/035-main-game-screen-data.xml"/>
     <include file="/db/changelog/036-add-location-zone-names.xml"/>
+    <include file="/db/changelog/037-refine-location-zone-names.xml"/>
 
 
 </databaseChangeLog>

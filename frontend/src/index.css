@@ -908,7 +908,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-player {
     top: -.25%;
     left: -.15%;
-    width: min(17.5vw, 21rem);
+    width: min(22.75vw, 27.3rem);
     aspect-ratio: 1774 / 887;
 }
 
@@ -922,7 +922,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     justify-content: space-between;
     gap: .5rem;
     color: #f0cf8e;
-    font-size: clamp(.52rem, .76vw, .76rem);
+    font-size: clamp(.6rem, .98vw, .98rem);
     line-height: 1;
     text-shadow: 0 .12rem .18rem #000;
 }
@@ -946,7 +946,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     place-items: center;
     overflow: hidden;
     color: #fff4dc;
-    font-size: clamp(.48rem, .7vw, .72rem);
+    font-size: clamp(.56rem, .9vw, .92rem);
     font-weight: 700;
     line-height: 1;
     text-shadow: 0 .1rem .18rem #000, 0 0 .22rem #000;
@@ -968,7 +968,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-location {
     top: 1.2%;
     left: 50%;
-    width: min(22.5vw, 27rem);
+    width: min(24.75vw, 29.7rem);
     aspect-ratio: 3 / 1;
     transform: translateX(-50%);
 }
@@ -988,20 +988,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-location__biome {
     top: 29%;
     color: #f2dfbc;
-    font-size: clamp(.68rem, 1.1vw, 1.25rem);
+    font-size: clamp(.72rem, 1.21vw, 1.38rem);
     font-weight: 600;
 }
 
 .game-location__name {
     top: 56%;
     color: #b8e2f4;
-    font-size: clamp(.55rem, .76vw, .82rem);
+    font-size: clamp(.58rem, .84vw, .9rem);
 }
 
 .game-quests {
-    top: 15.6%;
+    top: 20.2%;
     left: -.25%;
-    width: min(14vw, 16.5rem);
+    width: min(18.2vw, 21.45rem);
     aspect-ratio: 1200 / 1267;
 }
 
@@ -1013,7 +1013,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     margin: 0;
     overflow: hidden;
     color: #f2d7a2;
-    font-size: clamp(.7rem, 1.3vw, 1.3rem);
+    font-size: clamp(.78rem, 1.69vw, 1.69rem);
     font-weight: 600;
     line-height: 1;
     text-align: center;
@@ -1051,7 +1051,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     justify-self: center;
     color: #ffe2a0;
     font-family: Georgia, serif;
-    font-size: clamp(.58rem, 1.1vw, 1rem);
+    font-size: clamp(.62rem, 1.43vw, 1.3rem);
     font-weight: 700;
     background: radial-gradient(circle, rgba(19, 12, 10, .98) 48%, rgba(7, 6, 5, .95) 72%, transparent 74%);
     text-shadow: 0 0 .45rem currentColor, 0 .12rem .15rem #000;
@@ -1059,7 +1059,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .game-quest__icon--main_story { color: #ffd154; }
 .game-quest__icon--npc { color: #ffbc73; }
-.game-quest__icon--guild { color: #f2cf9c; font-size: clamp(.5rem, .85vw, .8rem); }
+.game-quest__icon--guild { color: #f2cf9c; font-size: clamp(.54rem, 1.1vw, 1.04rem); }
 
 .game-quest__copy {
     min-width: 0;
@@ -1076,13 +1076,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
     text-overflow: ellipsis;
 }
 
-.game-quest__copy strong { color: #efcb87; font-size: clamp(.48rem, .65vw, .62rem); }
-.game-quest__copy span { color: #d4e6ea; font-size: clamp(.42rem, .52vw, .5rem); }
-.game-quest__progress { color: #eef8ff; font-size: clamp(.46rem, .58vw, .55rem); text-shadow: 0 .1rem .16rem #000; }
+.game-quest__copy strong { color: #efcb87; font-size: clamp(.52rem, .85vw, .81rem); }
+.game-quest__copy span { color: #d4e6ea; font-size: clamp(.46rem, .68vw, .65rem); }
+.game-quest__progress { color: #eef8ff; font-size: clamp(.5rem, .75vw, .72rem); text-shadow: 0 .1rem .16rem #000; }
 
 .game-side-menu {
     top: -.9%;
-    right: -1.6%;
+    right: -2.4%;
     width: min(21.75vw, 18rem);
     aspect-ratio: 768 / 1724;
 }
@@ -1099,24 +1099,24 @@ button, a { -webkit-tap-highlight-color: transparent; }
     border-radius: .45rem;
 }
 
-.game-side-menu button { left: 15%; width: 70%; height: 18%; }
-.game-side-menu button:nth-of-type(1) { top: 2%; }
-.game-side-menu button:nth-of-type(2) { top: 20%; }
-.game-side-menu button:nth-of-type(3) { top: 39%; }
-.game-side-menu button:nth-of-type(4) { top: 58%; }
-.game-side-menu button:nth-of-type(5) { top: 77%; }
+.game-side-menu button { left: 36%; width: 44%; height: 15%; }
+.game-side-menu button:nth-of-type(1) { top: 2.5%; }
+.game-side-menu button:nth-of-type(2) { top: 21.3%; }
+.game-side-menu button:nth-of-type(3) { top: 40.1%; }
+.game-side-menu button:nth-of-type(4) { top: 58.9%; }
+.game-side-menu button:nth-of-type(5) { top: 77.7%; }
 
 .game-actions {
     left: 8%;
-    bottom: -4.2%;
+    bottom: -6.2%;
     width: min(72vw, 86rem);
     aspect-ratio: 3 / 1;
 }
 
-.game-actions button { top: 17%; width: 29%; height: 68%; }
-.game-actions button:nth-of-type(1) { left: 3%; }
-.game-actions button:nth-of-type(2) { left: 35.5%; }
-.game-actions button:nth-of-type(3) { left: 68%; }
+.game-actions button { top: 24%; width: 26%; height: 54%; }
+.game-actions button:nth-of-type(1) { left: 4.5%; }
+.game-actions button:nth-of-type(2) { left: 37%; }
+.game-actions button:nth-of-type(3) { left: 69.5%; }
 
 .game-rest {
     right: -.2%;
@@ -1140,7 +1140,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-actions button:focus-visible,
 .game-rest button:focus-visible { outline: .12rem solid #ffd18a; outline-offset: -.2rem; }
 .game-actions button:disabled,
-.game-rest button:disabled { cursor: not-allowed; background: rgba(0, 0, 0, .42); }
+.game-rest button:disabled { cursor: not-allowed; background: rgba(0, 0, 0, .26); }
 
 .game-dashboard__message {
     position: absolute;
@@ -1231,9 +1231,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 900px), (max-height: 620px) {
-    .game-player { width: min(23vw, 16rem); }
-    .game-location { width: min(27vw, 19rem); }
-    .game-quests { top: 18%; width: min(18vw, 12rem); }
+    .game-player { width: min(29.9vw, 20.8rem); }
+    .game-location { width: min(29.7vw, 20.9rem); }
+    .game-quests { top: 24%; width: min(23.4vw, 15.6rem); }
     .game-side-menu { width: min(24vw, 13.5rem); }
     .game-actions { left: 4%; width: 78vw; }
     .game-rest { width: min(19vw, 11rem); }
