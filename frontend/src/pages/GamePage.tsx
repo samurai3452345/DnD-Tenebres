@@ -160,9 +160,11 @@ export default function GamePage() {
                     <span>Ур. {player.level}</span>
                 </div>
                 <div className="game-player__bar game-player__bar--hp">
+                    <img src="/assets/game/player-health.png" alt="" aria-hidden="true" />
                     <span>{player.currentHp} / {player.maxHp}</span>
                 </div>
                 <div className="game-player__bar game-player__bar--mp">
+                    <img src="/assets/game/player-mana.png" alt="" aria-hidden="true" />
                     <span>{player.currentMp} / {player.maxMp}</span>
                 </div>
             </section>
