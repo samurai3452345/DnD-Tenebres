@@ -912,6 +912,29 @@ button, a { -webkit-tap-highlight-color: transparent; }
     aspect-ratio: 1672 / 941;
 }
 
+.game-player__avatar-button {
+    position: absolute;
+    top: 14%;
+    left: 5%;
+    width: 35%;
+    height: 66%;
+    z-index: 2;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+}
+
+.game-player__avatar-button:hover {
+    box-shadow: inset 0 0 1.2rem rgba(255, 75, 25, .16), 0 0 .65rem rgba(255, 54, 18, .18);
+}
+
+.game-player__avatar-button:focus-visible {
+    outline: .12rem solid #ffd18a;
+    outline-offset: -.22rem;
+}
+
 .game-player__identity {
     position: absolute;
     top: 25.5%;

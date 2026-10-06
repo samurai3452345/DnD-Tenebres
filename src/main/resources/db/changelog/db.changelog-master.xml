@@ -42,6 +42,7 @@
     <include file="/db/changelog/035-main-game-screen-data.xml"/>
     <include file="/db/changelog/036-add-location-zone-names.xml"/>
     <include file="/db/changelog/037-refine-location-zone-names.xml"/>
+    <include file="/db/changelog/038-rename-green-forest-zone.xml"/>
 
 
 </databaseChangeLog>

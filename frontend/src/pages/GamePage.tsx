@@ -19,6 +19,28 @@ const locationFrames: Record<Location["type"], string> = {
     DANGEROUS: "/assets/game/location-hostile.png",
 };
 
+const locationBackgrounds: Record<string, string> = {
+    city_merch_guild: "/assets/game/location-merchant-guild.png",
+    city_adv_guild: "/assets/game/location-adventurers-guild.png",
+    city_tavern: "/assets/game/location-north-hearth-tavern.png",
+    city_gates: "/assets/game/location-main-gates.png",
+    forest_edge: "/assets/game/location-forest-edge.png",
+    forest_goblin_camp: "/assets/game/location-goblin-camp.png",
+    forest_wolf_trail: "/assets/game/location-wolf-trail.png",
+    crypt_entrance: "/assets/game/location-crypt-entrance.png",
+    crypt_corridor: "/assets/game/location-crypt-corridor.png",
+    crypt_central: "/assets/game/location-crypt-central.png",
+    crypt_library: "/assets/game/location-crypt-library.png",
+    crypt_training: "/assets/game/location-crypt-training.png",
+    crypt_armory: "/assets/game/location-crypt-armory.png",
+    crypt_boss_room: "/assets/game/location-crypt-throne-room.png",
+};
+
+const zoneNameOverrides: Record<string, string> = {
+    "Зеленый лес": "Сумрачный лес",
+    "Зелёный лес": "Сумрачный лес",
+};
+
 const questSourceLabels: Record<QuestSource, string> = {
     MAIN_STORY: "Сюжетное задание",
     NPC: "Задание персонажа",
@@ -148,13 +170,22 @@ export default function GamePage() {
 
     const actionsDisabled = busyAction !== null || activeMonsterId !== null;
     const allows = (action: string) => location.availableActions.includes(action);
+    const locationBackground = locationBackgrounds[location.id] ?? "/assets/game/main-background.png";
+    const zoneName = zoneNameOverrides[location.zoneName] ?? location.zoneName;
 
     return (
-        <main className="game-dashboard">
+        <main className="game-dashboard" style={{ backgroundImage: `url("${locationBackground}")` }}>
             <div className="game-dashboard__veil" aria-hidden="true" />
 
             <section className="game-player" aria-label="Профиль персонажа">
                 <img src="/assets/game/player-panel.png" alt="" aria-hidden="true" />
+                <button
+                    className="game-player__avatar-button"
+                    type="button"
+                    aria-label="Открыть профиль персонажа"
+                    title="Профиль персонажа"
+                    onClick={() => navigate("/character")}
+                />
                 <div className="game-player__identity">
                     <strong>{player.playerName}</strong>
                     <span>Ур. {player.level}</span>
@@ -171,7 +202,7 @@ export default function GamePage() {
 
             <section className="game-location" aria-label="Текущая локация">
                 <img src={location.bossRoom ? "/assets/game/location-boss.png" : locationFrames[location.type]} alt="" aria-hidden="true" />
-                <strong className="game-location__biome">{location.zoneName}</strong>
+                <strong className="game-location__biome">{zoneName}</strong>
                 <span className="game-location__name">{location.name}</span>
             </section>
 
