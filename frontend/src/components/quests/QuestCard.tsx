@@ -11,12 +11,12 @@ interface QuestCardProps {
 }
 
 export default function QuestCard({ questTemplate, playerQuest, onAccept, onTurnIn }: QuestCardProps) {
-    const template = playerQuest ? playerQuest.questTemplate : questTemplate;
+    const template = playerQuest ? playerQuest.quest : questTemplate;
     if (!template) return null;
 
     const isAvailable = !!questTemplate && !playerQuest;
-    const isActive = playerQuest?.questStatus === 'ACTIVE';
-    const isCompleted = playerQuest?.questStatus === 'COMPLETED';
+    const isActive = playerQuest?.status === 'ACTIVE';
+    const isCompleted = playerQuest?.status === 'COMPLETED';
 
     return (
         <div style={{ border: '1px solid #dcdcdc', padding: '15px', borderRadius: '8px', background: '#fff', marginBottom: '15px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>

@@ -55,7 +55,7 @@ export default function CharacterSelectionPage() {
             const response = await playerApi.selectCharacter(playerId);
             const remember = localStorage.getItem("token") !== null;
             login(response.token, remember);
-            navigate("/", { replace: true });
+            navigate("/", { replace: true, state: { showWelcome: true } });
         } catch (requestError) {
             setError(getAuthError(requestError, "Не удалось выбрать персонажа."));
             setSelectingId(null);

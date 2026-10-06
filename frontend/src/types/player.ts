@@ -14,6 +14,8 @@ export interface Player {
     experience: number;
     currentHp: number;
     maxHp: number;
+    currentMp: number;
+    maxMp: number;
     gold: number;
     stats: PlayerStats;
     statPoints: number;

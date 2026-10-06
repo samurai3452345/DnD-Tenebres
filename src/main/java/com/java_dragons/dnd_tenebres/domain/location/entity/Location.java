@@ -35,6 +35,9 @@ public class Location {
     @Column(name = "zone_id", nullable = false)
     private String zoneId;
 
+    @Column(name = "zone_name", nullable = false)
+    private String zoneName;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private LocationType type;
@@ -52,6 +55,9 @@ public class Location {
 
     @Column(name = "search_difficulty", nullable = false)
     private int searchDifficulty = 15;
+
+    @Column(name = "boss_room", nullable = false)
+    private boolean bossRoom = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
