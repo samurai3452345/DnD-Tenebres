@@ -53,7 +53,7 @@ public class LocationService {
         var connections = location.getConnectedLocations().stream().map(target -> {
             var access = unlockService.check(player, location, target);
             return new LocationResponse.ConnectionResponse(target.getId(), target.getName(), target.getLevel(),
-                    access.open(), access.blockedReasons());
+                    target.getType(), target.isBossRoom(), access.open(), access.blockedReasons());
         }).toList();
         var resources = loot.stream().map(entry -> new LocationResponse.ResourceResponse(
                 entry.getItemTemplate().getId(), entry.getItemTemplate().getName(), entry.getMinAmount(),

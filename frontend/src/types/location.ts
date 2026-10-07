@@ -24,6 +24,8 @@ export interface LocationConnection {
     id: string;
     name: string;
     recommendedLevel: number;
+    type?: LocationType;
+    bossRoom?: boolean;
     open: boolean;
     blockedReasons: string[];
 }

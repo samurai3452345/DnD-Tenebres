@@ -41,6 +41,25 @@ const zoneNameOverrides: Record<string, string> = {
     "Зелёный лес": "Сумрачный лес",
 };
 
+const travelIcons: Record<Location["type"], string> = {
+    SAFE_ZONE: "/assets/game/travel-icon-safe.png",
+    NEUTRAL: "/assets/game/travel-icon-neutral.png",
+    DANGEROUS: "/assets/game/travel-icon-dangerous.png",
+};
+
+function travelIconFor(connection: LocationConnection) {
+    if (connection.bossRoom || connection.id === "crypt_boss_room") {
+        return "/assets/game/travel-icon-boss.png";
+    }
+    if (connection.type === "SAFE_ZONE" || connection.id.startsWith("city_")) {
+        return travelIcons.SAFE_ZONE;
+    }
+    if (connection.type === "DANGEROUS" || connection.id.startsWith("crypt_")) {
+        return travelIcons.DANGEROUS;
+    }
+    return travelIcons.NEUTRAL;
+}
+
 const questSourceLabels: Record<QuestSource, string> = {
     MAIN_STORY: "Сюжетное задание",
     NPC: "Задание персонажа",
@@ -254,18 +273,28 @@ export default function GamePage() {
 
             {travelOpen && (
                 <div className="game-modal" role="presentation" onMouseDown={() => setTravelOpen(false)}>
-                    <section className="game-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="travel-title" onMouseDown={(event) => event.stopPropagation()}>
-                        <h2 id="travel-title">Куда отправиться?</h2>
+                    <section className="game-modal__dialog game-modal__dialog--travel" role="dialog" aria-modal="true" aria-labelledby="travel-title" onMouseDown={(event) => event.stopPropagation()}>
+                        <img className="game-modal__frame" src="/assets/game/travel-panel.png" alt="" aria-hidden="true" />
+                        <h2 id="travel-title" className="sr-only">Куда отправиться?</h2>
                         <div className="game-modal__destinations">
                             {location.connections.map((connection) => (
-                                <button key={connection.id} type="button" className="game-modal__destination" onClick={() => handleTravel(connection)}>
-                                    <strong>{connection.name}</strong>
-                                    <span>Рекомендуемый уровень: {connection.recommendedLevel}</span>
-                                    {!connection.open && <small>{connection.blockedReasons.join(". ")}</small>}
+                                <button
+                                    key={connection.id}
+                                    type="button"
+                                    className={`game-modal__destination${connection.open ? "" : " game-modal__destination--locked"}`}
+                                    aria-label={`${connection.name}. Рекомендуемый уровень: ${connection.recommendedLevel}${connection.open ? "" : `. Путь закрыт: ${connection.blockedReasons.join(". ")}`}`}
+                                    onClick={() => handleTravel(connection)}
+                                >
+                                    <span className="game-modal__destination-copy">
+                                        <strong>{connection.name}</strong>
+                                        <span>Рекомендуемый уровень: {connection.recommendedLevel}</span>
+                                        {!connection.open && <small>{connection.blockedReasons.join(". ")}</small>}
+                                    </span>
+                                    <img src={travelIconFor(connection)} alt="" aria-hidden="true" />
                                 </button>
                             ))}
                         </div>
-                        <button type="button" className="game-modal__close" onClick={() => setTravelOpen(false)}>Закрыть</button>
+                        <button type="button" className="game-modal__close" aria-label="Закрыть окно выбора направления" onClick={() => setTravelOpen(false)} />
                     </section>
                 </div>
             )}
