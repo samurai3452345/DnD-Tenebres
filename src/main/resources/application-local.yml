@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://localhost:5432/dnd_tenebres}}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:postgres}}
