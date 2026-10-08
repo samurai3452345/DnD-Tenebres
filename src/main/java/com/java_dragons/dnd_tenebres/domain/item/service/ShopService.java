@@ -14,6 +14,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.*;
 
 @Service @RequiredArgsConstructor
@@ -45,11 +49,14 @@ public class ShopService {
     }
 
     @Transactional
-    public String buyItem(Long playerId, String operationId, Long offerId, int amount) {
+    public TradeResultResponse buyItem(Long playerId, String operationId, Long offerId, int amount) {
         validateOperation(operationId, amount);
-        Optional<TradeOperation> old = operationRepository.findByPlayerIdAndOperationId(playerId, operationId);
-        if (old.isPresent()) return old.get().getResult();
-        Player player = player(playerId); validateLocation(player);
+        String normalizedId = operationId.trim();
+        String requestHash = requestHash("BUY", offerId, amount);
+        Player player = lockedPlayer(playerId);
+        Optional<TradeOperation> old = operationRepository.findByPlayerIdAndOperationId(playerId, normalizedId);
+        if (old.isPresent()) return repeatedResult(old.get(), "BUY", requestHash);
+        validateLocation(player);
         MerchantOffer offer = offerRepository.findByIdAndLocationIdAndEnabledTrue(offerId, player.getCurrentLocation().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Товар отсутствует у этого торговца"));
         if (player.getLevel() < offer.getMinLevel()) throw new IllegalStateException("Требуется уровень " + offer.getMinLevel());
@@ -58,18 +65,21 @@ public class ShopService {
         offer.take(amount);
         inventoryService.addItemToPlayer(player, offer.getTemplate().getName(), amount);
         String result = "Куплено: " + offer.getTemplate().getName() + " x" + amount + " за " + price;
-        remember(playerId, operationId, "BUY", result);
+        remember(playerId, normalizedId, "BUY", requestHash, offerId, amount, result);
         auditService.record(player.getName(), playerId, "PURCHASE", "SUCCESS", result);
         eventPublisher.publishEvent(new QuestProgressEvent(playerId, QuestType.TRADE, "BUY", amount));
-        return result;
+        return new TradeResultResponse(normalizedId, "BUY", offerId, amount, result, false);
     }
 
     @Transactional
-    public String sellItem(Long playerId, String operationId, Long playerItemId, int amount) {
+    public TradeResultResponse sellItem(Long playerId, String operationId, Long playerItemId, int amount) {
         validateOperation(operationId, amount);
-        Optional<TradeOperation> old = operationRepository.findByPlayerIdAndOperationId(playerId, operationId);
-        if (old.isPresent()) return old.get().getResult();
-        Player player = player(playerId); validateLocation(player);
+        String normalizedId = operationId.trim();
+        String requestHash = requestHash("SELL", playerItemId, amount);
+        Player player = lockedPlayer(playerId);
+        Optional<TradeOperation> old = operationRepository.findByPlayerIdAndOperationId(playerId, normalizedId);
+        if (old.isPresent()) return repeatedResult(old.get(), "SELL", requestHash);
+        validateLocation(player);
         PlayerItem item = playerItemRepository.findByIdAndPlayerId(playerItemId, playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Предмет не найден"));
         if (item.isEquipped()) throw new IllegalStateException("Сначала снимите предмет");
@@ -81,13 +91,15 @@ public class ShopService {
         item.setAmount(item.getAmount() - amount);
         if (item.getAmount() == 0) { player.getInventory().remove(item); playerItemRepository.delete(item); }
         String result = "Продано: " + item.getTemplate().getName() + " x" + amount + " за " + price;
-        remember(playerId, operationId, "SELL", result);
+        remember(playerId, normalizedId, "SELL", requestHash, playerItemId, amount, result);
         auditService.record(player.getName(), playerId, "SALE", "SUCCESS", result);
         eventPublisher.publishEvent(new QuestProgressEvent(playerId, QuestType.TRADE, "SELL", amount));
-        return result;
+        return new TradeResultResponse(normalizedId, "SELL", playerItemId, amount, result, false);
     }
 
     private Player player(Long id) { return playerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Игрок не найден")); }
+    private Player lockedPlayer(Long id) { return playerRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalArgumentException("Игрок не найден")); }
     private void validateLocation(Player p) {
         if (p.isInCombat()) throw new IllegalStateException("Нельзя торговать во время боя");
         if (p.getCurrentLocation() == null || !MERCHANT_LOCATION_ID.equals(p.getCurrentLocation().getId()))
@@ -97,8 +109,26 @@ public class ShopService {
         if (id == null || id.isBlank() || id.length() > 100) throw new IllegalArgumentException("operationId is required");
         if (amount <= 0 || amount > 1000) throw new IllegalArgumentException("Некорректное количество");
     }
-    private void remember(Long playerId, String id, String type, String result) {
+    private void remember(Long playerId, String id, String type, String requestHash,
+                          Long resourceId, int amount, String result) {
         operationRepository.save(TradeOperation.builder().playerId(playerId).operationId(id).operationType(type)
+                .requestHash(requestHash).resourceId(resourceId).amount(amount)
                 .result(result).createdAt(Instant.now()).build());
+    }
+    private TradeResultResponse repeatedResult(TradeOperation operation, String type, String requestHash) {
+        if (!type.equals(operation.getOperationType()) || !requestHash.equals(operation.getRequestHash())) {
+            throw new IllegalStateException("operationId уже использован для другой торговой операции");
+        }
+        return new TradeResultResponse(operation.getOperationId(), operation.getOperationType(),
+                operation.getResourceId(), operation.getAmount(), operation.getResult(), true);
+    }
+    private String requestHash(String type, Long resourceId, int amount) {
+        String canonical = type + ':' + resourceId + ':' + amount;
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                    .digest(canonical.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 недоступен", exception);
+        }
     }
 }

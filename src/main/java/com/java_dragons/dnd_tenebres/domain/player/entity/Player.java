@@ -114,6 +114,7 @@ public class Player {
     public void restoreAfterDeath() {
         currentHp = Math.max(1, getMaxHp() / 2);
         currentMp = Math.max(0, getMaxMp() / 2);
+        normalizeResources();
     }
 
     public boolean spendGold(long amount) {
@@ -124,25 +125,29 @@ public class Player {
     }
 
     public void healToFull() {
-        this.currentHp = this.maxHp;
+        this.currentHp = this.getMaxHp();
     }
 
     public void buffMaxHp(int percent) {
         int bonus = (this.maxHp * percent) / 100;
         this.maxHp += bonus;
         this.currentHp += bonus;
+        normalizeResources();
     }
 
     public void takeDamage(int damage) {
+        normalizeResources();
         this.currentHp = Math.max(0, this.currentHp - damage);
     }
 
     public void removeEffect(EffectType type) {
         this.activeEffects.removeIf(e -> e.getType() == type);
+        normalizeResources();
     }
 
     public void clearEffects() {
         this.activeEffects.clear();
+        normalizeResources();
     }
 
     public boolean hasEffect(EffectType type) {
@@ -157,7 +162,6 @@ public class Player {
 
     public boolean canTakeShortRest() { return lastShortRestSequence != travelSequence; }
     public void markShortRestUsed() { this.lastShortRestSequence = this.travelSequence; }
-
     public void equipItem(Long playerItemId, EquipmentSlot targetSlot) {
         PlayerItem itemToEquip = this.inventory.stream()
                 .filter(item -> Objects.equals(item.getId(), playerItemId))
@@ -188,6 +192,7 @@ public class Player {
 
         itemToEquip.setEquipped(true);
         itemToEquip.setEquippedSlot(targetSlot);
+        normalizeResources();
     }
 
     private boolean isSlotCompatible(EquipmentSlot templateSlot, EquipmentSlot targetSlot) {
@@ -280,11 +285,13 @@ public class Player {
 
     public void heal(int amount) {
         if (amount < 0) throw new IllegalArgumentException("Количество лечения не может быть отрицательным");
+        normalizeResources();
         this.currentHp = Math.min(this.getMaxHp(), this.currentHp + amount);
     }
 
     public void restoreMp(int amount) {
         if (amount < 0) throw new IllegalArgumentException("Количество восстанавливаемой маны не может быть отрицательным");
+        normalizeResources();
         this.currentMp = Math.min(this.getMaxMp(), this.getCurrentMp() + amount);
     }
 
@@ -294,7 +301,7 @@ public class Player {
 
     public boolean spendMp(int amount) {
         if (amount < 0) throw new IllegalArgumentException("Расход маны не может быть отрицательным");
-        this.currentMp = this.getCurrentMp();
+        normalizeResources();
         if (this.currentMp >= amount) {
             this.currentMp -= amount;
             return true;
@@ -317,6 +324,7 @@ public class Player {
                         ),
                         () -> this.activeEffects.add(effect)
                 );
+        normalizeResources();
     }
 
     public void surviveAtOneHp() { this.currentHp = 1; }
@@ -352,6 +360,7 @@ public class Player {
                     item.setEquipped(false);
                     item.setEquippedSlot(EquipmentSlot.NONE);
                 });
+        normalizeResources();
     }
 
     public void levelUp(int baseHpForLevel, int baseMpForLevel) {
@@ -381,6 +390,7 @@ public class Player {
 
         this.stats.addStats(addStr, addDex, addCon, addInt, addWis, addCha);
         this.statPoints = Math.toIntExact(this.statPoints - totalCost);
+        normalizeResources();
     }
 
     public int getMaxHp() {
@@ -417,6 +427,15 @@ public class Player {
 
     public int getCurrentMp() {
         return Math.min(this.currentMp, this.getMaxMp());
+    }
+
+    public int getCurrentHp() {
+        return Math.min(this.currentHp, this.getMaxHp());
+    }
+
+    public void normalizeResources() {
+        this.currentHp = Math.max(0, Math.min(this.currentHp, this.getMaxHp()));
+        this.currentMp = Math.max(0, Math.min(this.currentMp, this.getMaxMp()));
     }
 
     public void enterCombat(Long monsterId) {

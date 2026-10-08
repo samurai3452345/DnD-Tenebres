@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.context.ApplicationEventPublisher;
 import com.java_dragons.dnd_tenebres.core.event.LocationVisitedEvent;
+import com.java_dragons.dnd_tenebres.core.event.ItemLootedEvent;
 import com.java_dragons.dnd_tenebres.core.random.RandomSource;
 
 @Slf4j
@@ -47,10 +48,12 @@ public class ExplorationService {
     private final ApplicationEventPublisher eventPublisher;
     private final RandomSource randomSource;
     private final com.java_dragons.dnd_tenebres.domain.location.service.LocationEffectService locationEffectService;
+    private final SearchAttemptService searchAttemptService;
 
     @Transactional
     public ExplorationReport travel(Long playerId, String targetLocationId) {
-        Player player = getPlayer(playerId);
+        Player player = playerRepository.findByIdForUpdate(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
         Location currentLocation = player.getCurrentLocation();
 
         if (player.isInCombat()) {
@@ -131,7 +134,8 @@ public class ExplorationService {
 
     @Transactional
     public ExplorationReport search(Long playerId) {
-        Player player = getPlayer(playerId);
+        Player player = playerRepository.findByIdForUpdate(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
         if (player.isInCombat()) {
             throw new IllegalStateException("Нельзя искать предметы, когда вас пытаются убить!");
@@ -139,17 +143,20 @@ public class ExplorationService {
 
         Location location = player.getCurrentLocation();
 
+        int remainingAttempts = searchAttemptService.consume(playerId, location.getId());
+
         // 1. Бросаем кубик на успешность обыска
         int roll = DiceRoller.rollD20();
         int searchDifficulty = locationEffectService.searchDifficulty(player, location.getSearchDifficulty());
         if (roll < searchDifficulty) {
-            return ExplorationReport.nothing("Вы ничего не нашли (Провал проверки обыска: " + roll + " < " + searchDifficulty + ").");
+            return ExplorationReport.nothing("Вы ничего не нашли (Провал проверки обыска: " + roll + " < "
+                    + searchDifficulty + "). Осталось попыток: " + remainingAttempts + '.');
         }
 
         List<LocationLootEntry> lootTable = locationLootEntryRepository.findByLocationId(location.getId());
 
         if (lootTable.isEmpty()) {
-            return ExplorationReport.nothing("Здесь абсолютно нечего искать.");
+            return ExplorationReport.nothing("Здесь абсолютно нечего искать. Осталось попыток: " + remainingAttempts + '.');
         }
 
         List<String> foundItemsList = new ArrayList<>();
@@ -157,9 +164,17 @@ public class ExplorationService {
 
         for (LocationLootEntry entry : lootTable) {
             if (DiceRoller.rollD100() <= entry.getFindChance()) {
-                int amount = randomSource.nextInt(entry.getMinAmount(), entry.getMaxAmount() + 1);
+                if (entry.getMinAmount() <= 0 || entry.getMaxAmount() < entry.getMinAmount()) {
+                    throw new IllegalStateException("Некорректный диапазон добычи в локации " + location.getId());
+                }
+                int amount = randomSource.nextInt(entry.getMinAmount(), Math.addExact(entry.getMaxAmount(), 1));
 
                 inventoryService.addItemToPlayer(player, entry.getItemTemplate().getName(), amount);
+                eventPublisher.publishEvent(new ItemLootedEvent(
+                        playerId,
+                        entry.getItemTemplate().getName(),
+                        amount
+                ));
 
                 String itemDisplay = entry.getItemTemplate().getName() + " (x" + amount + ")";
                 foundItemsList.add(itemDisplay);
@@ -168,11 +183,13 @@ public class ExplorationService {
         }
 
         if (foundItemsList.isEmpty()) {
-            return ExplorationReport.nothing("Вы тщательно осмотрели местность, но ничего интересного не попалось.");
+            return ExplorationReport.nothing("Вы тщательно осмотрели местность, но ничего интересного не попалось. Осталось попыток: "
+                    + remainingAttempts + '.');
         }
 
         foundItemsMsg.setLength(foundItemsMsg.length() - 2);
 
+        foundItemsMsg.append(". Осталось попыток: ").append(remainingAttempts).append('.');
         return ExplorationReport.loot(foundItemsMsg.toString(), foundItemsList);
     }
 

@@ -17,7 +17,7 @@ public class LocationClearService {
     }
 
     @Transactional
-    public void markLocationAsCleared(Long playerId, String locationId) {
+    public boolean markLocationAsCleared(Long playerId, String locationId) {
         if (!isLocationCleared(playerId, locationId)) {
             clearedLocationRepository.save(
                     PlayerClearedLocation.builder()
@@ -25,6 +25,8 @@ public class LocationClearService {
                             .locationId(locationId)
                             .build()
             );
+            return true;
         }
+        return false;
     }
 }

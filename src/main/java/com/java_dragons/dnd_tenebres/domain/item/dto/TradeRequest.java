@@ -1,6 +1,7 @@
 package com.java_dragons.dnd_tenebres.domain.item.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ public class TradeRequest {
             String templateName,
 
             @Positive(message = "Количество должно быть больше нуля")
+            @Max(value = 1000, message = "Количество не должно превышать 1000")
             int amount
     ) {}
 
@@ -28,6 +30,7 @@ public class TradeRequest {
             Long offerId,
 
             @Positive(message = "Количество должно быть больше нуля")
+            @Max(value = 1000, message = "Количество не должно превышать 1000")
             int amount
     ) {}
 
@@ -40,6 +43,7 @@ public class TradeRequest {
             Long playerItemId,
 
             @Positive(message = "Количество должно быть больше нуля")
+            @Max(value = 1000, message = "Количество не должно превышать 1000")
             int amount
     ) {}
 }

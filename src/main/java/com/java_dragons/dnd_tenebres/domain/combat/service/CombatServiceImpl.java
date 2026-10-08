@@ -69,6 +69,7 @@ public class CombatServiceImpl implements CombatService {
     private final com.java_dragons.dnd_tenebres.core.config.GameBalanceProperties balance;
     private final com.java_dragons.dnd_tenebres.domain.economy.service.WalletService walletService;
     private final com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterAiStrategy monsterAiStrategy;
+    private final SpellManaCostCalculator manaCostCalculator;
 
     @Autowired
     public CombatServiceImpl(DamageCalculator damageCalculator,
@@ -86,7 +87,8 @@ public class CombatServiceImpl implements CombatService {
                              com.java_dragons.dnd_tenebres.core.random.RandomSource randomSource,
                              com.java_dragons.dnd_tenebres.core.config.GameBalanceProperties balance,
                              com.java_dragons.dnd_tenebres.domain.economy.service.WalletService walletService,
-                             com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterAiStrategy monsterAiStrategy) {
+                             com.java_dragons.dnd_tenebres.domain.monster.strategy.MonsterAiStrategy monsterAiStrategy,
+                             SpellManaCostCalculator manaCostCalculator) {
 
         this.damageCalculator = damageCalculator;
         this.passiveStrategies = itemStrategies.stream()
@@ -109,6 +111,7 @@ public class CombatServiceImpl implements CombatService {
         this.balance = balance;
         this.walletService = walletService;
         this.monsterAiStrategy = monsterAiStrategy;
+        this.manaCostCalculator = manaCostCalculator;
     }
 
     @Override
@@ -206,13 +209,12 @@ public class CombatServiceImpl implements CombatService {
             spellToCast = spellOpt.get();
         }
 
-        int manaCost = spellToCast.getManaCost();
+        int manaCost = manaCostCalculator.calculate(player, spellToCast, weapon);
         if (player.getCurrentLocation() != null
                 && player.getCurrentLocation().getEffect() == com.java_dragons.dnd_tenebres.domain.location.model.LocationEffect.ANTI_MAGIC_FIELD) {
-            manaCost *= 2;
-            events.add(new CombatEvent("Локация", "ANTI_MAGIC", player.getName(), manaCost, "Антимагическое поле удвоило стоимость"));
+            events.add(new CombatEvent("Локация", "ANTI_MAGIC", player.getName(), manaCost,
+                    "Антимагическое поле увеличило стоимость заклинания"));
         }
-        if (weaponEffect == MagicWeaponEffect.MANA_DISCOUNT) manaCost = (int) (manaCost * 0.8);
 
         if (!player.spendMp(manaCost)) {
             events.add(new CombatEvent(player.getName(), "FAIL", monster.getName(), 0, "Недостаточно маны"));
@@ -536,10 +538,11 @@ public class CombatServiceImpl implements CombatService {
         if (aliveEnemyCount <= 1 && player.getCurrentLocation() != null) {
             String locationId = player.getCurrentLocation().getId();
 
-            locationClearService.markLocationAsCleared(player.getId(), locationId);
-
-            applicationEventPublisher.publishEvent(new LocationClearedEvent(player.getId(), locationId));
-            events.add(new CombatEvent("Система", "ROOM_CLEARED", player.getName(), 0, "Врагов больше нет. Локация зачищена!"));
+            if (locationClearService.markLocationAsCleared(player.getId(), locationId)) {
+                applicationEventPublisher.publishEvent(new LocationClearedEvent(player.getId(), locationId));
+                events.add(new CombatEvent("Система", "ROOM_CLEARED", player.getName(), 0,
+                        "Врагов больше нет. Локация зачищена!"));
+            }
         }
 
         return new CombatReport(round, events, true, false);
