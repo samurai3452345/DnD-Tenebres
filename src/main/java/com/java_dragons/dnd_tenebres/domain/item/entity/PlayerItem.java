@@ -9,7 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "player_items")
+@Table(name = "player_items", uniqueConstraints = @UniqueConstraint(
+        name = "uq_equipped_slot_key", columnNames = {"player_id", "equipped_slot_key"}))
 @Getter
 @Setter
 @Builder
@@ -44,6 +45,9 @@ public class PlayerItem {
     @Column(name = "equipped_slot", nullable = false)
     @Builder.Default
     private EquipmentSlot equippedSlot = EquipmentSlot.NONE;
+
+    @Column(name = "equipped_slot_key", length = 50)
+    private String equippedSlotKey;
 
     @Column(name = "bonus_strength", nullable = false)
     private int bonusStrength;
@@ -100,5 +104,11 @@ public class PlayerItem {
     public int getTotalDiceCount() {
         if (this.template.getDiceCount() == 0) return 0;
         return this.template.getDiceCount() + (this.tier - 1);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void synchronizeEquippedSlotKey() {
+        equippedSlotKey = isEquipped && equippedSlot != EquipmentSlot.NONE ? equippedSlot.name() : null;
     }
 }

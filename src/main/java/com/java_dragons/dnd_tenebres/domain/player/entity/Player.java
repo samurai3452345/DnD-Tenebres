@@ -36,7 +36,7 @@ public class Player {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "account_id")
+    @Column(name = "account_id", nullable = false)
     private Long accountId;
 
     @Builder.Default

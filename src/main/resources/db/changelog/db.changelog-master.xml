@@ -47,6 +47,7 @@
     <include file="/db/changelog/040-clean-up-orphaned-combat-encounters.xml"/>
     <include file="/db/changelog/041-harden-account-and-forge.xml"/>
     <include file="/db/changelog/042-gameplay-consistency.xml"/>
+    <include file="/db/changelog/043-database-integrity.xml"/>
 
 
 </databaseChangeLog>

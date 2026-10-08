@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="043-01-account-owner-and-resource-normalization" author="codex">
+        <preConditions onFail="HALT" onError="HALT">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM players WHERE account_id IS NULL</sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE players
+               SET max_hp = GREATEST(max_hp, 1),
+                   current_hp = GREATEST(current_hp, 0),
+                   max_mp = GREATEST(max_mp, 0),
+                   current_mp = GREATEST(0, LEAST(current_mp, GREATEST(max_mp, 0)))
+        </sql>
+        <addNotNullConstraint tableName="players" columnName="account_id" columnDataType="BIGINT"/>
+        <rollback>
+            <dropNotNullConstraint tableName="players" columnName="account_id" columnDataType="BIGINT"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="043-02-domain-check-constraints" author="codex">
+        <sql splitStatements="true">
+            ALTER TABLE players ADD CONSTRAINT ck_players_resources CHECK
+                (level &gt;= 1 AND experience &gt;= 0 AND gold &gt;= 0 AND max_hp &gt;= 1
+                 AND current_hp &gt;= 0 AND max_mp &gt;= 0 AND current_mp &gt;= 0 AND stat_points &gt;= 0);
+            ALTER TABLE players ADD CONSTRAINT ck_players_base_stats CHECK
+                (stat_str BETWEEN 1 AND 30 AND stat_dex BETWEEN 1 AND 30 AND stat_con BETWEEN 1 AND 30
+                 AND stat_int BETWEEN 1 AND 30 AND stat_wis BETWEEN 1 AND 30 AND stat_cha BETWEEN 1 AND 30);
+            ALTER TABLE player_items ADD CONSTRAINT ck_player_items_values CHECK
+                (amount &gt; 0 AND item_xp &gt;= 0 AND tier &gt;= 1 AND durability &gt;= 0);
+            ALTER TABLE monster_loot_tables ADD CONSTRAINT ck_monster_loot_values CHECK
+                (min_amount &gt; 0 AND max_amount &gt;= min_amount AND drop_chance BETWEEN 0 AND 100);
+            ALTER TABLE location_loot_tables ADD CONSTRAINT ck_location_loot_values CHECK
+                (min_amount &gt; 0 AND max_amount &gt;= min_amount AND find_chance BETWEEN 0 AND 100);
+            ALTER TABLE location_random_encounters ADD CONSTRAINT ck_random_encounter_weight CHECK (spawn_chance &gt; 0);
+            ALTER TABLE merchant_offers ADD CONSTRAINT ck_merchant_offer_values CHECK
+                (unit_price &gt;= 0 AND available_quantity &gt;= -1 AND min_level &gt;= 1);
+            ALTER TABLE quest_templates ADD CONSTRAINT ck_quest_template_values CHECK
+                (target_count &gt; 0 AND reward_xp &gt;= 0 AND reward_gold &gt;= 0
+                 AND min_level &gt;= 1 AND reward_item_amount &gt;= 0);
+            ALTER TABLE player_quests ADD CONSTRAINT ck_player_quest_progress CHECK (current_progress &gt;= 0);
+            ALTER TABLE combat_encounters ADD CONSTRAINT ck_combat_encounter_round CHECK (round &gt;= 1);
+            ALTER TABLE combat_log_entries ADD CONSTRAINT ck_combat_log_round CHECK (round &gt;= 1);
+            ALTER TABLE player_location_search_states ADD CONSTRAINT ck_search_attempts CHECK
+                (remaining_attempts BETWEEN 0 AND 10);
+            ALTER TABLE trade_operations ADD CONSTRAINT ck_trade_operation_amount CHECK (amount BETWEEN 1 AND 1000);
+            ALTER TABLE forge_operations ADD CONSTRAINT ck_forge_operation_values CHECK
+                (gained_xp &gt;= 0 AND resulting_xp &gt;= 0 AND resulting_tier &gt;= 1);
+        </sql>
+        <rollback>
+            <sql splitStatements="true">
+                ALTER TABLE forge_operations DROP CONSTRAINT ck_forge_operation_values;
+                ALTER TABLE trade_operations DROP CONSTRAINT ck_trade_operation_amount;
+                ALTER TABLE player_location_search_states DROP CONSTRAINT ck_search_attempts;
+                ALTER TABLE combat_log_entries DROP CONSTRAINT ck_combat_log_round;
+                ALTER TABLE combat_encounters DROP CONSTRAINT ck_combat_encounter_round;
+                ALTER TABLE player_quests DROP CONSTRAINT ck_player_quest_progress;
+                ALTER TABLE quest_templates DROP CONSTRAINT ck_quest_template_values;
+                ALTER TABLE merchant_offers DROP CONSTRAINT ck_merchant_offer_values;
+                ALTER TABLE location_random_encounters DROP CONSTRAINT ck_random_encounter_weight;
+                ALTER TABLE location_loot_tables DROP CONSTRAINT ck_location_loot_values;
+                ALTER TABLE monster_loot_tables DROP CONSTRAINT ck_monster_loot_values;
+                ALTER TABLE player_items DROP CONSTRAINT ck_player_items_values;
+                ALTER TABLE players DROP CONSTRAINT ck_players_base_stats;
+                ALTER TABLE players DROP CONSTRAINT ck_players_resources;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="043-03-stable-content-foreign-keys" author="codex">
+        <addColumn tableName="location_fixed_monsters">
+            <column name="monster_template_id" type="BIGINT"/>
+        </addColumn>
+        <addColumn tableName="location_random_encounters">
+            <column name="monster_template_id" type="BIGINT"/>
+        </addColumn>
+        <sql>
+            UPDATE location_fixed_monsters encounter
+               SET monster_template_id = (SELECT template.id FROM monster_templates template
+                                            WHERE template.name = encounter.monster_template_name);
+            UPDATE location_random_encounters encounter
+               SET monster_template_id = (SELECT template.id FROM monster_templates template
+                                            WHERE template.name = encounter.monster_template_name)
+        </sql>
+        <addNotNullConstraint tableName="location_fixed_monsters" columnName="monster_template_id" columnDataType="BIGINT"/>
+        <addNotNullConstraint tableName="location_random_encounters" columnName="monster_template_id" columnDataType="BIGINT"/>
+        <addForeignKeyConstraint baseTableName="location_fixed_monsters" baseColumnNames="monster_template_id"
+                                 referencedTableName="monster_templates" referencedColumnNames="id"
+                                 constraintName="fk_fixed_monster_template"/>
+        <addForeignKeyConstraint baseTableName="location_random_encounters" baseColumnNames="monster_template_id"
+                                 referencedTableName="monster_templates" referencedColumnNames="id"
+                                 constraintName="fk_random_monster_template"/>
+        <dropColumn tableName="location_fixed_monsters" columnName="monster_template_name"/>
+        <dropColumn tableName="location_random_encounters" columnName="monster_template_name"/>
+        <addForeignKeyConstraint baseTableName="merchant_offers" baseColumnNames="location_id"
+                                 referencedTableName="locations" referencedColumnNames="id"
+                                 constraintName="fk_merchant_offer_location"/>
+        <addForeignKeyConstraint baseTableName="quest_templates" baseColumnNames="accept_location_id"
+                                 referencedTableName="locations" referencedColumnNames="id"
+                                 constraintName="fk_quest_accept_location"/>
+        <addForeignKeyConstraint baseTableName="quest_templates" baseColumnNames="turn_in_location_id"
+                                 referencedTableName="locations" referencedColumnNames="id"
+                                 constraintName="fk_quest_turn_in_location"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="quest_templates" constraintName="fk_quest_turn_in_location"/>
+            <dropForeignKeyConstraint baseTableName="quest_templates" constraintName="fk_quest_accept_location"/>
+            <dropForeignKeyConstraint baseTableName="merchant_offers" constraintName="fk_merchant_offer_location"/>
+            <addColumn tableName="location_fixed_monsters"><column name="monster_template_name" type="VARCHAR(255)"/></addColumn>
+            <addColumn tableName="location_random_encounters"><column name="monster_template_name" type="VARCHAR(255)"/></addColumn>
+            <sql>
+                UPDATE location_fixed_monsters encounter
+                   SET monster_template_name = (SELECT template.name FROM monster_templates template
+                                                 WHERE template.id = encounter.monster_template_id);
+                UPDATE location_random_encounters encounter
+                   SET monster_template_name = (SELECT template.name FROM monster_templates template
+                                                 WHERE template.id = encounter.monster_template_id)
+            </sql>
+            <addNotNullConstraint tableName="location_fixed_monsters" columnName="monster_template_name" columnDataType="VARCHAR(255)"/>
+            <addNotNullConstraint tableName="location_random_encounters" columnName="monster_template_name" columnDataType="VARCHAR(255)"/>
+            <dropForeignKeyConstraint baseTableName="location_random_encounters" constraintName="fk_random_monster_template"/>
+            <dropForeignKeyConstraint baseTableName="location_fixed_monsters" constraintName="fk_fixed_monster_template"/>
+            <dropColumn tableName="location_random_encounters" columnName="monster_template_id"/>
+            <dropColumn tableName="location_fixed_monsters" columnName="monster_template_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="043-04-query-indexes" author="codex">
+        <createIndex tableName="player_items" indexName="idx_player_items_player"><column name="player_id"/></createIndex>
+        <createIndex tableName="player_quests" indexName="idx_player_quests_player_status">
+            <column name="player_id"/><column name="status"/>
+        </createIndex>
+        <createIndex tableName="combat_encounters" indexName="idx_encounters_player_created">
+            <column name="player_id"/><column name="created_at" descending="true"/>
+        </createIndex>
+        <rollback>
+            <dropIndex tableName="combat_encounters" indexName="idx_encounters_player_created"/>
+            <dropIndex tableName="player_quests" indexName="idx_player_quests_player_status"/>
+            <dropIndex tableName="player_items" indexName="idx_player_items_player"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="043-05-preserve-audit-history" author="codex">
+        <addColumn tableName="wallet_transactions"><column name="player_name" type="VARCHAR(50)"/></addColumn>
+        <addColumn tableName="wallet_transactions"><column name="player_reference_id" type="BIGINT"/></addColumn>
+        <addColumn tableName="combat_encounters"><column name="player_name" type="VARCHAR(50)"/></addColumn>
+        <addColumn tableName="combat_encounters"><column name="player_reference_id" type="BIGINT"/></addColumn>
+        <sql>
+            UPDATE wallet_transactions AS tx
+               SET player_name = (SELECT player.name FROM players player WHERE player.id = tx.player_id),
+                   player_reference_id = tx.player_id;
+            UPDATE combat_encounters encounter
+               SET player_name = (SELECT player.name FROM players player WHERE player.id = encounter.player_id),
+                   player_reference_id = encounter.player_id
+        </sql>
+        <addNotNullConstraint tableName="wallet_transactions" columnName="player_name" columnDataType="VARCHAR(50)"/>
+        <addNotNullConstraint tableName="wallet_transactions" columnName="player_reference_id" columnDataType="BIGINT"/>
+        <addNotNullConstraint tableName="combat_encounters" columnName="player_name" columnDataType="VARCHAR(50)"/>
+        <addNotNullConstraint tableName="combat_encounters" columnName="player_reference_id" columnDataType="BIGINT"/>
+        <dropForeignKeyConstraint baseTableName="wallet_transactions" constraintName="fk_wallet_player"/>
+        <dropForeignKeyConstraint baseTableName="combat_encounters" constraintName="fk_encounter_player"/>
+        <dropNotNullConstraint tableName="wallet_transactions" columnName="player_id" columnDataType="BIGINT"/>
+        <dropNotNullConstraint tableName="combat_encounters" columnName="player_id" columnDataType="BIGINT"/>
+        <addForeignKeyConstraint baseTableName="wallet_transactions" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_wallet_player" onDelete="SET NULL"/>
+        <addForeignKeyConstraint baseTableName="combat_encounters" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_encounter_player" onDelete="SET NULL"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="combat_encounters" constraintName="fk_encounter_player"/>
+            <dropForeignKeyConstraint baseTableName="wallet_transactions" constraintName="fk_wallet_player"/>
+            <addNotNullConstraint tableName="combat_encounters" columnName="player_id" columnDataType="BIGINT"/>
+            <addNotNullConstraint tableName="wallet_transactions" columnName="player_id" columnDataType="BIGINT"/>
+            <addForeignKeyConstraint baseTableName="combat_encounters" baseColumnNames="player_id"
+                                     referencedTableName="players" referencedColumnNames="id"
+                                     constraintName="fk_encounter_player" onDelete="CASCADE"/>
+            <addForeignKeyConstraint baseTableName="wallet_transactions" baseColumnNames="player_id"
+                                     referencedTableName="players" referencedColumnNames="id"
+                                     constraintName="fk_wallet_player" onDelete="CASCADE"/>
+            <dropColumn tableName="combat_encounters" columnName="player_name"/>
+            <dropColumn tableName="combat_encounters" columnName="player_reference_id"/>
+            <dropColumn tableName="wallet_transactions" columnName="player_name"/>
+            <dropColumn tableName="wallet_transactions" columnName="player_reference_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="043-06-portable-unique-state-keys" author="codex">
+        <addColumn tableName="combat_encounters"><column name="active_player_key" type="BIGINT"/></addColumn>
+        <addColumn tableName="player_quests"><column name="active_quest_key" type="BOOLEAN"/></addColumn>
+        <addColumn tableName="player_items"><column name="equipped_slot_key" type="VARCHAR(50)"/></addColumn>
+        <sql>
+            UPDATE combat_encounters SET active_player_key = player_id WHERE status = 'ACTIVE';
+            UPDATE player_quests SET active_quest_key = true WHERE status IN ('ACTIVE', 'COMPLETED');
+            UPDATE player_items SET equipped_slot_key = equipped_slot
+             WHERE is_equipped = true AND equipped_slot != 'NONE'
+        </sql>
+        <addUniqueConstraint tableName="combat_encounters" columnNames="active_player_key"
+                             constraintName="uq_active_encounter_key"/>
+        <addForeignKeyConstraint baseTableName="combat_encounters" baseColumnNames="active_player_key"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_active_encounter_player_key" onDelete="SET NULL"/>
+        <addUniqueConstraint tableName="player_quests" columnNames="player_id,quest_template_id,active_quest_key"
+                             constraintName="uq_active_quest_key"/>
+        <addUniqueConstraint tableName="player_items" columnNames="player_id,equipped_slot_key"
+                             constraintName="uq_equipped_slot_key"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="combat_encounters"
+                                      constraintName="fk_active_encounter_player_key"/>
+            <dropUniqueConstraint tableName="player_items" constraintName="uq_equipped_slot_key"/>
+            <dropUniqueConstraint tableName="player_quests" constraintName="uq_active_quest_key"/>
+            <dropUniqueConstraint tableName="combat_encounters" constraintName="uq_active_encounter_key"/>
+            <dropColumn tableName="player_items" columnName="equipped_slot_key"/>
+            <dropColumn tableName="player_quests" columnName="active_quest_key"/>
+            <dropColumn tableName="combat_encounters" columnName="active_player_key"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="043-07-drop-postgresql-only-state-indexes" author="codex" dbms="postgresql">
+        <sql>
+            DROP INDEX IF EXISTS uq_active_encounter_player;
+            DROP INDEX IF EXISTS uq_player_active_quest;
+            DROP INDEX IF EXISTS uq_player_equipped_slot
+        </sql>
+        <rollback>
+            <sql>
+                CREATE UNIQUE INDEX uq_active_encounter_player ON combat_encounters(player_id) WHERE status = 'ACTIVE';
+                CREATE UNIQUE INDEX uq_player_active_quest ON player_quests(player_id, quest_template_id)
+                    WHERE status IN ('ACTIVE', 'COMPLETED');
+                CREATE UNIQUE INDEX uq_player_equipped_slot ON player_items(player_id, equipped_slot)
+                    WHERE is_equipped = true AND equipped_slot != 'NONE'
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

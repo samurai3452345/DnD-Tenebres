@@ -21,7 +21,9 @@ public class WalletService {
         save(player, -amount, before, reason, type, id); return player.getGold();
     }
     private void save(Player p, long amount, long before, WalletReason reason, String type, String ref) {
-        repository.save(WalletTransaction.builder().playerId(p.getId()).amount(amount).balanceBefore(before)
+        repository.save(WalletTransaction.builder().playerId(p.getId()).playerName(p.getName())
+                .playerReferenceId(p.getId())
+                .amount(amount).balanceBefore(before)
                 .balanceAfter(p.getGold()).reason(reason).referenceType(type).referenceId(ref).createdAt(Instant.now()).build());
     }
 }

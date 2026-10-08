@@ -10,7 +10,8 @@ import java.time.Instant;
 import java.util.*;
 
 @Entity
-@Table(name = "combat_encounters")
+@Table(name = "combat_encounters", uniqueConstraints =
+        @UniqueConstraint(name = "uq_active_encounter_key", columnNames = "active_player_key"))
 @Getter
 @Builder
 @NoArgsConstructor
@@ -21,9 +22,15 @@ public class CombatEncounter {
     private Long id;
     @Version
     private Integer version;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id")
     private Player player;
+    @Column(name = "player_name", nullable = false, length = 50)
+    private String playerName;
+    @Column(name = "player_reference_id", nullable = false)
+    private Long playerReferenceId;
+    @Column(name = "active_player_key")
+    private Long activePlayerKey;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EncounterStatus status;
@@ -40,7 +47,8 @@ public class CombatEncounter {
     private List<CombatParticipant> participants = new ArrayList<>();
 
     public static CombatEncounter start(Player player, EncounterReason reason) {
-        return CombatEncounter.builder().player(player).status(EncounterStatus.ACTIVE).reason(reason)
+        return CombatEncounter.builder().player(player).playerName(player.getName()).playerReferenceId(player.getId())
+                .activePlayerKey(player.getId()).status(EncounterStatus.ACTIVE).reason(reason)
                 .round(1).createdAt(Instant.now()).build();
     }
 
@@ -61,5 +69,14 @@ public class CombatEncounter {
         if (status != EncounterStatus.ACTIVE) throw new IllegalStateException("Encounter already finished");
         if (result == EncounterStatus.ACTIVE) throw new IllegalArgumentException("Invalid terminal status");
         status = result;
+        activePlayerKey = null;
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void synchronizeHistoricalKeys() {
+        if (player != null && playerName == null) playerName = player.getName();
+        if (player != null && playerReferenceId == null) playerReferenceId = player.getId();
+        activePlayerKey = status == EncounterStatus.ACTIVE && player != null ? player.getId() : null;
     }
 }
