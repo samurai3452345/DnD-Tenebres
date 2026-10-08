@@ -21,7 +21,7 @@ public class PlayerProgressionService {
             int nextLevel = player.getLevel() + 1;
             player.levelUp(
                     progressionCalculator.getHeroBaseHp(nextLevel),
-                    progressionCalculator.calculateMaxMp(nextLevel, player.getTotalIntelligence()));
+                    progressionCalculator.getHeroBaseMp(nextLevel));
         }
         return new LevelUpResult(amount, oldLevel, player.getLevel(), player.getStatPoints() - oldPoints);
     }

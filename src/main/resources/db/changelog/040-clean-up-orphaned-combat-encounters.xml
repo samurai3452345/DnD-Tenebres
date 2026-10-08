@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="040-clean-up-orphaned-combat-encounters" author="codex">
+        <comment>Close encounters left active by the deprecated combat turn endpoint.</comment>
+        <sql>
+            UPDATE combat_encounters encounter
+            SET status = 'CANCELLED'
+            WHERE encounter.status = 'ACTIVE'
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM players player
+                  JOIN combat_participants participant
+                    ON participant.encounter_id = encounter.id
+                   AND participant.status = 'ACTIVE'
+                  WHERE player.id = encounter.player_id
+                    AND player.active_combat_monster_id = participant.monster_id
+              );
+
+            UPDATE players player
+            SET active_combat_monster_id = NULL
+            WHERE player.active_combat_monster_id IS NOT NULL
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM combat_encounters encounter
+                  JOIN combat_participants participant
+                    ON participant.encounter_id = encounter.id
+                   AND participant.status = 'ACTIVE'
+                  WHERE encounter.player_id = player.id
+                    AND encounter.status = 'ACTIVE'
+                    AND participant.monster_id = player.active_combat_monster_id
+              );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

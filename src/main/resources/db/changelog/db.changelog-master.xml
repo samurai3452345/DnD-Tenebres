@@ -43,6 +43,8 @@
     <include file="/db/changelog/036-add-location-zone-names.xml"/>
     <include file="/db/changelog/037-refine-location-zone-names.xml"/>
     <include file="/db/changelog/038-rename-green-forest-zone.xml"/>
+    <include file="/db/changelog/039-normalize-player-mana.xml"/>
+    <include file="/db/changelog/040-clean-up-orphaned-combat-encounters.xml"/>
 
 
 </databaseChangeLog>

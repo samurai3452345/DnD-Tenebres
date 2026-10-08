@@ -1,47 +1,55 @@
-import { useState } from 'react';
-import { combatApi } from '../api/combatApi';
-import type { CombatTurnRequest, CombatAction, CombatEvent } from '../types/combat';
+import { useCallback, useState } from "react";
+
+import { combatApi } from "../api/combatApi";
+import type { CombatActionRequest, CombatState } from "../types/combat";
 
 export function useCombat() {
     const [loading, setLoading] = useState(false);
-    const [events, setEvents] = useState<CombatEvent[]>([]);
-    const [round, setRound] = useState(1);
-    const [isPlayerDead, setIsPlayerDead] = useState(false);
-    const [isEnemyDead, setIsEnemyDead] = useState(false);
+    const [state, setState] = useState<CombatState | null>(null);
+    const [lastEnemyName, setLastEnemyName] = useState<string | null>(null);
 
-    const executeTurn = async (monsterId: number, action: CombatAction, actionTargetName?: string) => {
+    const rememberState = useCallback((nextState: CombatState) => {
+        setState(nextState);
+        if (nextState.currentEnemy?.name) {
+            setLastEnemyName(nextState.currentEnemy.name);
+        }
+        return nextState;
+    }, []);
+
+    const loadCurrent = useCallback(async () => {
         setLoading(true);
         try {
-            const request: CombatTurnRequest = {
-                monsterId,
-                round,
-                aliveEnemyCount: 1, // Для MVP считаем, что враг один
-                action,
-                actionTargetName: actionTargetName || null
-            };
-
-            const report = await combatApi.executeTurn(request);
-
-            setEvents(prev => [...prev, ...report.events]);
-            setRound(report.round + 1);
-            setIsPlayerDead(report.isPlayerDead);
-            setIsEnemyDead(report.isEnemyDead);
-
-            return report;
-        } catch (err: any) {
-            console.error("Ошибка боя:", err);
-            setEvents(prev => [...prev, { actor: 'Система', actionType: 'ERROR', target: '', value: 0, description: 'Ошибка сервера при выполнении хода' }]);
+            return rememberState(await combatApi.current());
         } finally {
             setLoading(false);
         }
-    };
+    }, [rememberState]);
 
-    const resetCombat = () => {
-        setEvents([]);
-        setRound(1);
-        setIsPlayerDead(false);
-        setIsEnemyDead(false);
-    };
+    const executeAction = useCallback(async (request: CombatActionRequest) => {
+        setLoading(true);
+        try {
+            return rememberState(await combatApi.executeAction(request));
+        } finally {
+            setLoading(false);
+        }
+    }, [rememberState]);
 
-    return { loading, events, round, isPlayerDead, isEnemyDead, executeTurn, resetCombat };
+    const adoptState = useCallback((nextState: CombatState) => {
+        return rememberState(nextState);
+    }, [rememberState]);
+
+    const resetCombat = useCallback(() => {
+        setState(null);
+        setLastEnemyName(null);
+    }, []);
+
+    return {
+        loading,
+        state,
+        enemyName: state?.currentEnemy?.name ?? lastEnemyName ?? "Неизвестный противник",
+        loadCurrent,
+        executeAction,
+        adoptState,
+        resetCombat,
+    };
 }

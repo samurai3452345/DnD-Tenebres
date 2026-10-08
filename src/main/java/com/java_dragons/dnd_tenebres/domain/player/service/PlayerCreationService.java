@@ -65,16 +65,18 @@ public class PlayerCreationService {
                 request.charisma());
 
         int initialHp = progressionCalculator.getHeroBaseHp(1);
-        int initialMp = progressionCalculator.calculateMaxMp(1, request.intelligence());
+        int initialBaseMp = progressionCalculator.getHeroBaseMp(1);
 
-        return Player.builder()
+        Player player = Player.builder()
                 .name(characterName)
                 .accountId(accountId)
                 .stats(stats)
                 .maxHp(initialHp)
                 .currentHp(initialHp)
-                .maxMp(initialMp)
-                .currentMp(initialMp)
+                .maxMp(initialBaseMp)
+                .currentMp(0)
                 .build();
+        player.restoreMpToFull();
+        return player;
     }
 }

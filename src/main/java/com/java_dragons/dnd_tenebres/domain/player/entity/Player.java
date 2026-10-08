@@ -285,11 +285,16 @@ public class Player {
 
     public void restoreMp(int amount) {
         if (amount < 0) throw new IllegalArgumentException("Количество восстанавливаемой маны не может быть отрицательным");
-        this.currentMp = Math.min(this.maxMp, this.currentMp + amount);
+        this.currentMp = Math.min(this.getMaxMp(), this.getCurrentMp() + amount);
+    }
+
+    public void restoreMpToFull() {
+        this.currentMp = this.getMaxMp();
     }
 
     public boolean spendMp(int amount) {
         if (amount < 0) throw new IllegalArgumentException("Расход маны не может быть отрицательным");
+        this.currentMp = this.getCurrentMp();
         if (this.currentMp >= amount) {
             this.currentMp -= amount;
             return true;
@@ -402,6 +407,10 @@ public class Player {
         }
 
         return Math.max(0, calculatedMp);
+    }
+
+    public int getCurrentMp() {
+        return Math.min(this.currentMp, this.getMaxMp());
     }
 
     public void enterCombat(Long monsterId) {
