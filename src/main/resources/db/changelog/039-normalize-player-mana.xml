@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="039-normalize-player-mana" author="codex">
+        <sql>
+            UPDATE players
+            SET max_mp = CASE level
+                WHEN 1 THEN 20
+                WHEN 2 THEN 30
+                WHEN 3 THEN 42
+                WHEN 4 THEN 54
+                WHEN 5 THEN 68
+                WHEN 6 THEN 82
+                WHEN 7 THEN 98
+                WHEN 8 THEN 114
+                WHEN 9 THEN 132
+                WHEN 10 THEN 150
+                WHEN 11 THEN 170
+                WHEN 12 THEN 190
+                WHEN 13 THEN 212
+                WHEN 14 THEN 234
+                WHEN 15 THEN 258
+                WHEN 16 THEN 282
+                ELSE max_mp
+            END
+        </sql>
+    </changeSet>
+</databaseChangeLog>

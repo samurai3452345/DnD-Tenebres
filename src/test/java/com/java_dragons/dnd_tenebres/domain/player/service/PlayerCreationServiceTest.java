@@ -1,20 +1,17 @@
 package com.java_dragons.dnd_tenebres.domain.player.service;
 
 import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculator;
+import com.java_dragons.dnd_tenebres.core.math.ProgressionCalculatorImpl;
 import com.java_dragons.dnd_tenebres.domain.player.dto.PlayerCreationRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class PlayerCreationServiceTest {
 
     @Test
     void связываетНовогоПерсонажаСАккаунтом() {
-        ProgressionCalculator progression = mock(ProgressionCalculator.class);
-        when(progression.getHeroBaseHp(1)).thenReturn(10);
-        when(progression.calculateMaxMp(1, 8)).thenReturn(4);
+        ProgressionCalculator progression = new ProgressionCalculatorImpl();
         PlayerCreationService service = new PlayerCreationService(progression);
 
         var player = service.createCharacter(
@@ -24,5 +21,12 @@ class PlayerCreationServiceTest {
 
         assertThat(player.getAccountId()).isEqualTo(7L);
         assertThat(player.getName()).isEqualTo("Герой");
+        assertThat(player.getCurrentMp()).isEqualTo(17);
+        assertThat(player.getMaxMp()).isEqualTo(17);
+
+        player.levelUp(progression.getHeroBaseHp(2), progression.getHeroBaseMp(2));
+
+        assertThat(player.getCurrentMp()).isEqualTo(24);
+        assertThat(player.getMaxMp()).isEqualTo(24);
     }
 }

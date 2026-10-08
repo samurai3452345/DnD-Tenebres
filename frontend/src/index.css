@@ -622,8 +622,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .character-selection__list {
     position: absolute;
     top: 27.4%;
-    left: 26.35%;
-    width: 47.3%;
+    left: 19.25%;
+    width: 61.5%;
     height: 54.7%;
     display: flex;
     flex-direction: column;
@@ -642,8 +642,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .character-card {
     position: relative;
     flex: 0 0 clamp(8.7rem, 21svh, 11.5rem);
-    width: 100%;
-    overflow: hidden;
+    width: 76.923%;
+    align-self: center;
+    overflow: visible;
     color: #e9c884;
 }
 
@@ -657,6 +658,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     object-fit: contain;
     pointer-events: none;
     user-select: none;
+    transform: scaleX(1.2);
 }
 
 .character-card__value {
@@ -842,7 +844,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
         width: min(160vw, calc(98svh * 1.7779));
         transform: translate(50%, -50%);
     }
-    .character-selection__list { left: 25.6%; width: 48.7%; }
+    .character-selection__list { left: 18.35%; width: 63.3%; }
     .character-card__value { font-size: clamp(.58rem, 2.2vw, .88rem); }
     .character-card__name { font-size: clamp(.62rem, 2.45vw, .96rem); }
     .character-selection__create { font-size: clamp(.68rem, 3vw, 1rem); }
@@ -1236,6 +1238,142 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-modal__close { width: 100%; margin-top: 1rem; }
 .game-combat { z-index: 19; }
 .game-combat > button { margin-top: 1rem; }
+
+.game-modal__dialog--travel {
+    position: relative;
+    width: min(96vw, 48rem, calc(94svh * 1.3333));
+    max-height: none;
+    aspect-ratio: 1448 / 1086;
+    overflow: visible;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    box-shadow: none;
+    animation: frame-arrive .36s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.game-modal__frame {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 1.2rem 1.8rem rgba(0, 0, 0, .78));
+}
+
+.game-modal__dialog--travel .game-modal__destinations {
+    position: absolute;
+    z-index: 1;
+    top: 31.25%;
+    left: 15.25%;
+    width: 69.7%;
+    height: 50.3%;
+    display: grid;
+    grid-auto-rows: 21.9%;
+    gap: 3.35%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.game-modal__dialog--travel .game-modal__destinations::-webkit-scrollbar { display: none; }
+
+.game-modal__dialog--travel .game-modal__destination {
+    position: relative;
+    display: block;
+    min-height: 0;
+    padding: 1.2% 22% 1.2% 10.8%;
+    overflow: hidden;
+    color: #f3ead7;
+    text-align: left;
+    text-shadow: 0 .08rem .14rem #000, 0 0 .25rem #000;
+    background: transparent;
+    border: 0;
+    border-radius: .2rem;
+    transition: filter .16s ease, box-shadow .16s ease;
+}
+
+.game-modal__dialog--travel .game-modal__destination:hover,
+.game-modal__dialog--travel .game-modal__destination:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 1.35rem rgba(220, 35, 19, .36), 0 0 .35rem rgba(255, 111, 45, .45);
+    filter: brightness(1.12);
+}
+
+.game-modal__destination-copy {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: .05rem;
+}
+
+.game-modal__dialog--travel .game-modal__destination strong {
+    overflow: hidden;
+    font-size: clamp(.78rem, 2.25vw, 1.52rem);
+    line-height: 1.05;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.game-modal__dialog--travel .game-modal__destination span span {
+    color: #c9c1b7;
+    font-size: clamp(.58rem, 1.35vw, .92rem);
+    line-height: 1.05;
+}
+
+.game-modal__dialog--travel .game-modal__destination small {
+    overflow: hidden;
+    color: #ec9a83;
+    font-size: clamp(.48rem, 1vw, .7rem);
+    line-height: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.game-modal__dialog--travel .game-modal__destination > img {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: 4.2%;
+    width: 18%;
+    height: 90%;
+    object-fit: contain;
+    transform: translateY(-50%);
+    pointer-events: none;
+    filter: drop-shadow(0 0 .22rem rgba(255, 72, 26, .45));
+}
+
+.game-modal__dialog--travel .game-modal__destination--locked {
+    filter: saturate(.5) brightness(.72);
+}
+
+.game-modal__dialog--travel .game-modal__close {
+    position: absolute;
+    z-index: 2;
+    left: 19.25%;
+    bottom: 7.55%;
+    width: 61.5%;
+    height: 8.7%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 48%;
+}
+
+.game-modal__dialog--travel .game-modal__close:hover,
+.game-modal__dialog--travel .game-modal__close:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 1rem rgba(255, 182, 81, .26), 0 0 .55rem rgba(255, 48, 19, .45);
+    filter: brightness(1.14);
+}
 
 .game-section-placeholder {
     min-height: 100svh;

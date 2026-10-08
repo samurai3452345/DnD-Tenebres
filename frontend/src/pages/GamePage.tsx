@@ -10,6 +10,7 @@ import ErrorMessage from "../components/common/ErrorMessage";
 import Loading from "../components/common/Loading";
 import { useCombat } from "../hooks/useCombat";
 import { usePlayer } from "../hooks/usePlayer";
+import type { CombatActionRequest } from "../types/combat";
 import type { Location, LocationConnection } from "../types/location";
 import type { PlayerQuest, QuestSource } from "../types/quest";
 
@@ -41,6 +42,25 @@ const zoneNameOverrides: Record<string, string> = {
     "Зелёный лес": "Сумрачный лес",
 };
 
+const travelIcons: Record<Location["type"], string> = {
+    SAFE_ZONE: "/assets/game/travel-icon-safe.png",
+    NEUTRAL: "/assets/game/travel-icon-neutral.png",
+    DANGEROUS: "/assets/game/travel-icon-dangerous.png",
+};
+
+function travelIconFor(connection: LocationConnection) {
+    if (connection.bossRoom || connection.id === "crypt_boss_room") {
+        return "/assets/game/travel-icon-boss.png";
+    }
+    if (connection.type === "SAFE_ZONE" || connection.id.startsWith("city_")) {
+        return travelIcons.SAFE_ZONE;
+    }
+    if (connection.type === "DANGEROUS" || connection.id.startsWith("crypt_")) {
+        return travelIcons.DANGEROUS;
+    }
+    return travelIcons.NEUTRAL;
+}
+
 const questSourceLabels: Record<QuestSource, string> = {
     MAIN_STORY: "Сюжетное задание",
     NPC: "Задание персонажа",
@@ -59,7 +79,15 @@ export default function GamePage() {
         Boolean((routeLocation.state as { showWelcome?: boolean } | null)?.showWelcome)
     );
     const { player, loading: playerLoading, error: playerError, refreshPlayer } = usePlayer();
-    const { events, isPlayerDead, isEnemyDead, executeTurn, loading: combatLoading, resetCombat } = useCombat();
+    const {
+        state: combatState,
+        enemyName,
+        loadCurrent: loadCurrentCombat,
+        executeAction: executeCombatAction,
+        adoptState: adoptCombatState,
+        loading: combatLoading,
+        resetCombat,
+    } = useCombat();
     const [location, setLocation] = useState<Location | null>(null);
     const [quests, setQuests] = useState<PlayerQuest[]>([]);
     const [worldLoading, setWorldLoading] = useState(true);
@@ -67,7 +95,7 @@ export default function GamePage() {
     const [message, setMessage] = useState<string | null>(
         enteredFromCharacterSelection.current ? "Добро пожаловать в мир Tenebres!" : null
     );
-    const [activeMonsterId, setActiveMonsterId] = useState<number | null>(null);
+    const [combatOpen, setCombatOpen] = useState(false);
     const [travelOpen, setTravelOpen] = useState(false);
     const [busyAction, setBusyAction] = useState<string | null>(null);
 
@@ -105,8 +133,13 @@ export default function GamePage() {
     }, [message]);
 
     useEffect(() => {
-        if (player?.activeCombatMonsterId) setActiveMonsterId(player.activeCombatMonsterId);
-    }, [player]);
+        if (!player?.activeCombatMonsterId) return;
+        setCombatOpen(true);
+        void loadCurrentCombat().catch((error) => {
+            setCombatOpen(false);
+            setMessage(requestErrorMessage(error, "Не удалось восстановить активный бой."));
+        });
+    }, [player?.activeCombatMonsterId, loadCurrentCombat]);
 
     const runAction = async (key: string, action: () => Promise<{ message: string; encounterMonsterId?: number | null }>) => {
         setBusyAction(key);
@@ -114,8 +147,9 @@ export default function GamePage() {
             const response = await action();
             setMessage(response.message);
             if (response.encounterMonsterId) {
-                setActiveMonsterId(response.encounterMonsterId);
                 resetCombat();
+                setCombatOpen(true);
+                await loadCurrentCombat();
             }
             await Promise.all([refreshPlayer(), refreshWorld()]);
         } catch (error) {
@@ -130,6 +164,14 @@ export default function GamePage() {
         try {
             const response = kind === "short" ? await restApi.shortRest() : await restApi.longRest();
             setMessage(response.message);
+            if (response.encounter) {
+                adoptCombatState(response.encounter);
+                setCombatOpen(true);
+            } else if (response.isAmbushed) {
+                resetCombat();
+                setCombatOpen(true);
+                await loadCurrentCombat();
+            }
             await Promise.all([refreshPlayer(), refreshWorld()]);
         } catch (error) {
             setMessage(requestErrorMessage(error, "Отдохнуть не вышло."));
@@ -148,10 +190,19 @@ export default function GamePage() {
     };
 
     const finishCombat = async () => {
-        setActiveMonsterId(null);
+        setCombatOpen(false);
         resetCombat();
         setMessage("Бой окончен. Можно продолжать путь.");
         await Promise.all([refreshPlayer(), refreshWorld()]);
+    };
+
+    const handleCombatAction = async (request: CombatActionRequest) => {
+        try {
+            await executeCombatAction(request);
+            await refreshPlayer();
+        } catch (error) {
+            setMessage(requestErrorMessage(error, "Не удалось выполнить боевое действие."));
+        }
     };
 
     const displayedQuests = useMemo(() => quests.slice(0, 5), [quests]);
@@ -168,7 +219,7 @@ export default function GamePage() {
         );
     }
 
-    const actionsDisabled = busyAction !== null || activeMonsterId !== null;
+    const actionsDisabled = busyAction !== null || combatOpen || player.activeCombatMonsterId !== null;
     const allows = (action: string) => location.availableActions.includes(action);
     const locationBackground = locationBackgrounds[location.id] ?? "/assets/game/main-background.png";
     const zoneName = zoneNameOverrides[location.zoneName] ?? location.zoneName;
@@ -254,33 +305,47 @@ export default function GamePage() {
 
             {travelOpen && (
                 <div className="game-modal" role="presentation" onMouseDown={() => setTravelOpen(false)}>
-                    <section className="game-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="travel-title" onMouseDown={(event) => event.stopPropagation()}>
-                        <h2 id="travel-title">Куда отправиться?</h2>
+                    <section className="game-modal__dialog game-modal__dialog--travel" role="dialog" aria-modal="true" aria-labelledby="travel-title" onMouseDown={(event) => event.stopPropagation()}>
+                        <img className="game-modal__frame" src="/assets/game/travel-panel.png" alt="" aria-hidden="true" />
+                        <h2 id="travel-title" className="sr-only">Куда отправиться?</h2>
                         <div className="game-modal__destinations">
                             {location.connections.map((connection) => (
-                                <button key={connection.id} type="button" className="game-modal__destination" onClick={() => handleTravel(connection)}>
-                                    <strong>{connection.name}</strong>
-                                    <span>Рекомендуемый уровень: {connection.recommendedLevel}</span>
-                                    {!connection.open && <small>{connection.blockedReasons.join(". ")}</small>}
+                                <button
+                                    key={connection.id}
+                                    type="button"
+                                    className={`game-modal__destination${connection.open ? "" : " game-modal__destination--locked"}`}
+                                    aria-label={`${connection.name}. Рекомендуемый уровень: ${connection.recommendedLevel}${connection.open ? "" : `. Путь закрыт: ${connection.blockedReasons.join(". ")}`}`}
+                                    onClick={() => handleTravel(connection)}
+                                >
+                                    <span className="game-modal__destination-copy">
+                                        <strong>{connection.name}</strong>
+                                        <span>Рекомендуемый уровень: {connection.recommendedLevel}</span>
+                                        {!connection.open && <small>{connection.blockedReasons.join(". ")}</small>}
+                                    </span>
+                                    <img src={travelIconFor(connection)} alt="" aria-hidden="true" />
                                 </button>
                             ))}
                         </div>
-                        <button type="button" className="game-modal__close" onClick={() => setTravelOpen(false)}>Закрыть</button>
+                        <button type="button" className="game-modal__close" aria-label="Закрыть окно выбора направления" onClick={() => setTravelOpen(false)} />
                     </section>
                 </div>
             )}
 
-            {activeMonsterId && (
+            {combatOpen && (
                 <section className="game-combat" aria-label="Бой">
-                    <CombatPanel
-                        monsterName="Неизвестный противник"
-                        events={events}
-                        isPlayerDead={isPlayerDead}
-                        isEnemyDead={isEnemyDead}
-                        isLoading={combatLoading}
-                        onAction={(action, targetName) => executeTurn(activeMonsterId, action, targetName).then(refreshPlayer)}
-                    />
-                    {(isPlayerDead || isEnemyDead) && <button type="button" onClick={finishCombat}>Вернуться к действиям</button>}
+                    {combatState ? (
+                        <CombatPanel
+                            state={combatState}
+                            monsterName={enemyName}
+                            isLoading={combatLoading}
+                            onAction={handleCombatAction}
+                        />
+                    ) : (
+                        <div><Loading text="Загрузка боя..." /></div>
+                    )}
+                    {combatState && combatState.status !== "ACTIVE" && (
+                        <button type="button" onClick={finishCombat}>Вернуться к действиям</button>
+                    )}
                 </section>
             )}
         </main>

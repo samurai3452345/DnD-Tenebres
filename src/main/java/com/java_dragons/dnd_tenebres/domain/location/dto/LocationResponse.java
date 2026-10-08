@@ -8,7 +8,7 @@ public record LocationResponse(String id, String name, String zoneName, String d
                                boolean cleared, boolean bossRoom, List<String> availableActions,
                                List<ConnectionResponse> connections,
                                List<ResourceResponse> resources) {
-    public record ConnectionResponse(String id, String name, int recommendedLevel, boolean open,
-                                     List<String> blockedReasons) {}
+    public record ConnectionResponse(String id, String name, int recommendedLevel, LocationType type,
+                                     boolean bossRoom, boolean open, List<String> blockedReasons) {}
     public record ResourceResponse(Long templateId, String name, int minAmount, int maxAmount, int findChance) {}
 }

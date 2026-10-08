@@ -1,5 +1,8 @@
+import type { CombatState } from "./combat";
+
 export interface RestReport {
     message: string;
-    currentHp: number;
-    maxHp: number;
+    isAmbushed: boolean;
+    locationId: string | null;
+    encounter: CombatState | null;
 }
