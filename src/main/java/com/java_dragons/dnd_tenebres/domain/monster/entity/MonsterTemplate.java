@@ -64,13 +64,13 @@ public class MonsterTemplate {
     @Column(name = "skill_frequency", nullable = false)
     private int skillFrequency = 0;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "template_elements", joinColumns = @JoinColumn(name = "template_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
     private Set<DamageType> elements = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "template_resistances", joinColumns = @JoinColumn(name = "template_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")

@@ -40,13 +40,12 @@ public class CombatEncounterService {
         if (monsters == null || monsters.isEmpty()) throw new IllegalArgumentException("Encounter requires enemies");
         if (encounterRepository.findForUpdate(playerId, EncounterStatus.ACTIVE).isPresent())
             throw new IllegalStateException("Player already has an active encounter");
-        Player player = playerRepository.findById(playerId).orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        Player player = playerRepository.findById(playerId).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
         CombatEncounter encounter = CombatEncounter.start(player, Objects.requireNonNull(reason));
         for (int i = 0; i < monsters.size(); i++) {
             encounter.addParticipant(CombatParticipant.builder().encounter(encounter).monster(monsters.get(i))
                     .turnOrder(i).status(i == 0 ? ParticipantStatus.ACTIVE : ParticipantStatus.WAITING).build());
         }
-        player.enterCombat(monsters.get(0).getId());
         encounterRepository.saveAndFlush(encounter);
         CombatEvent opening = new CombatEvent("SYSTEM", "ENCOUNTER_STARTED", monsters.get(0).getName(),
                 monsters.size(), "Причина боя: " + reason);
@@ -67,7 +66,7 @@ public class CombatEncounterService {
                 ? encounterRepository.findFirstByPlayerIdOrderByCreatedAtDesc(playerId)
                     .orElseThrow(() -> new IllegalStateException("No encounters found"))
                 : encounterRepository.findByIdAndPlayerId(encounterId, playerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Encounter not found"));
+                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Бой не найден"));
         Page<CombatLogEntry> entries = logRepository.findByEncounterIdOrderByIdDesc(
                 encounter.getId(), PageRequest.of(Math.max(0, page), safeSize));
         return entries.map(CombatLogEntry::toEvent);
@@ -86,13 +85,13 @@ public class CombatEncounterService {
         if (request.action() == CombatAction.CAST_SPELL) {
             if (request.abilityId() == null) throw new IllegalArgumentException("abilityId is required");
             Spell spell = spellRepository.findById(request.abilityId())
-                    .orElseThrow(() -> new IllegalArgumentException("Ability not found"));
+                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Способность не найдена"));
             validateSpell(encounter.getPlayer(), spell);
             selectedName = spell.getName();
         } else if (request.action() == CombatAction.USE_POTION) {
             if (request.itemId() == null) throw new IllegalArgumentException("itemId is required");
             PlayerItem item = playerItemRepository.findByIdAndPlayerId(request.itemId(), playerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+                    .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Предмет не найден"));
             if (item.getTemplate().getType() != ItemType.CONSUMABLE || item.getAmount() <= 0)
                 throw new IllegalArgumentException("Item is not an available potion");
             selectedName = item.getId().toString();
@@ -115,7 +114,6 @@ public class CombatEncounterService {
                     .filter(p -> p.getStatus() == ParticipantStatus.WAITING).findFirst();
             if (next.isPresent()) {
                 next.get().activate();
-                encounter.getPlayer().enterCombat(next.get().getMonster().getId());
                 encounter.advanceRound();
             } else finish(encounter, EncounterStatus.VICTORY);
         } else encounter.advanceRound();
@@ -152,7 +150,6 @@ public class CombatEncounterService {
 
     private void finish(CombatEncounter encounter, EncounterStatus status) {
         encounter.finish(status);
-        encounter.getPlayer().leaveCombat();
     }
 
     private void appendEvents(CombatEncounter encounter, List<CombatEvent> events) {

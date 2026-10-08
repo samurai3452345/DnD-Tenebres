@@ -1,6 +1,6 @@
 package com.java_dragons.dnd_tenebres.domain.monster.strategy;
 
-import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
+import com.java_dragons.dnd_tenebres.core.random.RandomSource;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.Monster;
 import com.java_dragons.dnd_tenebres.domain.monster.model.MonsterSkill;
 import org.springframework.stereotype.Component;
@@ -13,8 +13,8 @@ public class FireBreathSkillStrategy implements MonsterSkillStrategy {
     }
 
     @Override
-    public Monster.MonsterAttackResult executeSkill(Monster monster) {
-        int damage = DiceRoller.roll(Math.max(2, monster.getDiceCount()), monster.getDamageDice().getSides())
+    public Monster.MonsterAttackResult executeSkill(Monster monster, RandomSource randomSource) {
+        int damage = randomSource.roll(Math.max(2, monster.getDiceCount()), monster.getDamageDice().getSides())
                 + monster.getDamageBonus();
         return new Monster.MonsterAttackResult("Огненное дыхание", damage);
     }

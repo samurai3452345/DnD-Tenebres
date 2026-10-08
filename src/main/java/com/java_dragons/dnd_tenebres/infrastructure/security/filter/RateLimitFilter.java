@@ -87,11 +87,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             allowed = allow("api:anonymous:" + clientIp + ':' + route, anonymousLimit, windowNumber);
         }
         if (!allowed) {
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("application/json");
             response.setHeader("Retry-After", Long.toString(WINDOW_SECONDS));
-            response.getWriter().write("{\"code\":\"RATE_LIMITED\",\"message\":\"Слишком много запросов\"}");
+            com.java_dragons.dnd_tenebres.infrastructure.web.ApiErrorWriter.write(response,
+                    HttpStatus.TOO_MANY_REQUESTS.value(), "RATE_LIMITED", "Слишком много запросов",
+                    request.getRequestURI());
             return;
         }
 

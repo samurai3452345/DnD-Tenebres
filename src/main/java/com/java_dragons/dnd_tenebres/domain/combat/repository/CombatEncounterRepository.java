@@ -19,5 +19,10 @@ public interface CombatEncounterRepository extends JpaRepository<CombatEncounter
     Optional<CombatEncounter> findByIdAndPlayerId(Long id, Long playerId);
 
     Optional<CombatEncounter> findFirstByPlayerIdOrderByCreatedAtDesc(Long playerId);
+    boolean existsByPlayerIdAndStatus(Long playerId, EncounterStatus status);
+
+    @Query("select p.monster.id from CombatEncounter e join e.participants p where e.player.id=:playerId and e.status=:status and p.status=com.java_dragons.dnd_tenebres.domain.combat.model.ParticipantStatus.ACTIVE")
+    Optional<Long> findActiveMonsterId(@Param("playerId") Long playerId, @Param("status") EncounterStatus status);
+
     long countByStatus(EncounterStatus status);
 }

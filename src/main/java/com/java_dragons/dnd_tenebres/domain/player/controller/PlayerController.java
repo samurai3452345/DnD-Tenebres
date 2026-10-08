@@ -33,7 +33,7 @@ public class PlayerController {
             @Valid @RequestBody PlayerCreationRequest request
     ) {
         var account = userAccountRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Аккаунт не найден"));
 
         playerService.createPlayer(account.getId(), request);
         return authService.createResponse(account);
@@ -42,14 +42,14 @@ public class PlayerController {
     @GetMapping
     public List<CharacterSummaryResponse> getCharacters(Authentication authentication) {
         var account = userAccountRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Аккаунт не найден"));
         return playerService.getCharacters(account.getId());
     }
 
     @PostMapping("/{playerId}/select")
     public AuthResponse selectCharacter(Authentication authentication, @PathVariable Long playerId) {
         var account = userAccountRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Аккаунт не найден"));
         playerService.verifyCharacterOwnership(account.getId(), playerId);
         return authService.createResponse(account, playerId);
     }
@@ -58,7 +58,7 @@ public class PlayerController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCharacter(Authentication authentication, @PathVariable Long playerId) {
         var account = userAccountRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Аккаунт не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Аккаунт не найден"));
         playerService.deleteCharacter(account.getId(), playerId);
     }
 

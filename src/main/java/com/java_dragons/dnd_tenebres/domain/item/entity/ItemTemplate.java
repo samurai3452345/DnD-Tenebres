@@ -2,7 +2,6 @@ package com.java_dragons.dnd_tenebres.domain.item.entity;
 
 import com.java_dragons.dnd_tenebres.domain.item.model.*;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "item_templates")
 @Getter
 @NoArgsConstructor
-@Data
 public class ItemTemplate {
 
     @Id
@@ -68,4 +66,16 @@ public class ItemTemplate {
     @Enumerated(EnumType.STRING)
     @Column(name = "consumable_action")
     private ConsumableAction consumableAction = ConsumableAction.NONE;
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof ItemTemplate template)) return false;
+        return id != null && id.equals(template.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -63,9 +63,6 @@ public class Player {
     @Column(name = "max_mp", nullable = false)
     private int maxMp;
 
-    @Column(name = "active_combat_monster_id")
-    private Long activeCombatMonsterId;
-
     @Embedded
     private PlayerStats stats;
 
@@ -436,27 +433,6 @@ public class Player {
     public void normalizeResources() {
         this.currentHp = Math.max(0, Math.min(this.currentHp, this.getMaxHp()));
         this.currentMp = Math.max(0, Math.min(this.currentMp, this.getMaxMp()));
-    }
-
-    public void enterCombat(Long monsterId) {
-        if (monsterId == null) {
-            throw new IllegalArgumentException("ID монстра не указан при входе в бой");
-        }
-        this.activeCombatMonsterId = monsterId;
-    }
-
-    public void leaveCombat() {
-        this.activeCombatMonsterId = null;
-    }
-
-    public boolean isInCombat() {
-        return this.activeCombatMonsterId != null;
-    }
-
-    public void revive() {
-        this.currentHp = 1;
-        long lostGold = (long) (this.gold * 0.20); // Штраф 20% золота
-        this.gold -= lostGold;
     }
 
 }

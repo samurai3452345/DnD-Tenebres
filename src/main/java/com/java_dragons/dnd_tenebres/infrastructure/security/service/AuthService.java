@@ -9,8 +9,7 @@ import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +22,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
     private final PlayerRepository playerRepository;
+    private final com.java_dragons.dnd_tenebres.infrastructure.audit.AuditService auditService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         String username = request.username().trim();
         if (userAccountRepository.existsByUsername(username)) {
+            auditService.record(username, null, "REGISTER", "DENIED", "Username already exists");
             throw new IllegalStateException("Пользователь с таким именем уже существует");
         }
 
@@ -45,12 +45,16 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         String username = request.username().trim();
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, request.password())
-        );
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, request.password()));
+        } catch (AuthenticationException exception) {
+            auditService.record(username, null, "LOGIN", "DENIED", "Invalid credentials");
+            throw exception;
+        }
 
         UserAccount account = userAccountRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        auditService.record(username, null, "LOGIN", "SUCCESS", "Authenticated");
         return createResponse(account);
     }
 
@@ -59,10 +63,9 @@ public class AuthService {
     }
 
     public AuthResponse createResponse(UserAccount account, Long selectedPlayerId) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(account.getUsername());
         long characterCount = playerRepository.countByAccountId(account.getId());
         return new AuthResponse(
-                jwtService.generateToken(account, userDetails, selectedPlayerId),
+                jwtService.generateToken(account, selectedPlayerId),
                 characterCount > 0,
                 characterCount,
                 selectedPlayerId

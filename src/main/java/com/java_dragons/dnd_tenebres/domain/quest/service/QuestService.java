@@ -31,19 +31,20 @@ public class QuestService {
     private final GameBalanceProperties balance;
     private final WalletService walletService;
     private final com.java_dragons.dnd_tenebres.infrastructure.audit.AuditService auditService;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
     @Transactional
     public PlayerQuestResponse acceptQuestById(Long playerId, Long questTemplateId) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
         QuestTemplate template = questTemplateRepository.findById(questTemplateId)
-                .orElseThrow(() -> new IllegalArgumentException("Quest template not found"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Шаблон квеста не найден"));
         validateAcceptance(player, template);
         return map(playerQuestRepository.save(PlayerQuest.create(player, template)));
     }
 
     private void validateAcceptance(Player player, QuestTemplate template) {
-        if (player.isInCombat()) throw new IllegalStateException("Нельзя принять квест во время боя");
+        combatStateService.requireOutOfCombat(player.getId(), "Нельзя принять квест во время боя");
         String requiredLocation = template.getAcceptLocationId() == null ? "city_adv_guild" : template.getAcceptLocationId();
         if (player.getCurrentLocation() == null || !requiredLocation.equals(player.getCurrentLocation().getId()))
             throw new IllegalStateException("Квест принимается в локации " + requiredLocation);
@@ -66,9 +67,9 @@ public class QuestService {
     @Transactional
     public QuestRewardResponse turnInQuest(Long playerId, Long playerQuestId) {
         PlayerQuest quest = playerQuestRepository.findByPlayerIdAndId(playerId, playerQuestId)
-                .orElseThrow(() -> new IllegalArgumentException("Quest not found"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Квест не найден"));
         QuestTemplate template = quest.getQuestTemplate();
-        if (quest.getPlayer().isInCombat()) {
+        if (combatStateService.isInCombat(quest.getPlayer().getId())) {
             throw new IllegalStateException("Нельзя сдавать квест во время боя");
         }
         if (quest.getQuestStatus() == QuestStatus.REWARDED)
@@ -99,8 +100,8 @@ public class QuestService {
 
     @Transactional(readOnly = true)
     public List<QuestTemplateResponse> getAvailableQuests(Long playerId) {
-        Player player = playerRepository.findById(playerId).orElseThrow(() -> new IllegalArgumentException("Player not found"));
-        if (player.isInCombat()) {
+        Player player = playerRepository.findById(playerId).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
+        if (combatStateService.isInCombat(player.getId())) {
             return List.of();
         }
         String locationId = player.getCurrentLocation() == null ? null : player.getCurrentLocation().getId();

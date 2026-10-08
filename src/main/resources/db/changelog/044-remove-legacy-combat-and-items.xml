@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="044-remove-legacy-combat-state" author="codex">
+        <preConditions onFail="HALT">
+            <columnExists tableName="players" columnName="active_combat_monster_id"/>
+        </preConditions>
+        <dropColumn tableName="players" columnName="active_combat_monster_id"/>
+        <rollback>
+            <addColumn tableName="players">
+                <column name="active_combat_monster_id" type="BIGINT"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="044-remove-unused-items-table" author="codex">
+        <preConditions onFail="HALT">
+            <tableExists tableName="items"/>
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM items</sqlCheck>
+        </preConditions>
+        <dropTable tableName="items"/>
+        <rollback>
+            <createTable tableName="items">
+                <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+                <column name="version" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="player_id" type="BIGINT"><constraints nullable="false" foreignKeyName="fk_items_player" referencedTableName="players" referencedColumnNames="id"/></column>
+                <column name="item_type" type="VARCHAR(31)"><constraints nullable="false"/></column>
+                <column name="rarity" type="VARCHAR(50)"><constraints nullable="false"/></column>
+                <column name="name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+                <column name="current_xp" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="base_dice_type" type="VARCHAR(10)"/>
+                <column name="is_equipped" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+                <column name="equip_slot" type="VARCHAR(50)"/>
+                <column name="parent_item_id" type="BIGINT"><constraints foreignKeyName="fk_items_parent" referencedTableName="items" referencedColumnNames="id"/></column>
+                <column name="stat_str" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="stat_dex" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="stat_con" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="stat_int" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="stat_wis" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+                <column name="stat_cha" type="INTEGER" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            </createTable>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

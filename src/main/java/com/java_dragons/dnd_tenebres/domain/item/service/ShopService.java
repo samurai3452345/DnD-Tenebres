@@ -31,6 +31,7 @@ public class ShopService {
     private final WalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
     private final com.java_dragons.dnd_tenebres.infrastructure.audit.AuditService auditService;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
     @Transactional(readOnly = true)
     public MerchantResponse currentMerchant(Long playerId) {
@@ -81,7 +82,7 @@ public class ShopService {
         if (old.isPresent()) return repeatedResult(old.get(), "SELL", requestHash);
         validateLocation(player);
         PlayerItem item = playerItemRepository.findByIdAndPlayerId(playerItemId, playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Предмет не найден"));
         if (item.isEquipped()) throw new IllegalStateException("Сначала снимите предмет");
         if (item.isLocked()) throw new IllegalStateException("Заблокированный предмет нельзя продать");
         if (item.getAmount() < amount) throw new IllegalArgumentException("Недостаточное количество");
@@ -97,11 +98,11 @@ public class ShopService {
         return new TradeResultResponse(normalizedId, "SELL", playerItemId, amount, result, false);
     }
 
-    private Player player(Long id) { return playerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Игрок не найден")); }
+    private Player player(Long id) { return playerRepository.findById(id).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден")); }
     private Player lockedPlayer(Long id) { return playerRepository.findByIdForUpdate(id)
-            .orElseThrow(() -> new IllegalArgumentException("Игрок не найден")); }
+            .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден")); }
     private void validateLocation(Player p) {
-        if (p.isInCombat()) throw new IllegalStateException("Нельзя торговать во время боя");
+        combatStateService.requireOutOfCombat(p.getId(), "Нельзя торговать во время боя");
         if (p.getCurrentLocation() == null || !MERCHANT_LOCATION_ID.equals(p.getCurrentLocation().getId()))
             throw new IllegalStateException("Торговец недоступен в текущей локации");
     }

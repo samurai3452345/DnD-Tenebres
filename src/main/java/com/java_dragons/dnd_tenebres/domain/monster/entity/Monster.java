@@ -1,6 +1,6 @@
 package com.java_dragons.dnd_tenebres.domain.monster.entity;
 
-import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
+import com.java_dragons.dnd_tenebres.core.random.RandomSource;
 import com.java_dragons.dnd_tenebres.domain.combat.model.DamageType;
 import com.java_dragons.dnd_tenebres.domain.effect.model.ActiveEffect;
 import com.java_dragons.dnd_tenebres.domain.item.model.DiceType;
@@ -78,14 +78,14 @@ public class Monster {
     @Builder.Default
     private int skillFrequency = 0;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "monster_elements", joinColumns = @JoinColumn(name = "monster_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
     @Builder.Default
     private Set<DamageType> elements = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "monster_resistances", joinColumns = @JoinColumn(name = "monster_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "element")
@@ -115,19 +115,19 @@ public class Monster {
 
     public record MonsterAttackResult(String attackName, int totalDamage) {}
 
-    public MonsterAttackResult performAttack(int round, MonsterSkillStrategy skillStrategy) {
+    public MonsterAttackResult performAttack(int round, MonsterSkillStrategy skillStrategy, RandomSource randomSource) {
         if (this.specialSkill != MonsterSkill.NONE && this.skillFrequency > 0 && round % this.skillFrequency == 0) {
             if (skillStrategy != null) {
-                return skillStrategy.executeSkill(this);
+                return skillStrategy.executeSkill(this, randomSource);
             }
         }
 
-        int diceDamage = DiceRoller.roll(this.diceCount, this.damageDice.getSides());
+        int diceDamage = randomSource.roll(this.diceCount, this.damageDice.getSides());
         int totalDamage = diceDamage + this.damageBonus;
         return new MonsterAttackResult(this.attackName, totalDamage);
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "monster_combat_effects", joinColumns = @JoinColumn(name = "monster_id"))
     @Builder.Default
     private List<ActiveEffect> combatEffects = new ArrayList<>();

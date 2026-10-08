@@ -22,7 +22,6 @@ public class PlayerDeathService {
         if (player.getCurrentHp() > 0) throw new IllegalStateException("Cannot respawn a living player");
         long lost = (player.getGold() * gamePlayerProperties.getDeathGoldPenaltyPercent()) / 100;
         if (lost > 0) walletService.debit(player, lost, WalletReason.DEATH_PENALTY, "PLAYER", player.getId().toString());
-        player.leaveCombat();
         player.clearEffects();
         String respawnLocationId = gamePlayerProperties.getRespawnLocationId();
         player.moveTo(locationRepository.findById(respawnLocationId)

@@ -18,7 +18,7 @@ public class CombatParticipant {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "encounter_id")
     private CombatEncounter encounter;
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "monster_id")
     private Monster monster;
     @Column(name = "turn_order", nullable = false)

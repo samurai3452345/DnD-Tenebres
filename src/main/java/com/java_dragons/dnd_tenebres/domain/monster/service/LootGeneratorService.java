@@ -1,6 +1,5 @@
 package com.java_dragons.dnd_tenebres.domain.monster.service;
 
-import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.domain.item.entity.ItemTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.core.random.RandomSource;
@@ -21,7 +20,7 @@ public class LootGeneratorService {
     public Map<ItemTemplate, Integer> generateLootForMonster(MonsterTemplate template) {
 
         return template.getLootTable().stream()
-                .filter(lootEntry -> DiceRoller.rollD100() <= lootEntry.getDropChance())
+                .filter(lootEntry -> randomSource.chance(lootEntry.getDropChance()))
                 .map(lootEntry -> {
                     if (lootEntry.getMinAmount() <= 0 || lootEntry.getMaxAmount() < lootEntry.getMinAmount()) {
                         throw new IllegalStateException("Некорректный диапазон добычи для монстра " + template.getName());

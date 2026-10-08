@@ -52,6 +52,10 @@ application:
     jwt:
       secret: ${JWT_SECRET}
       expiration: ${JWT_EXPIRATION:PT24H}
+      issuer: ${JWT_ISSUER:dnd-tenebres}
+      audience: ${JWT_AUDIENCE:dnd-tenebres-api}
+      # During rotation set the previous key for no longer than the token TTL.
+      previous-secret: ${JWT_PREVIOUS_SECRET:}
 
 management:
   endpoints:
