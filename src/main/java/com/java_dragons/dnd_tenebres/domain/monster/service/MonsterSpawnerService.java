@@ -9,13 +9,13 @@ import com.java_dragons.dnd_tenebres.domain.monster.entity.MonsterTemplate;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterRepository;
 import com.java_dragons.dnd_tenebres.domain.monster.repository.MonsterTemplateRepository;
 import lombok.RequiredArgsConstructor;
+import com.java_dragons.dnd_tenebres.core.random.RandomSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class MonsterSpawnerService {
     private final MonsterTemplateRepository monsterTemplateRepository;
     private final LocationFixedMonsterRepository locationFixedMonsterRepository;
     private final LocationRandomEncounterRepository randomEncounterRepository;
+    private final RandomSource randomSource;
 
     @Transactional
     public Monster spawnRandomMonster(String locationId) {
@@ -34,8 +35,11 @@ public class MonsterSpawnerService {
         }
 
         int totalWeight = encounters.stream().mapToInt(LocationRandomEncounter::getSpawnChance).sum();
+        if (totalWeight <= 0) {
+            throw new IllegalStateException("Сумма весов случайных встреч должна быть положительной: " + locationId);
+        }
 
-        int roll = ThreadLocalRandom.current().nextInt(totalWeight);
+        int roll = randomSource.nextInt(0, totalWeight);
         int currentSum = 0;
         String chosenMonsterName = null;
 

@@ -41,8 +41,11 @@ public class ItemUpgradeService {
         String normalizedOperationId = operationId.trim();
         String requestHash = requestHash(targetItemId, foodItemIds);
 
-        playerRepository.findByIdForUpdate(playerId)
+        var player = playerRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Нельзя улучшать предметы во время боя");
+        }
 
         var previous = forgeOperationRepository.findByPlayerIdAndOperationId(playerId, normalizedOperationId);
         if (previous.isPresent()) {

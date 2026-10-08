@@ -72,10 +72,11 @@ public class PlayerCreationService {
                 .accountId(accountId)
                 .stats(stats)
                 .maxHp(initialHp)
-                .currentHp(initialHp)
+                .currentHp(0)
                 .maxMp(initialBaseMp)
                 .currentMp(0)
                 .build();
+        player.healToFull();
         player.restoreMpToFull();
         return player;
     }

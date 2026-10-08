@@ -209,30 +209,40 @@ public class InventoryService {
 
     @Transactional
     public void equipItem(Long playerId, Long itemId, EquipmentSlot slot) {
-        Player player = playerRepository.findById(playerId)
+        Player player = playerRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
-        PlayerItem itemToEquip = playerItemRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден"));
-
-        if (!itemToEquip.getPlayer().getId().equals(playerId)) {
-            throw new IllegalArgumentException("Это не ваш предмет!");
-        }
+        PlayerItem itemToEquip = player.getInventory().stream()
+                .filter(item -> Objects.equals(item.getId(), itemId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден или не принадлежит игроку"));
 
         if (player.getLevel() < itemToEquip.getTemplate().getRequiredLevel())
             throw new IllegalStateException("Требуется уровень " + itemToEquip.getTemplate().getRequiredLevel());
         if (itemToEquip.getDurability() <= 0) throw new IllegalStateException("Предмет сломан");
         if (player.isInCombat()) throw new IllegalStateException("Нельзя менять экипировку во время боя");
 
+        player.getInventory().stream()
+                .filter(PlayerItem::isEquipped)
+                .filter(item -> item.getEquippedSlot() == slot)
+                .findFirst()
+                .ifPresent(item -> {
+                    item.setEquipped(false);
+                    item.setEquippedSlot(EquipmentSlot.NONE);
+                });
+        playerItemRepository.flush();
         player.equipItem(itemId, slot);
+        player.normalizeResources();
     }
 
     @Transactional
     public void unequipItem(Long playerId, EquipmentSlot slot) {
-        Player player = playerRepository.findById(playerId)
+        Player player = playerRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
 
+        if (player.isInCombat()) throw new IllegalStateException("Нельзя менять экипировку во время боя");
         player.unequipItem(slot);
+        player.normalizeResources();
     }
 
     @Transactional

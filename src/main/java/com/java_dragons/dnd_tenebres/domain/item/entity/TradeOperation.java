@@ -9,6 +9,9 @@ public class TradeOperation {
     @Column(name="player_id", nullable=false) private Long playerId;
     @Column(name="operation_id", nullable=false) private String operationId;
     @Column(name="operation_type", nullable=false) private String operationType;
+    @Column(name="request_hash", nullable=false, length=64) private String requestHash;
+    @Column(name="resource_id", nullable=false) private Long resourceId;
+    @Column(name="amount", nullable=false) private int amount;
     @Column(nullable=false, length=1000) private String result;
     @Column(name="created_at", nullable=false) private Instant createdAt;
 }

@@ -33,6 +33,7 @@ public class CombatEncounterService {
     private final SpellRepository spellRepository;
     private final CombatService combatService;
     private final GameBalanceProperties balance;
+    private final SpellManaCostCalculator manaCostCalculator;
 
     @Transactional
     public CombatStateResponse startEncounter(Long playerId, List<Monster> monsters, EncounterReason reason) {
@@ -145,10 +146,7 @@ public class CombatEncounterService {
                 .orElseThrow(() -> new IllegalStateException("Для заклинания нужно магическое оружие"));
         if (spell.getTier() > focus.getTemplate().getRarity().getTierIndex())
             throw new IllegalStateException("Магическое оружие не поддерживает этот тир");
-        int multiplier = player.getCurrentLocation() != null &&
-                player.getCurrentLocation().getEffect() == LocationEffect.ANTI_MAGIC_FIELD
-                ? balance.antiMagicManaMultiplier() : 1;
-        if (player.getCurrentMp() < spell.getManaCost() * multiplier)
+        if (player.getCurrentMp() < manaCostCalculator.calculate(player, spell, focus))
             throw new IllegalStateException("Not enough mana");
     }
 
@@ -181,12 +179,11 @@ public class CombatEncounterService {
                 .filter(cp -> cp.getStatus() == ParticipantStatus.ACTIVE || cp.getStatus() == ParticipantStatus.WAITING).count();
         int maxTier = Math.min(5, 1 + Math.max(0, player.getLevel() - 1) / 4);
         var magicFocus = player.getMainHandWeapon().filter(item -> item.getTemplate().getType() == ItemType.MAGIC_WEAPON);
-        boolean antiMagic = player.getCurrentLocation() != null &&
-                player.getCurrentLocation().getEffect() == LocationEffect.ANTI_MAGIC_FIELD;
         List<CombatStateResponse.AbilityState> abilities = spellRepository
                 .findByTierLessThanEqualOrderByTierAscNameAsc(maxTier).stream().map(spell -> {
-                    int manaCost = spell.getManaCost() * (antiMagic ? balance.antiMagicManaMultiplier() : 1);
                     boolean supported = magicFocus.isPresent() && spell.getTier() <= magicFocus.get().getTemplate().getRarity().getTierIndex();
+                    int manaCost = magicFocus.map(focus -> manaCostCalculator.calculate(player, spell, focus))
+                            .orElse(spell.getManaCost());
                     boolean available = supported && player.getCurrentMp() >= manaCost;
                     String reason = available ? null : !supported ? "MAGIC_FOCUS_REQUIRED" : "NOT_ENOUGH_MANA";
                     return new CombatStateResponse.AbilityState(spell.getId(), spell.getName(), spell.getTier(),

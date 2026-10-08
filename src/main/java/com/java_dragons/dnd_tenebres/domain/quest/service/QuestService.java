@@ -14,8 +14,7 @@ import com.java_dragons.dnd_tenebres.domain.quest.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
-import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.context.event.EventListener;
 import java.util.List;
 import com.java_dragons.dnd_tenebres.domain.economy.service.WalletService;
 import com.java_dragons.dnd_tenebres.domain.economy.model.WalletReason;
@@ -35,7 +34,7 @@ public class QuestService {
 
     @Transactional
     public PlayerQuestResponse acceptQuestById(Long playerId, Long questTemplateId) {
-        Player player = playerRepository.findById(playerId)
+        Player player = playerRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
         QuestTemplate template = questTemplateRepository.findById(questTemplateId)
                 .orElseThrow(() -> new IllegalArgumentException("Quest template not found"));
@@ -69,6 +68,9 @@ public class QuestService {
         PlayerQuest quest = playerQuestRepository.findByPlayerIdAndId(playerId, playerQuestId)
                 .orElseThrow(() -> new IllegalArgumentException("Quest not found"));
         QuestTemplate template = quest.getQuestTemplate();
+        if (quest.getPlayer().isInCombat()) {
+            throw new IllegalStateException("Нельзя сдавать квест во время боя");
+        }
         if (quest.getQuestStatus() == QuestStatus.REWARDED)
             return new QuestRewardResponse(template.getRewardGold(),
                     new com.java_dragons.dnd_tenebres.domain.player.dto.LevelUpResult(0,
@@ -98,10 +100,25 @@ public class QuestService {
     @Transactional(readOnly = true)
     public List<QuestTemplateResponse> getAvailableQuests(Long playerId) {
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        if (player.isInCombat()) {
+            return List.of();
+        }
         String locationId = player.getCurrentLocation() == null ? null : player.getCurrentLocation().getId();
-        return questTemplateRepository.findAvailableForPlayer(playerId).stream()
+        long activeCount = playerQuestRepository.countByPlayerIdAndQuestStatusIn(
+                playerId, List.of(QuestStatus.ACTIVE, QuestStatus.COMPLETED));
+        if (activeCount >= balance.maxActiveQuests()) {
+            return List.of();
+        }
+        return questTemplateRepository.findAllByOrderByIdAsc().stream()
                 .filter(q -> player.getLevel() >= q.getMinLevel())
                 .filter(q -> q.getAcceptLocationId() == null ? "city_adv_guild".equals(locationId) : q.getAcceptLocationId().equals(locationId))
+                .filter(q -> q.getPrerequisiteQuestId() == null
+                        || playerQuestRepository.existsByPlayerIdAndQuestTemplateIdAndQuestStatus(
+                                playerId, q.getPrerequisiteQuestId(), QuestStatus.REWARDED))
+                .filter(q -> q.isRepeatable()
+                        ? !playerQuestRepository.existsByPlayerIdAndQuestTemplateIdAndQuestStatusIn(
+                                playerId, q.getId(), List.of(QuestStatus.ACTIVE, QuestStatus.COMPLETED))
+                        : !playerQuestRepository.existsByPlayerIdAndQuestTemplateId(playerId, q.getId()))
                 .map(this::map).toList();
     }
 
@@ -111,32 +128,32 @@ public class QuestService {
                 List.of(QuestStatus.ACTIVE, QuestStatus.COMPLETED)).stream().map(this::map).toList();
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional
     public void onMonsterKilled(MonsterKilledEvent event) {
         progress(event.playerId(), QuestType.KILL_MONSTERS, event.monsterTemplateName(), 1);
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional
     public void onItemLooted(ItemLootedEvent event) {
         progress(event.playerId(), QuestType.GATHER_ITEMS, event.itemTemplateName(), event.amount());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional
     public void onLocationCleared(LocationClearedEvent event) {
         progress(event.playerId(), QuestType.CLEAR_LOCATION, event.locationId(), 1);
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional
     public void onLocationVisited(LocationVisitedEvent event) {
         progress(event.playerId(), QuestType.VISIT_LOCATION, event.locationId(), 1);
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional
     public void onGenericProgress(QuestProgressEvent event) {
         progress(event.playerId(), event.type(), event.targetIdentifier(), event.amount());
     }

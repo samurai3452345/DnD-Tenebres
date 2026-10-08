@@ -3,6 +3,7 @@ package com.java_dragons.dnd_tenebres.domain.item.controller;
 import com.java_dragons.dnd_tenebres.domain.item.dto.MerchantResponse;
 import com.java_dragons.dnd_tenebres.domain.item.dto.ShopOfferResponse;
 import com.java_dragons.dnd_tenebres.domain.item.dto.TradeRequest;
+import com.java_dragons.dnd_tenebres.domain.item.dto.TradeResultResponse;
 import com.java_dragons.dnd_tenebres.domain.item.service.ShopService;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import jakarta.validation.Valid;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/merchants/current")
@@ -43,38 +43,32 @@ public class MerchantController {
     }
 
     @PostMapping("/buy")
-    public ResponseEntity<Map<String, String>> buy(
+    public ResponseEntity<TradeResultResponse> buy(
             @CurrentPlayerId Long playerId,
             @Valid @RequestBody TradeRequest.BuyByIdRequest request
     ) {
-        String message = shopService.buyItem(
+        TradeResultResponse result = shopService.buyItem(
                 playerId,
                 request.operationId(),
                 request.offerId(),
                 request.amount()
         );
 
-        return ResponseEntity.ok(Map.of(
-                "status", "SUCCESS",
-                "message", message
-        ));
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/sell")
-    public ResponseEntity<Map<String, String>> sell(
+    public ResponseEntity<TradeResultResponse> sell(
             @CurrentPlayerId Long playerId,
             @Valid @RequestBody TradeRequest.SellRequest request
     ) {
-        String message = shopService.sellItem(
+        TradeResultResponse result = shopService.sellItem(
                 playerId,
                 request.operationId(),
                 request.playerItemId(),
                 request.amount()
         );
 
-        return ResponseEntity.ok(Map.of(
-                "status", "SUCCESS",
-                "message", message
-        ));
+        return ResponseEntity.ok(result);
     }
 }

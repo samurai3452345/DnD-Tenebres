@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="042-01-search-attempts" author="codex">
+        <createTable tableName="player_location_search_states">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER"/>
+            <column name="player_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remaining_attempts" type="INTEGER" defaultValueNumeric="10">
+                <constraints nullable="false"/>
+            </column>
+            <column name="refreshed_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="player_location_search_states"
+                             columnNames="player_id,location_id"
+                             constraintName="uq_player_location_search_state"/>
+        <addForeignKeyConstraint baseTableName="player_location_search_states" baseColumnNames="player_id"
+                                 referencedTableName="players" referencedColumnNames="id"
+                                 constraintName="fk_search_state_player" onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseTableName="player_location_search_states" baseColumnNames="location_id"
+                                 referencedTableName="locations" referencedColumnNames="id"
+                                 constraintName="fk_search_state_location" onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="042-02-trade-request-hash" author="codex">
+        <addColumn tableName="trade_operations">
+            <column name="request_hash" type="VARCHAR(64)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_id" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="042-03-unique-active-quest" author="codex" dbms="postgresql">
+        <sql>
+            DELETE FROM player_quests
+             WHERE id IN (
+                SELECT id FROM (
+                    SELECT id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY player_id, quest_template_id
+                               ORDER BY CASE WHEN status = 'COMPLETED' THEN 0 ELSE 1 END, id
+                           ) AS duplicate_number
+                      FROM player_quests
+                     WHERE status IN ('ACTIVE', 'COMPLETED')
+                ) duplicates
+                WHERE duplicate_number &gt; 1
+             )
+        </sql>
+        <sql>
+            CREATE UNIQUE INDEX uq_player_active_quest
+                ON player_quests(player_id, quest_template_id)
+             WHERE status IN ('ACTIVE', 'COMPLETED')
+        </sql>
+    </changeSet>
+
+    <changeSet id="042-04-unique-equipped-slot" author="codex" dbms="postgresql">
+        <sql>
+            UPDATE player_items
+               SET is_equipped = false,
+                   equipped_slot = 'NONE'
+             WHERE id IN (
+                SELECT id FROM (
+                    SELECT id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY player_id, equipped_slot
+                               ORDER BY id
+                           ) AS duplicate_number
+                      FROM player_items
+                     WHERE is_equipped = true
+                       AND equipped_slot != 'NONE'
+                ) duplicates
+                WHERE duplicate_number &gt; 1
+             )
+        </sql>
+        <sql>
+            CREATE UNIQUE INDEX uq_player_equipped_slot
+                ON player_items(player_id, equipped_slot)
+             WHERE is_equipped = true
+               AND equipped_slot != 'NONE'
+        </sql>
+    </changeSet>
+</databaseChangeLog>

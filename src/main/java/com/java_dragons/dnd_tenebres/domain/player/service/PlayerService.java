@@ -99,8 +99,12 @@ public class PlayerService {
 
     @Transactional
     public PlayerResponse allocateStats(Long playerId, StatAllocationRequest request) {
-        Player player = playerRepository.findById(playerId)
+        Player player = playerRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Нельзя распределять характеристики во время боя");
+        }
 
         player.allocateStats(
                 request.addStrength(), request.addDexterity(), request.addConstitution(),

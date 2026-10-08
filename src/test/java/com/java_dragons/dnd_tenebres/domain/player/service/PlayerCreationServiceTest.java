@@ -23,10 +23,12 @@ class PlayerCreationServiceTest {
         assertThat(player.getName()).isEqualTo("Герой");
         assertThat(player.getCurrentMp()).isEqualTo(17);
         assertThat(player.getMaxMp()).isEqualTo(17);
+        assertThat(player.getCurrentHp()).isEqualTo(player.getMaxHp());
 
         player.levelUp(progression.getHeroBaseHp(2), progression.getHeroBaseMp(2));
 
         assertThat(player.getCurrentMp()).isEqualTo(24);
         assertThat(player.getMaxMp()).isEqualTo(24);
+        assertThat(player.getCurrentHp()).isEqualTo(player.getMaxHp());
     }
 }

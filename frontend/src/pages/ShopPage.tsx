@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { usePlayer } from '../hooks/usePlayer';
 import { inventoryApi } from '../api/inventoryApi';
-import { shopApi } from '../api/shopApi';
+import { shopApi, type ShopOffer } from '../api/shopApi';
 import Button from '../components/common/Button';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
 
-// Товары из базы данных (015-populate-consumables.xml)
-const STORE_ITEMS = [
-    { name: 'Малое зелье лечения', price: 25, desc: 'Мгновенно лечит легкие раны' },
-    { name: 'Зелье лечения', price: 55, desc: 'Лечит средние раны' },
-    { name: 'Малое зелье маны', price: 55, desc: 'Восстанавливает немного маны' },
-    { name: 'Зелье маны', price: 105, desc: 'Восстанавливает ману' },
-];
-
 export default function ShopPage() {
     const { player, loading: playerLoading, error: playerError, refreshPlayer } = usePlayer();
     const [inventory, setInventory] = useState<any[]>([]);
+    const [offers, setOffers] = useState<ShopOffer[]>([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
 
     const loadInventory = async () => {
         try {
             const data: any = await inventoryApi.getInventory();
-            setInventory(data);
+            setInventory(data.items ?? []);
         } catch (e) {
             console.error(e);
         }
@@ -31,13 +24,17 @@ export default function ShopPage() {
 
     useEffect(() => {
         loadInventory();
+        shopApi.getOffers().then(setOffers).catch((error) => {
+            console.error(error);
+            setMessage({ text: 'Не удалось загрузить товары торговца', type: 'error' });
+        });
     }, []);
 
-    const handleBuy = async (templateName: string) => {
+    const handleBuy = async (offerId: number) => {
         setLoading(true);
         setMessage(null);
         try {
-            const res = await shopApi.buyItem({ templateName, amount: 1 });
+            const res = await shopApi.buyItem({ operationId: crypto.randomUUID(), offerId, amount: 1 });
             setMessage({ text: res.message, type: 'success' });
             refreshPlayer();
             loadInventory();
@@ -52,7 +49,7 @@ export default function ShopPage() {
         setLoading(true);
         setMessage(null);
         try {
-            const res = await shopApi.sellItem({ playerItemId, amount: 1 });
+            const res = await shopApi.sellItem({ operationId: crypto.randomUUID(), playerItemId, amount: 1 });
             setMessage({ text: res.message, type: 'success' });
             refreshPlayer();
             loadInventory();
@@ -67,7 +64,7 @@ export default function ShopPage() {
     if (playerError || !player) return <div style={{ padding: '20px' }}><ErrorMessage message={playerError} /></div>;
 
     // Игрок может продавать только то, что не надето
-    const sellableItems = inventory.filter(item => !item.isEquipped);
+    const sellableItems = inventory.filter(item => !item.equipped && !item.locked);
 
     return (
         <div style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}>
@@ -89,18 +86,20 @@ export default function ShopPage() {
                 {/* Витрина */}
                 <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #dcdcdc' }}>
                     <h2 style={{ marginTop: 0, color: '#333' }}>Витрина (Купить)</h2>
-                    {STORE_ITEMS.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #eee' }}>
+                    {offers.map((offer) => (
+                        <div key={offer.offerId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #eee' }}>
                             <div>
-                                <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-                                <div style={{ fontSize: '0.85rem', color: '#777' }}>{item.desc}</div>
+                                <div style={{ fontWeight: 'bold' }}>{offer.name}</div>
+                                <div style={{ fontSize: '0.85rem', color: '#777' }}>
+                                    {offer.type} · {offer.rarity}{offer.minLevel > 1 ? ` · уровень ${offer.minLevel}` : ''}
+                                </div>
                             </div>
                             <Button
-                                onClick={() => handleBuy(item.name)}
-                                disabled={loading || player.gold < item.price}
-                                style={{ background: player.gold >= item.price ? '#27ae60' : '#ccc' }}
+                                onClick={() => handleBuy(offer.offerId)}
+                                disabled={loading || !offer.available || player.gold < offer.unitPrice}
+                                style={{ background: offer.available && player.gold >= offer.unitPrice ? '#27ae60' : '#ccc' }}
                             >
-                                {item.price} 🪙
+                                {offer.unitPrice} 🪙
                             </Button>
                         </div>
                     ))}
