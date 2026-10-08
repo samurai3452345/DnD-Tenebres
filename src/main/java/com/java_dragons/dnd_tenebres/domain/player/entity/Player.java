@@ -366,15 +366,21 @@ public class Player {
     }
 
     public void allocateStats(int addStr, int addDex, int addCon, int addInt, int addWis, int addCha) {
-        int totalCost = addStr + addDex + addCon + addInt + addWis + addCha;
+        if (addStr < 0 || addDex < 0 || addCon < 0 || addInt < 0 || addWis < 0 || addCha < 0) {
+            throw new IllegalArgumentException("Добавка к характеристике не может быть отрицательной");
+        }
+        long totalCost = Math.addExact(
+                Math.addExact(Math.addExact((long) addStr, addDex), Math.addExact((long) addCon, addInt)),
+                Math.addExact((long) addWis, addCha)
+        );
 
         if (totalCost <= 0) return;
         if (totalCost > this.statPoints) {
             throw new IllegalStateException("Недостаточно поинтов! У вас: " + this.statPoints);
         }
 
-        this.statPoints -= totalCost;
         this.stats.addStats(addStr, addDex, addCon, addInt, addWis, addCha);
+        this.statPoints = Math.toIntExact(this.statPoints - totalCost);
     }
 
     public int getMaxHp() {

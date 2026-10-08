@@ -26,8 +26,6 @@ game:
     max-combat-log-page-size: 100
 
 spring:
-  profiles:
-    default: local
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/dnd_tenebres}
     username: ${DB_USERNAME:postgres}
@@ -42,6 +40,13 @@ spring:
 
 application:
   security:
+    rate-limit:
+      trusted-proxy: ${RATE_LIMIT_TRUSTED_PROXY:false}
+      max-entries: ${RATE_LIMIT_MAX_ENTRIES:10000}
+      auth-requests-per-minute: ${RATE_LIMIT_AUTH_REQUESTS_PER_MINUTE:10}
+      anonymous-requests-per-minute: ${RATE_LIMIT_ANONYMOUS_REQUESTS_PER_MINUTE:120}
+      account-requests-per-minute: ${RATE_LIMIT_ACCOUNT_REQUESTS_PER_MINUTE:120}
+      authenticated-ip-requests-per-minute: ${RATE_LIMIT_AUTHENTICATED_IP_REQUESTS_PER_MINUTE:600}
     cors:
       allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
     jwt:

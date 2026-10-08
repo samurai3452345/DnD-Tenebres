@@ -2,10 +2,13 @@ package com.java_dragons.dnd_tenebres.domain.item.dto;
 
 import java.util.List;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record ItemUpgradeRequest(
+        @NotBlank(message = "operationId обязателен")
+        @Size(max = 100, message = "operationId не может быть длиннее 100 символов")
         String operationId,
         @NotNull(message = "ID улучшаемого предмета обязателен")
         Long targetItemId,

@@ -40,17 +40,19 @@ public class AccountController {
 
     @PostMapping("/logout-all") @Transactional
     public ResponseEntity<Void> logoutAll(Authentication auth) {
-        repository.findByUsername(auth.getName()).orElseThrow().revokeAllTokens();
-        var a = repository.findByUsername(auth.getName()).orElseThrow();
-        auditService.record(a.getUsername(), null, "LOGOUT_ALL", "SUCCESS", "All tokens revoked");
+        if (repository.incrementTokenVersion(auth.getName()) != 1) {
+            throw new IllegalStateException("Аккаунт недоступен");
+        }
+        auditService.record(auth.getName(), null, "LOGOUT_ALL", "SUCCESS", "All tokens revoked");
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping @Transactional
     public ResponseEntity<Void> delete(Authentication auth) {
-        var a = repository.findByUsername(auth.getName()).orElseThrow();
-        a.disable();
-        auditService.record(a.getUsername(), null, "ACCOUNT_DELETE", "SUCCESS", "Account disabled");
+        if (repository.disableAccount(auth.getName()) != 1) {
+            throw new IllegalStateException("Аккаунт уже отключён");
+        }
+        auditService.record(auth.getName(), null, "ACCOUNT_DELETE", "SUCCESS", "Account disabled");
         return ResponseEntity.noContent().build();
     }
 }

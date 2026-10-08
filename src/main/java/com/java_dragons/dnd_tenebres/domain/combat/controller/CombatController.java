@@ -2,11 +2,8 @@ package com.java_dragons.dnd_tenebres.domain.combat.controller;
 
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatActionRequest;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatEvent;
-import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatReport;
 import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatStateResponse;
-import com.java_dragons.dnd_tenebres.domain.combat.dto.CombatTurnRequest;
 import com.java_dragons.dnd_tenebres.domain.combat.service.CombatEncounterService;
-import com.java_dragons.dnd_tenebres.domain.combat.service.CombatService;
 import com.java_dragons.dnd_tenebres.infrastructure.security.annotation.CurrentPlayerId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CombatController {
 
-    private final CombatService combatService;
     private final CombatEncounterService encounterService;
 
     @GetMapping("/current")
@@ -49,17 +45,6 @@ public class CombatController {
             @CurrentPlayerId Long playerId
     ) {
         return ResponseEntity.ok(encounterService.flee(playerId));
-    }
-
-    @Deprecated
-    @PostMapping("/turn")
-    public ResponseEntity<CombatReport> executeTurn(
-            @CurrentPlayerId Long playerId,
-            @Valid @RequestBody CombatTurnRequest request
-    ) {
-        return ResponseEntity.ok(
-                combatService.executeTurnByIds(playerId, request)
-        );
     }
 
     @GetMapping("/journal")

@@ -45,6 +45,7 @@
     <include file="/db/changelog/038-rename-green-forest-zone.xml"/>
     <include file="/db/changelog/039-normalize-player-mana.xml"/>
     <include file="/db/changelog/040-clean-up-orphaned-combat-encounters.xml"/>
+    <include file="/db/changelog/041-harden-account-and-forge.xml"/>
 
 
 </databaseChangeLog>
