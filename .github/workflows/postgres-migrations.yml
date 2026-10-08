@@ -19,4 +19,4 @@ jobs:
       - name: Verify Docker runtime
         run: docker info
       - name: Apply all migrations and validate mappings
-        run: ./mvnw -B -Dtest=PostgresIntegrationTest test
+        run: mvn -B -Dtest=PostgresIntegrationTest test
