@@ -19,6 +19,7 @@ services:
       - "8081:8081"
     environment:
       - JWT_SECRET=${JWT_SECRET}
+      - SPRING_PROFILES_ACTIVE=production
       - DB_PASSWORD=${DB_PASSWORD}
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
