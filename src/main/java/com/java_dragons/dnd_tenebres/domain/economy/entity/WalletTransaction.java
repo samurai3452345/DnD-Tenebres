@@ -7,7 +7,9 @@ import java.time.Instant;
 @Getter @Builder @NoArgsConstructor @AllArgsConstructor
 public class WalletTransaction {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
-    @Column(name="player_id", nullable=false) private Long playerId;
+    @Column(name="player_id") private Long playerId;
+    @Column(name="player_name", nullable=false, length=50) private String playerName;
+    @Column(name="player_reference_id", nullable=false) private Long playerReferenceId;
     @Column(nullable=false) private long amount;
     @Column(name="balance_before", nullable=false) private long balanceBefore;
     @Column(name="balance_after", nullable=false) private long balanceAfter;

@@ -77,6 +77,9 @@ public class PlayerService {
     public void deleteCharacter(Long accountId, Long playerId) {
         Player player = playerRepository.findByIdAndAccountId(playerId, accountId)
                 .orElseThrow(() -> new EntityNotFoundException("Персонаж не найден в этом аккаунте"));
+        if (player.isInCombat()) {
+            throw new IllegalStateException("Нельзя удалить персонажа во время активного боя");
+        }
         playerRepository.delete(player);
     }
 

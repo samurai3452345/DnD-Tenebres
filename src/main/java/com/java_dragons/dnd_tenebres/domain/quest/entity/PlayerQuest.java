@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "player_quests")
+@Table(name = "player_quests", uniqueConstraints = @UniqueConstraint(
+        name = "uq_active_quest_key", columnNames = {"player_id", "quest_template_id", "active_quest_key"}))
 public class PlayerQuest {
 
     @Id
@@ -41,6 +42,9 @@ public class PlayerQuest {
     @Column(name = "status", nullable = false)
     private QuestStatus questStatus;
 
+    @Column(name = "active_quest_key")
+    private Boolean activeQuestKey;
+
     public void incrementProgress(int amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Количество должно быть больше нуля");
@@ -60,10 +64,12 @@ public class PlayerQuest {
             throw new IllegalStateException("Для получения награды квест должен быть завершён");
         }
         this.questStatus = QuestStatus.REWARDED;
+        this.activeQuestKey = null;
     }
 
     private PlayerQuest(Player player, QuestTemplate questTemplate) {
         this.questStatus = QuestStatus.ACTIVE;
+        this.activeQuestKey = true;
         this.currentProgress = 0;
         this.questTemplate = questTemplate;
         this.player = player;
@@ -80,5 +86,11 @@ public class PlayerQuest {
 
     public int getRewardGold() {
         return questTemplate.getRewardGold();
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void synchronizeActiveKey() {
+        activeQuestKey = questStatus == QuestStatus.REWARDED ? null : Boolean.TRUE;
     }
 }
