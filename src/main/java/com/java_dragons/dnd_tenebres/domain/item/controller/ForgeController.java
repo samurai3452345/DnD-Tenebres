@@ -14,6 +14,14 @@ import org.springframework.web.bind.annotation.*;
 public class ForgeController {
 
     private final ItemUpgradeService itemUpgradeService;
+    private final com.java_dragons.dnd_tenebres.domain.item.service.SmeltingService smeltingService;
+
+    @PostMapping("/smelt")
+    public ResponseEntity<com.java_dragons.dnd_tenebres.domain.item.dto.SmeltResponse> smelt(
+            @CurrentPlayerId Long playerId,
+            @Valid @RequestBody com.java_dragons.dnd_tenebres.domain.item.dto.SmeltRequest request) {
+        return ResponseEntity.ok(smeltingService.smelt(playerId, request.oreName(), request.amount()));
+    }
 
     @PostMapping("/upgrade")
     public ResponseEntity<?> upgradeItem(

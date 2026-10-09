@@ -7,5 +7,10 @@ export interface Item {
 }
 
 export interface Inventory {
-    items: Item[];
+    items: {
+        id: number;
+        template: { name: string; type: string; rarity: string };
+        equipped: boolean;
+        amount: number;
+    }[];
 }

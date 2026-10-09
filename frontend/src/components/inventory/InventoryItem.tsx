@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Item } from '../../types/inventory';
+import { resourceIcons } from '../../assets/resourceIcons';
 
 interface InventoryItemProps {
     item: Item;
@@ -27,6 +28,8 @@ export default function InventoryItem({ item, onClick }: InventoryItemProps) {
             onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
             onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
+            {resourceIcons[item.name] && <img src={resourceIcons[item.name]} alt=""
+                style={{ width: '80px', height: '80px', objectFit: 'contain', marginBottom: '8px' }} />}
             <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{item.name}</div>
             <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{item.type}</div>
             <div style={{ fontSize: '0.9rem', flexGrow: 1, color: '#555' }}>{item.description}</div>

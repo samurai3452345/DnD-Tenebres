@@ -3,9 +3,10 @@ import { inventoryApi } from '../api/inventoryApi';
 import Inventory from '../components/inventory/Inventory';
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
+import type { Item } from '../types/inventory';
 
 export default function InventoryPage() {
-    const [items, setItems] = useState<any[]>([]); // Используем any для MVP, так как бэкенд отдает структуру PlayerItem
+    const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -17,13 +18,13 @@ export default function InventoryPage() {
         setLoading(true);
         setError(null);
         try {
-            const data: any = await inventoryApi.getInventory();
+            const data = await inventoryApi.getInventory();
             // Маппим данные с бэкенда под наш интерфейс
-            const mappedItems = data.map((pi: any) => ({
+            const mappedItems = data.items.map(pi => ({
                 id: pi.id,
                 name: pi.template.name,
                 type: pi.template.type,
-                description: `Статы: ${pi.template.statBudget} | Экипировано: ${pi.isEquipped ? 'Да' : 'Нет'}`,
+                description: `Редкость: ${pi.template.rarity} | Экипировано: ${pi.equipped ? 'Да' : 'Нет'}`,
                 quantity: pi.amount
             }));
             setItems(mappedItems);
