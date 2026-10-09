@@ -5,5 +5,10 @@ public record CombatEvent(
         String actionType,
         String target,
         int value,
-        String description
-) {}
+        String description,
+        Integer round
+) {
+    public CombatEvent(String actor, String actionType, String target, int value, String description) {
+        this(actor, actionType, target, value, description, null);
+    }
+}

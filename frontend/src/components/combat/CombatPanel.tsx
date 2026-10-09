@@ -1,62 +1,55 @@
-import React from 'react';
-import type { CombatActionRequest, CombatState } from '../../types/combat';
-import CombatLog from './CombatLog';
-import CombatActions from './CombatActions';
+import { useEffect, useRef, useState } from "react";
+import type { CombatActionRequest, CombatState } from "../../types/combat";
+import CombatLog from "./CombatLog";
+import CombatActions from "./CombatActions";
+import EnemyHealthBar from "./EnemyHealthBar";
+import { CombatEffects, CombatSymbol, elementNames } from "./CombatSymbols";
+import "./combat.css";
 
 interface CombatPanelProps {
-    state: CombatState;
-    monsterName: string;
-    isLoading: boolean;
-    onAction: (request: CombatActionRequest) => void;
+    state: CombatState; monsterName: string; isLoading: boolean; onAction: (request: CombatActionRequest) => void;
+    onFinish: () => void; background: string; error: string | null;
 }
-
 const statusLabels: Partial<Record<CombatState["status"], string>> = {
-    VICTORY: "ПОБЕДА!",
-    DEFEAT: "ВЫ ПОГИБЛИ",
-    FLED: "ПОБЕГ УДАЛСЯ",
-    CANCELLED: "БОЙ ПРЕРВАН",
+    VICTORY: "Победа!", DEFEAT: "Поражение", FLED: "Побег удался", CANCELLED: "Бой прерван",
 };
-
-export default function CombatPanel({ state, monsterName, isLoading, onAction }: CombatPanelProps) {
+export default function CombatPanel({ state, monsterName, isLoading, onAction, onFinish, background, error }: CombatPanelProps) {
+    const [lastEnemy, setLastEnemy] = useState(state.currentEnemy);
+    const screenRef = useRef<HTMLElement>(null);
+    useEffect(() => {
+        const previousFocus = document.activeElement;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        screenRef.current?.focus();
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            if (previousFocus instanceof HTMLElement) previousFocus.focus();
+        };
+    }, []);
+    useEffect(() => { if (state.currentEnemy) setLastEnemy(state.currentEnemy); }, [state.currentEnemy]);
+    const enemy = state.currentEnemy ?? lastEnemy;
     const isFinished = state.status !== "ACTIVE";
-    const enemy = state.currentEnemy;
-
-    return (
-        <div style={{ border: '2px solid #e74c3c', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-
-            <div style={{ backgroundColor: '#e74c3c', color: 'white', padding: '12px 15px', fontWeight: 'bold', fontSize: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>⚔️ Противник: {monsterName}</span>
-                {statusLabels[state.status] && (
-                    <span style={{ color: '#f1c40f', background: 'rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: '4px' }}>
-                        {statusLabels[state.status]}
-                    </span>
-                )}
-            </div>
-
-            <div style={{ padding: '15px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', color: '#2c1810' }}>
-                    <span>
-                        <strong>{state.player.name}</strong>: {state.player.currentHp}/{state.player.maxHp} HP · {state.player.currentMp}/{state.player.maxMp} MP
-                    </span>
-                    <span>
-                        Раунд {state.round}
-                        {enemy ? ` · ${enemy.currentHp}/${enemy.maxHp} HP` : ''}
-                        {state.remainingEnemies > 1 ? ` · врагов: ${state.remainingEnemies}` : ''}
-                    </span>
-                </div>
-                <CombatLog events={state.journal} />
-
-                <div style={{ marginTop: '15px' }}>
-                    <CombatActions
-                        allowedActions={state.allowedActions}
-                        abilities={state.availableAbilities}
-                        potions={state.availablePotions}
-                        currentEnemyId={enemy?.id ?? null}
-                        onAction={onAction}
-                        disabled={isFinished || isLoading}
-                    />
-                </div>
-            </div>
+    return <section ref={screenRef} tabIndex={-1} className="combat-screen" style={{ backgroundImage: `url("${background}")` }} aria-label="Поле боя" aria-busy={isLoading}>
+        <div className="combat-screen__shade" aria-hidden="true" />
+        <div className="combat-stage">
+            <header className="combat-enemy" aria-label="Противник">
+                <img className="combat-enemy__frame" src="/assets/combat/enemy-panel-no-hp.png" alt="" />
+                <h1>{monsterName}</h1><span className="combat-enemy__level">{enemy?.level ?? "—"}</span>
+                {enemy?.elements.find(element => element !== "PHYSICAL") && <span className="combat-enemy__element-icon"><CombatSymbol kind={enemy.elements.find(element => element !== "PHYSICAL")!} /></span>}
+                <span className="combat-enemy__elements">{enemy?.elements.filter(element => element !== "PHYSICAL").map(element => elementNames[element] ?? element).join(", ") || "Нет стихии"}</span>
+                <div className="combat-enemy__effects"><CombatEffects effects={state.currentEnemy?.effects ?? []} /></div>
+                <EnemyHealthBar value={state.currentEnemy?.currentHp ?? (state.status === "VICTORY" ? 0 : enemy?.currentHp ?? 0)} maximum={enemy?.maxHp ?? 0} />
+            </header>
+            {state.remainingEnemies > 1 && <div className="combat-stage__caption"><span>Противников: {state.remainingEnemies}</span></div>}
+            {/* Enemy artwork will be mapped to the backend avatarKey when supplied. */}
+            <div className="combat-stage__enemy" aria-hidden="true" data-avatar-key={enemy?.avatarKey} />
+            {isFinished && <div className="combat-result" role="status"><h2>{statusLabels[state.status]}</h2>
+                <p>{state.status === "VICTORY" ? "Противник повержен. Награды — в журнале боя." : "Бой окончен."}</p>
+                <button type="button" onClick={onFinish}>Вернуться в локацию</button></div>}
+            {isLoading && <p className="combat-screen__notice" role="status">Выполняется действие…</p>}
+            {error && <p className="combat-screen__notice combat-screen__notice--error" role="alert">{error}</p>}
         </div>
-    );
+        <CombatLog events={state.journal} />
+        <CombatActions state={state} onAction={onAction} disabled={isFinished || isLoading} />
+    </section>;
 }

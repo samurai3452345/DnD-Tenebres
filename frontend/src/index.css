@@ -1686,3 +1686,102 @@ button, a { -webkit-tap-highlight-color: transparent; }
     .auth-card--ornate .auth-field { min-height: 3rem; padding: 0 .8rem; }
     .auth-card--ornate .auth-submit { min-height: 3.35rem; }
 }
+
+/* БОЙ: пользовательская HP-полоска врага.
+   Все проценты ниже относятся к родительскому блоку.
+   left/top — положение; width — длина; height — толщина.
+   Этот блок управляет только новой полоской, обычные HP/MP героя — в combat.css. */
+
+/* Положение и размер всей полоски внутри панели врага (рамка + заполнение + цифры). */
+.combat-enemy-hp {
+    position: absolute;
+    left: 16%;
+    top: 51%;
+    width: 61%;
+    height: 19%;
+    pointer-events: none;
+}
+
+/* РАМКА: можно сдвигать и масштабировать отдельно от заполнений. */
+.combat-enemy-hp__frame {
+    position: absolute;
+    left: 0%;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+}
+
+.combat-enemy-hp svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Общая динамика: выбранное изображение обрезается по точному проценту HP.
+   --hp-visible задаётся автоматически компонентом; вручную менять не нужно. */
+.combat-enemy-hp__fill {
+    position: absolute;
+    visibility: hidden;
+    clip-path: inset(0 calc(100% - var(--hp-visible, 100%)) 0 0);
+    transition: clip-path .3s ease;
+}
+.combat-enemy-hp__fill[data-active="true"] { visibility: visible; }
+
+/* ЗАПОЛНЕНИЕ 20%: положение, длина и толщина только этой картинки. */
+.combat-enemy-hp__fill--20 {
+    left: 14.4%;
+    top: 31%;
+    width: 15.3%;
+    height: 42%;
+}
+
+/* ЗАПОЛНЕНИЕ 40%. */
+.combat-enemy-hp__fill--40 {
+    left: 14.4%;
+    top: 31%;
+    width: 30.6%;
+    height: 42%;
+}
+
+/* ЗАПОЛНЕНИЕ 60%. */
+.combat-enemy-hp__fill--60 {
+    left: 14.4%;
+    top: 31%;
+    width: 45.9%;
+    height: 42%;
+}
+
+/* ЗАПОЛНЕНИЕ 80%. */
+.combat-enemy-hp__fill--80 {
+    left: 14.4%;
+    top: 31%;
+    width: 61.2%;
+    height: 42%;
+}
+
+/* ЗАПОЛНЕНИЕ 100%. */
+.combat-enemy-hp__fill--100 {
+    left: 14.4%;
+    top: 31%;
+    width: 78.5%;
+    height: 42%;
+}
+
+/* Числа текущего и максимального HP поверх заполнения. */
+.combat-enemy-hp__value {
+    position: absolute;
+    left: 15%;
+    top: 27%;
+    width: 76.5%;
+    height: 42%;
+    display: grid;
+    place-items: center;
+    font-size: clamp(7px, .8vw, 13px);
+    color: #fff0d3;
+    text-shadow: 0 1px 3px #000, 1px 0 2px #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .combat-enemy-hp__fill { transition: none; }
+}

@@ -25,6 +25,7 @@ export interface CombatActionRequest {
 }
 
 export interface CombatEvent {
+    round?: number | null;
     actor: string;
     actionType: string;
     target: string;

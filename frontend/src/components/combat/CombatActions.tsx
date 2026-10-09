@@ -1,130 +1,89 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { CombatActionRequest, CombatState, CombatAbilityState, CombatPotionState } from "../../types/combat";
+import { CombatBar, CombatEffects, CombatSymbol, PotionSymbol, elementNames } from "./CombatSymbols";
 
-import Button from "../common/Button";
-import type {
-    CombatAbilityState,
-    CombatAction,
-    CombatActionRequest,
-    CombatPotionState,
-} from "../../types/combat";
-
-interface CombatActionsProps {
-    allowedActions: CombatAction[];
-    abilities: CombatAbilityState[];
-    potions: CombatPotionState[];
-    currentEnemyId: number | null;
-    onAction: (request: CombatActionRequest) => void;
-    disabled?: boolean;
-}
-
+type Selection = { kind: "spell"; item: CombatAbilityState } | { kind: "potion"; item: CombatPotionState };
 function unavailableReason(reason: string | null) {
-    if (reason === "MAGIC_FOCUS_REQUIRED") return "нужно магическое оружие";
-    if (reason === "NOT_ENOUGH_MANA") return "не хватает маны";
-    return "недоступно";
+    if (reason === "MAGIC_FOCUS_REQUIRED") return "Нужно подходящее магическое оружие";
+    if (reason === "NOT_ENOUGH_MANA") return "Не хватает маны";
+    return "Недоступно";
 }
-
-export default function CombatActions({
-    allowedActions,
-    abilities,
-    potions,
-    currentEnemyId,
-    onAction,
-    disabled,
-}: CombatActionsProps) {
-    const availableAbilities = useMemo(() => abilities.filter((ability) => ability.available), [abilities]);
-    const availablePotions = useMemo(() => potions.filter((potion) => potion.available), [potions]);
-    const [abilityId, setAbilityId] = useState<number | null>(null);
-    const [itemId, setItemId] = useState<number | null>(null);
-    const allows = (action: CombatAction) => allowedActions.includes(action);
-
+export default function CombatActions({ state, onAction, disabled }: {
+    state: CombatState; onAction: (request: CombatActionRequest) => void; disabled: boolean;
+}) {
+    const [selection, setSelection] = useState<Selection | null>(null);
+    const confirmRef = useRef<HTMLButtonElement>(null);
+    const allows = (action: CombatActionRequest["action"]) => !disabled && state.allowedActions.includes(action);
+    useEffect(() => { setSelection(null); }, [state.encounterId, state.round, state.status]);
     useEffect(() => {
-        setAbilityId((current) => availableAbilities.some((ability) => ability.id === current)
-            ? current
-            : availableAbilities[0]?.id ?? null);
-    }, [availableAbilities]);
-
-    useEffect(() => {
-        setItemId((current) => availablePotions.some((potion) => potion.itemId === current)
-            ? current
-            : availablePotions[0]?.itemId ?? null);
-    }, [availablePotions]);
-
-    const actionRequest = (
-        action: CombatAction,
-        selectedAbilityId: number | null = null,
-        selectedItemId: number | null = null,
-    ): CombatActionRequest => ({
-        action,
-        targetId: action === "ATTACK" || action === "CAST_SPELL" ? currentEnemyId : null,
-        abilityId: selectedAbilityId,
-        itemId: selectedItemId,
-    });
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '15px', background: '#f5f5f5', borderRadius: '8px' }}>
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <Button
-                    variant="primary"
-                    disabled={disabled || !allows("ATTACK") || currentEnemyId === null}
-                    onClick={() => onAction(actionRequest("ATTACK"))}
-                    style={{ flex: 1 }}
-                >
-                    ⚔️ Атаковать
-                </Button>
-                <Button
-                    variant="secondary"
-                    disabled={disabled || !allows("FLEE")}
-                    onClick={() => onAction(actionRequest("FLEE"))}
-                    style={{ flex: 1 }}
-                >
-                    🏃 Сбежать
-                </Button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '10px', alignItems: 'center', marginTop: '5px' }}>
-                <select
-                    aria-label="Заклинание"
-                    value={abilityId ?? ""}
-                    onChange={(event) => setAbilityId(Number(event.target.value))}
-                    disabled={disabled || availableAbilities.length === 0}
-                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', flexGrow: 1 }}
-                >
-                    {availableAbilities.length === 0 && <option value="">Нет доступных заклинаний</option>}
-                    {abilities.map((ability) => (
-                        <option key={ability.id} value={ability.id} disabled={!ability.available}>
-                            {ability.name} — {ability.manaCost} маны
-                            {!ability.available ? ` (${unavailableReason(ability.unavailableReason)})` : ""}
-                        </option>
-                    ))}
-                </select>
-                <Button
-                    variant="primary"
-                    disabled={disabled || !allows("CAST_SPELL") || abilityId === null || currentEnemyId === null}
-                    onClick={() => onAction(actionRequest("CAST_SPELL", abilityId))}
-                >
-                    ✨ Применить
-                </Button>
-                <select
-                    aria-label="Зелье"
-                    value={itemId ?? ""}
-                    onChange={(event) => setItemId(Number(event.target.value))}
-                    disabled={disabled || availablePotions.length === 0}
-                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', flexGrow: 1 }}
-                >
-                    {availablePotions.length === 0 && <option value="">Нет доступных зелий</option>}
-                    {potions.map((potion) => (
-                        <option key={potion.itemId} value={potion.itemId} disabled={!potion.available}>
-                            {potion.name} × {potion.amount}
-                        </option>
-                    ))}
-                </select>
-                <Button
-                    variant="primary"
-                    disabled={disabled || !allows("USE_POTION") || itemId === null}
-                    onClick={() => onAction(actionRequest("USE_POTION", null, itemId))}
-                >
-                    🧪 Выпить
-                </Button>
-            </div>
+        if (!selection) return;
+        const previousFocus = document.activeElement;
+        confirmRef.current?.focus();
+        const escape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setSelection(null);
+            if (event.key === "Tab") {
+                const buttons = confirmRef.current?.parentElement?.querySelectorAll<HTMLButtonElement>("button");
+                if (buttons?.length === 2) { event.preventDefault(); (document.activeElement === buttons[0] ? buttons[1] : buttons[0]).focus(); }
+            }
+        };
+        document.addEventListener("keydown", escape);
+        return () => { document.removeEventListener("keydown", escape); if (previousFocus instanceof HTMLElement) previousFocus.focus(); };
+    }, [selection]);
+    const send = (action: CombatActionRequest["action"], abilityId: number | null = null, itemId: number | null = null) => {
+        setSelection(null);
+        onAction({ action, abilityId, itemId, targetId: action === "ATTACK" || action === "CAST_SPELL" ? state.currentEnemy?.id ?? null : null });
+    };
+    const selectedAvailable = selection?.kind === "spell"
+        ? allows("CAST_SPELL") && !!state.currentEnemy && state.availableAbilities.some(a => a.id === selection.item.id && a.available)
+        : selection?.kind === "potion" && allows("USE_POTION") && state.availablePotions.some(p => p.itemId === selection.item.itemId && p.available && p.amount > 0);
+    return <>
+        <section className="combat-dock" aria-label="Персонаж и способности">
+            <section className="combat-hero" aria-label="Герой">
+                <div className="combat-hero__interface">
+                <h2>{state.player.name}</h2>
+                <div className="combat-hero__vitals">
+                <CombatBar kind="hp" value={state.player.currentHp} maximum={state.player.maxHp} />
+                <CombatBar kind="mp" value={state.player.currentMp} maximum={state.player.maxMp} />
+                <CombatEffects effects={state.player.effects} />
+                </div>
+                </div>
+            </section>
+            <section className="combat-spells" aria-label="Заклинания"><h2 className="sr-only">Заклинания</h2><div className="combat-cards">
+                {state.availableAbilities.map(ability => <button key={ability.id} type="button" className="combat-card"
+                    disabled={!allows("CAST_SPELL") || !ability.available || !state.currentEnemy}
+                    title={ability.available ? `${ability.name}, ${elementNames[ability.element] ?? ability.element}` : unavailableReason(ability.unavailableReason)}
+                    onClick={() => setSelection({ kind: "spell", item: ability })}>
+                    <span className="combat-card__icon"><CombatSymbol kind={ability.element} /></span>
+                    <strong>{ability.name}</strong><span>Мана: {ability.manaCost}</span>
+                    {!ability.available && <small>{ability.unavailableReason === "MAGIC_FOCUS_REQUIRED" ? "Нужно маг. оружие" : unavailableReason(ability.unavailableReason)}</small>}
+                </button>)}
+                {!state.availableAbilities.length && <p className="combat-empty">Заклинаний пока нет</p>}
+            </div></section>
+            <section className="combat-potions" aria-label="Зелья"><h2 className="sr-only">Зелья</h2><div className="combat-cards">
+                {state.availablePotions.map(potion => <button key={potion.itemId} type="button" className="combat-card"
+                    disabled={!allows("USE_POTION") || !potion.available || potion.amount <= 0}
+                    onClick={() => setSelection({ kind: "potion", item: potion })}>
+                    <span className="combat-card__icon combat-card__icon--potion"><PotionSymbol kind={potion.action} /></span>
+                    <strong>{potion.name}</strong><span>×{potion.amount}</span>
+                </button>)}
+                {!state.availablePotions.length && <p className="combat-empty">Нет зелий</p>}
+            </div></section>
+        </section>
+        <div className="combat-main-actions" aria-label="Боевые действия">
+            <button className="combat-image-button" type="button" disabled={!allows("ATTACK") || !state.currentEnemy}
+                aria-label="Атаковать" onClick={() => send("ATTACK")}><img src="/assets/combat/attack.png" alt="Атаковать" /></button>
+            <button className="combat-image-button" type="button" disabled={!allows("FLEE")}
+                aria-label="Сбежать" onClick={() => send("FLEE")}><img src="/assets/combat/flee.png" alt="Сбежать" /></button>
         </div>
-    );
+        {selection && <div className="combat-confirm-backdrop" onMouseDown={() => setSelection(null)}>
+            <section className="combat-confirm" role="dialog" aria-modal="true" aria-labelledby="combat-confirm-title" onMouseDown={event => event.stopPropagation()}>
+                <CombatSymbol kind={selection.kind === "spell" ? selection.item.element : selection.item.action} />
+                <h2 id="combat-confirm-title">{selection.item.name}</h2>
+                <p>{selection.kind === "spell" ? `Использовать заклинание? Расход маны: ${selection.item.manaCost}.` : `Использовать зелье? В наличии: ${selection.item.amount}.`}</p>
+                <div><button ref={confirmRef} type="button" disabled={!selectedAvailable} onClick={() => selection.kind === "spell"
+                    ? send("CAST_SPELL", selection.item.id) : send("USE_POTION", null, selection.item.itemId)}>Использовать</button>
+                    <button type="button" onClick={() => setSelection(null)}>Отмена</button></div>
+            </section>
+        </div>}
+    </>;
 }
