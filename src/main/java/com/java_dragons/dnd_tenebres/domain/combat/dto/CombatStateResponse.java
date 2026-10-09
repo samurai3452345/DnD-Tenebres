@@ -10,7 +10,9 @@ public record CombatStateResponse(
         PlayerState player, EnemyState currentEnemy, long remainingEnemies,
         List<CombatAction> allowedActions, List<AbilityState> availableAbilities,
         List<PotionState> availablePotions, List<CombatEvent> events,
-        List<CombatEvent> journal, Instant startedAt) {
+        List<CombatEvent> journal, Instant startedAt, List<RewardState> rewards) {
+
+    public record RewardState(String name, long amount, String iconKey) {}
 
     public record EffectState(String type, int remainingRounds, int power, String category) {}
     public record PlayerState(Long id, String name, int level, int currentHp, int maxHp,

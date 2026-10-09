@@ -3,6 +3,8 @@ import type { CombatActionRequest, CombatState } from "../../types/combat";
 import CombatLog from "./CombatLog";
 import CombatActions from "./CombatActions";
 import EnemyHealthBar from "./EnemyHealthBar";
+import CombatEnemyArtwork from "./CombatEnemyArtwork";
+import CombatVictory from "./CombatVictory";
 import { CombatEffects, CombatSymbol, elementNames } from "./CombatSymbols";
 import "./combat.css";
 
@@ -31,6 +33,7 @@ export default function CombatPanel({ state, monsterName, isLoading, onAction, o
     const isFinished = state.status !== "ACTIVE";
     return <section ref={screenRef} tabIndex={-1} className="combat-screen" style={{ backgroundImage: `url("${background}")` }} aria-label="Поле боя" aria-busy={isLoading}>
         <div className="combat-screen__shade" aria-hidden="true" />
+        <div style={{ display: "contents" }} inert={state.status === "VICTORY"}>
         <div className="combat-stage">
             <header className="combat-enemy" aria-label="Противник">
                 <img className="combat-enemy__frame" src="/assets/combat/enemy-panel-no-hp.png" alt="" />
@@ -41,15 +44,16 @@ export default function CombatPanel({ state, monsterName, isLoading, onAction, o
                 <EnemyHealthBar value={state.currentEnemy?.currentHp ?? (state.status === "VICTORY" ? 0 : enemy?.currentHp ?? 0)} maximum={enemy?.maxHp ?? 0} />
             </header>
             {state.remainingEnemies > 1 && <div className="combat-stage__caption"><span>Противников: {state.remainingEnemies}</span></div>}
-            {/* Enemy artwork will be mapped to the backend avatarKey when supplied. */}
-            <div className="combat-stage__enemy" aria-hidden="true" data-avatar-key={enemy?.avatarKey} />
-            {isFinished && <div className="combat-result" role="status"><h2>{statusLabels[state.status]}</h2>
-                <p>{state.status === "VICTORY" ? "Противник повержен. Награды — в журнале боя." : "Бой окончен."}</p>
+            <CombatEnemyArtwork enemy={enemy} />
+            {isFinished && state.status !== "VICTORY" && <div className="combat-result" role="status"><h2>{statusLabels[state.status]}</h2>
+                <p>Бой окончен.</p>
                 <button type="button" onClick={onFinish}>Вернуться в локацию</button></div>}
             {isLoading && <p className="combat-screen__notice" role="status">Выполняется действие…</p>}
             {error && <p className="combat-screen__notice combat-screen__notice--error" role="alert">{error}</p>}
         </div>
         <CombatLog events={state.journal} />
         <CombatActions state={state} onAction={onAction} disabled={isFinished || isLoading} />
+        </div>
+        {state.status === "VICTORY" && <CombatVictory rewards={state.rewards} onFinish={onFinish} />}
     </section>;
 }

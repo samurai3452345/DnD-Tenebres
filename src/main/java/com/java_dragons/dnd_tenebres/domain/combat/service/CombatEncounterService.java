@@ -201,7 +201,12 @@ public class CombatEncounterService {
                 new CombatStateResponse.PlayerState(player.getId(), player.getName(), player.getLevel(),
                         player.getCurrentHp(), player.getMaxHp(), player.getCurrentMp(), player.getMaxMp(),
                         "hero:default", effects(player.getActiveEffects())), enemy, remaining, actions,
-                abilities, potions, events, journal, encounter.getCreatedAt());
+                abilities, potions, events, journal, encounter.getCreatedAt(),
+                encounter.getStatus() == EncounterStatus.VICTORY
+                        ? CombatRewardSummary.fromEvents(logRepository
+                            .findByEncounterIdAndActionTypeInOrderByIdAsc(encounter.getId(), List.of("LOOT", "REWARD"))
+                            .stream().map(CombatLogEntry::toEvent).toList())
+                        : List.of());
     }
 
     private List<CombatStateResponse.EffectState> effects(Collection<ActiveEffect> effects) {
