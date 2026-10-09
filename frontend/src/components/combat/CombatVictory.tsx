@@ -1,9 +1,12 @@
 import { useEffect, useRef } from "react";
 import type { CombatReward } from "../../types/combat";
 import "./victory.css";
+import { resourceIcons } from "../../assets/resourceIcons";
 
 // Add supplied artwork here, keyed by the backend iconKey (e.g. "item:Ржавый кинжал").
-const rewardIcons: Record<string, string> = {};
+const rewardIcons: Record<string, string> = Object.fromEntries(
+    Object.entries(resourceIcons).map(([name, path]) => [`item:${name}`, path])
+);
 
 function Asset({ file, viewBox, className }: { file: string; viewBox: string; className: string }) {
     return <svg className={className} viewBox={viewBox} preserveAspectRatio="none" aria-hidden="true">

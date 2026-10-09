@@ -21,6 +21,16 @@ class LiquibaseMigrationTest {
         liquibase.afterPropertiesSet();
 
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        assertThat(jdbc.queryForObject("select count(*) from item_templates where name in "
+                + "('Железная руда','Мифриловая руда','Орихалковая руда') and type='RESOURCE'", Integer.class)).isEqualTo(3);
+        assertThat(jdbc.queryForObject("select count(*) from locations where id in "
+                + "('forest_edge','forest_wolf_trail','forest_goblin_camp') and search_difficulty=6", Integer.class)).isEqualTo(3);
+        assertThat(jdbc.queryForObject("select count(*) from locations l where (zone_id='forgotten_crypt' or zone_id='green_forest') "
+                + "and not exists (select 1 from location_loot_tables t where t.location_id=l.id)", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from location_loot_tables l join item_templates t on t.id=l.item_template_id "
+                + "where t.name in ('Железный слиток','Мифриловый слиток','Орихалковый слиток')", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from location_connections where from_location_id='city_square' "
+                + "and to_location_id='city_forge'", Integer.class)).isEqualTo(1);
         assertThat(constraintCount(jdbc, "ck_players_resources")).isEqualTo(1);
         assertThat(constraintCount(jdbc, "uq_active_encounter_key")).isEqualTo(1);
         assertThat(constraintCount(jdbc, "uq_active_quest_key")).isEqualTo(1);

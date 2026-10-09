@@ -49,6 +49,7 @@
     <include file="/db/changelog/042-gameplay-consistency.xml"/>
     <include file="/db/changelog/043-database-integrity.xml"/>
     <include file="/db/changelog/044-remove-legacy-combat-and-items.xml"/>
+    <include file="/db/changelog/045-resource-ores-and-search.xml"/>
 
 
 </databaseChangeLog>

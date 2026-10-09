@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="045-ores-and-ingots" author="codex">
+        <!-- Preserve IDs and existing inventories / loot references. -->
+        <sql>
+            UPDATE item_templates SET name = 'Железный слиток' WHERE name = 'Железо';
+            UPDATE item_templates SET name = 'Мифриловый слиток' WHERE name = 'Мифрил';
+            UPDATE item_templates SET name = 'Орихалковый слиток' WHERE name = 'Орихалк';
+            INSERT INTO item_templates (name, type, slot, rarity, armor_type, armor_class, required_strength, damage_dice, stat_budget, passive_effect)
+            VALUES ('Железная руда', 'RESOURCE', 'NONE', 'UNCOMMON', 'NONE', 0, 0, NULL, 0, 'NONE'),
+                   ('Мифриловая руда', 'RESOURCE', 'NONE', 'RARE', 'NONE', 0, 0, NULL, 0, 'NONE'),
+                   ('Орихалковая руда', 'RESOURCE', 'NONE', 'EPIC', 'NONE', 0, 0, NULL, 0, 'NONE');
+            UPDATE location_loot_tables SET item_template_id = (SELECT id FROM item_templates WHERE name = 'Железная руда')
+             WHERE item_template_id = (SELECT id FROM item_templates WHERE name = 'Железный слиток');
+            UPDATE location_loot_tables SET item_template_id = (SELECT id FROM item_templates WHERE name = 'Мифриловая руда')
+             WHERE item_template_id = (SELECT id FROM item_templates WHERE name = 'Мифриловый слиток');
+            UPDATE location_loot_tables SET item_template_id = (SELECT id FROM item_templates WHERE name = 'Орихалковая руда')
+             WHERE item_template_id = (SELECT id FROM item_templates WHERE name = 'Орихалковый слиток');
+            UPDATE locations SET search_difficulty = 6 WHERE id IN ('forest_edge', 'forest_wolf_trail', 'forest_goblin_camp');
+        </sql>
+    </changeSet>
+    <changeSet id="045-search-loot" author="codex">
+        <!-- Existing chances are preserved; missing locations get their own loot. -->
+        <sql>
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            SELECT id, (SELECT id FROM item_templates WHERE name = 'Древесина'), 1, 3, 60
+              FROM locations WHERE id IN ('forest_edge', 'forest_wolf_trail', 'forest_goblin_camp');
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            SELECT id, (SELECT id FROM item_templates WHERE name = 'Кровоцвет'), 1, 2, 30
+              FROM locations WHERE id IN ('forest_wolf_trail', 'forest_goblin_camp');
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            VALUES ('forest_goblin_camp', (SELECT id FROM item_templates WHERE name = 'Железная руда'), 1, 2, 30);
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            SELECT id, (SELECT id FROM item_templates WHERE name = 'Железная руда'), 1, 2, 30
+              FROM locations WHERE zone_id = 'forgotten_crypt' AND id != 'crypt_entrance';
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            SELECT id, (SELECT id FROM item_templates WHERE name = 'Мифриловая руда'), 1, 2, 15
+              FROM locations WHERE id IN ('crypt_library', 'crypt_armory', 'crypt_boss_room');
+            INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
+            VALUES ('crypt_boss_room', (SELECT id FROM item_templates WHERE name = 'Орихалковая руда'), 1, 1, 5);
+        </sql>
+    </changeSet>
+    <changeSet id="045-city-forge" author="codex">
+        <sql>
+            INSERT INTO locations (id, name, level, zone_id, zone_name, type, biome, effect, hunt_difficulty, search_difficulty)
+            VALUES ('city_forge', 'Городская кузница', 1, 'talmiria', 'Талмирия', 'SAFE_ZONE', 'CITY', 'NONE', 99, 20);
+            INSERT INTO location_connections (from_location_id, to_location_id)
+            VALUES ('city_square', 'city_forge'), ('city_forge', 'city_square');
+        </sql>
+    </changeSet>
+</databaseChangeLog>
