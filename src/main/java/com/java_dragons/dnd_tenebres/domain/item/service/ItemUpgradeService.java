@@ -29,6 +29,7 @@ public class ItemUpgradeService {
     private final PlayerRepository playerRepository;
     private final ForgeOperationRepository forgeOperationRepository;
     private final ItemProgressionCalculator itemProgressionCalculator;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
     @Transactional
     public ItemUpgradePreviewResponse feedItems(
@@ -42,10 +43,8 @@ public class ItemUpgradeService {
         String requestHash = requestHash(targetItemId, foodItemIds);
 
         var player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
-        if (player.isInCombat()) {
-            throw new IllegalStateException("Нельзя улучшать предметы во время боя");
-        }
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
+        combatStateService.requireOutOfCombat(playerId, "Нельзя улучшать предметы во время боя");
 
         var previous = forgeOperationRepository.findByPlayerIdAndOperationId(playerId, normalizedOperationId);
         if (previous.isPresent()) {
@@ -58,7 +57,7 @@ public class ItemUpgradeService {
         }
 
         PlayerItem target = playerItemRepository.findByIdAndPlayerId(targetItemId, playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Улучшаемый предмет не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Улучшаемый предмет не найден"));
 
         ItemType targetType = target.getTemplate().getType();
         if (targetType == ItemType.ARTIFACT || targetType == ItemType.CONSUMABLE || targetType == ItemType.RESOURCE) {
@@ -70,7 +69,7 @@ public class ItemUpgradeService {
 
         List<PlayerItem> foodItems = playerItemRepository.findAllById(foodItemIds);
         if (foodItems.size() != foodItemIds.size()) {
-            throw new IllegalArgumentException("Один или несколько предметов для поглощения не найдены");
+            throw new jakarta.persistence.EntityNotFoundException("Один или несколько предметов для поглощения не найдены");
         }
         if (foodItems.stream().anyMatch(item -> !item.getPlayer().getId().equals(playerId))) {
             throw new IllegalArgumentException("Один из предметов для поглощения принадлежит другому игроку");

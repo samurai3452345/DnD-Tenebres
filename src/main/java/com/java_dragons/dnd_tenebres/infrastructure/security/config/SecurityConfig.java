@@ -66,36 +66,16 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(
                                 (request, response, exception) -> {
-                                    response.setStatus(
-                                            HttpStatus.UNAUTHORIZED.value()
-                                    );
-                                    response.setCharacterEncoding(
-                                            StandardCharsets.UTF_8.name()
-                                    );
-                                    response.setContentType(
-                                            MediaType.APPLICATION_JSON_VALUE
-                                    );
-                                    response.getWriter().write(
-                                            "{\"status\":401," +
-                                                    "\"message\":\"Требуется авторизация\"}"
-                                    );
+                                    com.java_dragons.dnd_tenebres.infrastructure.web.ApiErrorWriter.write(
+                                            response, 401, "AUTHENTICATION_REQUIRED", "Требуется авторизация",
+                                            request.getRequestURI());
                                 }
                         )
                         .accessDeniedHandler(
                                 (request, response, exception) -> {
-                                    response.setStatus(
-                                            HttpStatus.FORBIDDEN.value()
-                                    );
-                                    response.setCharacterEncoding(
-                                            StandardCharsets.UTF_8.name()
-                                    );
-                                    response.setContentType(
-                                            MediaType.APPLICATION_JSON_VALUE
-                                    );
-                                    response.getWriter().write(
-                                            "{\"status\":403," +
-                                                    "\"message\":\"Доступ запрещён\"}"
-                                    );
+                                    com.java_dragons.dnd_tenebres.infrastructure.web.ApiErrorWriter.write(
+                                            response, 403, "ACCESS_DENIED", "Доступ запрещён",
+                                            request.getRequestURI());
                                 }
                         )
                 )

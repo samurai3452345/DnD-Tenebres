@@ -22,6 +22,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiError> handleApi(ApiException exception, HttpServletRequest request) {
+        return response(exception.status(), exception.code(), exception.getMessage(), Map.of(), request);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(
             MethodArgumentNotValidException exception,
@@ -95,7 +100,7 @@ public class GlobalExceptionHandler {
         return response(
                 HttpStatus.NOT_FOUND,
                 "NOT_FOUND",
-                safeMessage(exception, "Запрашиваемая сущность не найдена"),
+                "Запрашиваемая сущность не найдена",
                 Map.of(),
                 request
         );
@@ -109,7 +114,7 @@ public class GlobalExceptionHandler {
         return response(
                 HttpStatus.BAD_REQUEST,
                 "INVALID_REQUEST",
-                safeMessage(exception, "Переданы некорректные данные"),
+                "Переданы некорректные данные",
                 Map.of(),
                 request
         );
@@ -123,10 +128,7 @@ public class GlobalExceptionHandler {
         return response(
                 HttpStatus.CONFLICT,
                 "INVALID_STATE",
-                safeMessage(
-                        exception,
-                        "Операция недоступна в текущем состоянии"
-                ),
+                "Операция недоступна в текущем состоянии",
                 Map.of(),
                 request
         );
@@ -199,14 +201,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    private String safeMessage(
-            RuntimeException exception,
-            String fallback
-    ) {
-        String message = exception.getMessage();
-
-        return message == null || message.isBlank()
-                ? fallback
-                : message;
-    }
 }

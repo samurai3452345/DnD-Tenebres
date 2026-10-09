@@ -15,7 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,7 +26,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
     private final UserAccountRepository accountRepository;
     private final PlayerRepository playerRepository;
 
@@ -47,13 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = authHeader.substring(7);
 
         try {
-            String username = jwtService.extractUsername(jwt);
+            JwtService.JwtClaims claims = jwtService.parseAndValidate(jwt);
+            String username = claims.username();
 
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(username);
 
                 UserAccount account =
                         accountRepository.findByUsername(username).orElse(null);
@@ -61,16 +58,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 boolean accountIsValid =
                         account != null
                                 && account.isEnabled()
-                                && jwtService.isTokenValid(jwt, userDetails)
-                                && jwtService.extractTokenVersion(jwt)
-                                == account.getTokenVersion();
+                                && claims.tokenVersion() == account.getTokenVersion();
 
                 if (accountIsValid) {
-                    Long playerId = jwtService.extractPlayerId(jwt);
+                    Long playerId = claims.playerId();
                     if (playerId != null && !playerRepository.existsByIdAndAccountId(playerId, account.getId())) {
                         filterChain.doFilter(request, response);
                         return;
                     }
+                    UserDetails userDetails = User.withUsername(account.getUsername())
+                            .password(account.getPassword()).authorities(java.util.List.of()).build();
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,

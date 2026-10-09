@@ -19,7 +19,7 @@ public class AccountController {
     private final PlayerRepository playerRepository;
     public record AccountResponse(String username, long characterCount, int tokenVersion, boolean enabled) {}
     public record ChangePasswordRequest(@NotBlank String currentPassword,
-                                        @NotBlank @Size(min=8,max=100) String newPassword) {}
+                                        @com.java_dragons.dnd_tenebres.infrastructure.security.validation.StrongPassword String newPassword) {}
 
     @GetMapping
     public ResponseEntity<AccountResponse> account(Authentication auth) {
@@ -30,8 +30,10 @@ public class AccountController {
     @PostMapping("/change-password") @Transactional
     public ResponseEntity<Void> changePassword(Authentication auth, @RequestBody @Valid ChangePasswordRequest request) {
         var a = repository.findByUsername(auth.getName()).orElseThrow();
-        if (!passwordEncoder.matches(request.currentPassword(), a.getPassword()))
+        if (!passwordEncoder.matches(request.currentPassword(), a.getPassword())) {
+            auditService.record(a.getUsername(), null, "PASSWORD_CHANGE", "DENIED", "Current password mismatch");
             throw new IllegalArgumentException("Неверный текущий пароль");
+        }
         a.changePassword(passwordEncoder.encode(request.newPassword()));
         a.revokeAllTokens();
         auditService.record(a.getUsername(), null, "PASSWORD_CHANGE", "SUCCESS", "All tokens revoked");

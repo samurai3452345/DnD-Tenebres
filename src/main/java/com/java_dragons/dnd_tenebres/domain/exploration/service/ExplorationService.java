@@ -1,6 +1,5 @@
 package com.java_dragons.dnd_tenebres.domain.exploration.service;
 
-import com.java_dragons.dnd_tenebres.core.math.DiceRoller;
 import com.java_dragons.dnd_tenebres.core.math.StatMathUtils;
 import com.java_dragons.dnd_tenebres.domain.exploration.dto.ExplorationReport;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.context.ApplicationEventPublisher;
 import com.java_dragons.dnd_tenebres.core.event.LocationVisitedEvent;
 import com.java_dragons.dnd_tenebres.core.event.ItemLootedEvent;
@@ -49,14 +47,15 @@ public class ExplorationService {
     private final RandomSource randomSource;
     private final com.java_dragons.dnd_tenebres.domain.location.service.LocationEffectService locationEffectService;
     private final SearchAttemptService searchAttemptService;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
     @Transactional
     public ExplorationReport travel(Long playerId, String targetLocationId) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
         Location currentLocation = player.getCurrentLocation();
 
-        if (player.isInCombat()) {
+        if (combatStateService.isInCombat(player.getId())) {
             throw new IllegalStateException("Вы не можете путешествовать, пока находитесь в бою!");
         }
 
@@ -100,7 +99,7 @@ public class ExplorationService {
     public ExplorationReport hunt(Long playerId) {
         Player player = getPlayer(playerId);
 
-        if (player.isInCombat()) {
+        if (combatStateService.isInCombat(player.getId())) {
             throw new IllegalStateException("Вы уже в бою! Сначала победите текущего врага.");
         }
 
@@ -114,7 +113,7 @@ public class ExplorationService {
             return ExplorationReport.nothing("Вы победили всех врагов, здесь пусто.");
         }
 
-        int roll = DiceRoller.rollD20();
+        int roll = randomSource.roll(1, 20);
         int wisMod = StatMathUtils.calculateModifier(player.getStats().getWisdom());
         int totalCheck = roll + wisMod;
 
@@ -135,9 +134,9 @@ public class ExplorationService {
     @Transactional
     public ExplorationReport search(Long playerId) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
 
-        if (player.isInCombat()) {
+        if (combatStateService.isInCombat(player.getId())) {
             throw new IllegalStateException("Нельзя искать предметы, когда вас пытаются убить!");
         }
 
@@ -146,7 +145,7 @@ public class ExplorationService {
         int remainingAttempts = searchAttemptService.consume(playerId, location.getId());
 
         // 1. Бросаем кубик на успешность обыска
-        int roll = DiceRoller.rollD20();
+        int roll = randomSource.roll(1, 20);
         int searchDifficulty = locationEffectService.searchDifficulty(player, location.getSearchDifficulty());
         if (roll < searchDifficulty) {
             return ExplorationReport.nothing("Вы ничего не нашли (Провал проверки обыска: " + roll + " < "
@@ -163,7 +162,7 @@ public class ExplorationService {
         StringBuilder foundItemsMsg = new StringBuilder("Вы нашли: ");
 
         for (LocationLootEntry entry : lootTable) {
-            if (DiceRoller.rollD100() <= entry.getFindChance()) {
+            if (randomSource.chance(entry.getFindChance())) {
                 if (entry.getMinAmount() <= 0 || entry.getMaxAmount() < entry.getMinAmount()) {
                     throw new IllegalStateException("Некорректный диапазон добычи в локации " + location.getId());
                 }
@@ -195,6 +194,6 @@ public class ExplorationService {
 
     private Player getPlayer(Long playerId) {
         return playerRepository.findById(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
     }
 }

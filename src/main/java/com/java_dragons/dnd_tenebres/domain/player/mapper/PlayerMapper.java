@@ -7,11 +7,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface PlayerMapper {
 
-    @Mapping(source = "id", target = "playerId")
-    @Mapping(source = "name", target = "playerName")
+    @Mapping(source = "player.id", target = "playerId")
+    @Mapping(source = "player.name", target = "playerName")
+    @Mapping(source = "activeCombatMonsterId", target = "activeCombatMonsterId")
     @Mapping(target = "totalStrength", expression = "java(player.getTotalStrength())")
     @Mapping(target = "totalDexterity", expression = "java(player.getTotalDexterity())")
     @Mapping(target = "totalConstitution", expression = "java(player.getTotalConstitution())")
@@ -19,6 +20,6 @@ public interface PlayerMapper {
     @Mapping(target = "totalWisdom", expression = "java(player.getTotalWisdom())")
     @Mapping(target = "totalCharisma", expression = "java(player.getTotalCharisma())")
     @Mapping(target = "armorClass", expression = "java(player.getArmorClass())")
-    PlayerResponse toResponse(Player player);
+    PlayerResponse toResponse(Player player, Long activeCombatMonsterId);
 
 }

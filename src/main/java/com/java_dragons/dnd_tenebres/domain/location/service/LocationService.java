@@ -41,7 +41,7 @@ public class LocationService {
 
     @Transactional(readOnly = true)
     public LocationResponse getCurrentLocation(Long playerId) {
-        var player = playerRepository.findById(playerId).orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        var player = playerRepository.findById(playerId).orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
         Location location = locationRepository.findByIdWithConnections(player.getCurrentLocation().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Current location is missing"));
         boolean cleared = clearedLocationRepository.existsByPlayerIdAndLocationId(playerId, location.getId());

@@ -33,6 +33,6 @@ public class CombatLogEntry {
     private Instant createdAt;
 
     public CombatEvent toEvent() {
-        return new CombatEvent(actor, actionType, target, value, description);
+        return new CombatEvent(actor, actionType, target, value, description, round);
     }
 }

@@ -34,13 +34,14 @@ public class RestingService {
     private final CombatEncounterService encounterService;
     private final LocationEffectService locationEffectService;
     private final SearchAttemptService searchAttemptService;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
     @Transactional
     public RestReport takeShortRest(Long playerId) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
 
-        if (player.isInCombat()) {
+        if (combatStateService.isInCombat(player.getId())) {
             throw new IllegalStateException("Вы не можете разбить привал во время боя!");
         }
 
@@ -90,9 +91,9 @@ public class RestingService {
     @Transactional
     public RestReport takeLongRest(Long playerId) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
 
-        if (player.isInCombat()) {
+        if (combatStateService.isInCombat(player.getId())) {
             throw new IllegalStateException("Вы не можете путешествовать, пока находитесь в бою!");
         }
 

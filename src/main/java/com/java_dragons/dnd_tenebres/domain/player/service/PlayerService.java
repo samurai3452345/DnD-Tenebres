@@ -35,6 +35,7 @@ public class PlayerService {
     private final PlayerProgressionService progressionService;
     private final GamePlayerProperties gamePlayerProperties;
     private final com.java_dragons.dnd_tenebres.domain.economy.service.WalletService walletService;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
 
     @Transactional
@@ -47,7 +48,7 @@ public class PlayerService {
                 "PLAYER", savedPlayer.getId().toString());
         gamePlayerProperties.getStartItems().forEach(item ->
                 inventoryService.addItemToPlayer(savedPlayer, item.getTemplate(), item.getAmount()));
-        return playerMapper.toResponse(savedPlayer);
+        return toResponse(savedPlayer);
     }
 
     @Transactional(readOnly = true)
@@ -77,17 +78,15 @@ public class PlayerService {
     public void deleteCharacter(Long accountId, Long playerId) {
         Player player = playerRepository.findByIdAndAccountId(playerId, accountId)
                 .orElseThrow(() -> new EntityNotFoundException("Персонаж не найден в этом аккаунте"));
-        if (player.isInCombat()) {
-            throw new IllegalStateException("Нельзя удалить персонажа во время активного боя");
-        }
+        combatStateService.requireOutOfCombat(playerId, "Нельзя удалить персонажа во время активного боя");
         playerRepository.delete(player);
     }
 
     @Transactional(readOnly = true)
     public PlayerResponse getPlayerById(Long id) {
         Player player = playerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок с ID " + id + " не найден!"));
-        return playerMapper.toResponse(player);
+                .orElseThrow(() -> new EntityNotFoundException("Игрок не найден"));
+        return toResponse(player);
     }
 
     @Transactional
@@ -103,27 +102,20 @@ public class PlayerService {
     @Transactional
     public PlayerResponse allocateStats(Long playerId, StatAllocationRequest request) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Игрок не найден"));
 
-        if (player.isInCombat()) {
-            throw new IllegalStateException("Нельзя распределять характеристики во время боя");
-        }
+        combatStateService.requireOutOfCombat(playerId, "Нельзя распределять характеристики во время боя");
 
         player.allocateStats(
                 request.addStrength(), request.addDexterity(), request.addConstitution(),
                 request.addIntelligence(), request.addWisdom(), request.addCharisma()
         );
 
-        return playerMapper.toResponse(player);
+        return toResponse(player);
     }
 
-    @Transactional
-    public void respawnPlayer(Player player) {
-        player.revive();
-        player.clearEffects();
-
-        Location tavern = locationService.getLocationById("city_tavern");
-        player.moveTo(tavern);
+    private PlayerResponse toResponse(Player player) {
+        return playerMapper.toResponse(player, combatStateService.activeMonsterId(player.getId()).orElse(null));
     }
 
 }

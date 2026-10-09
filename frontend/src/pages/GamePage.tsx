@@ -96,6 +96,8 @@ export default function GamePage() {
         enteredFromCharacterSelection.current ? "Добро пожаловать в мир Tenebres!" : null
     );
     const [combatOpen, setCombatOpen] = useState(false);
+    const [combatError, setCombatError] = useState<string | null>(null);
+    const combatActionPending = useRef(false);
     const [travelOpen, setTravelOpen] = useState(false);
     const [busyAction, setBusyAction] = useState<string | null>(null);
 
@@ -190,6 +192,7 @@ export default function GamePage() {
     };
 
     const finishCombat = async () => {
+        setCombatError(null);
         setCombatOpen(false);
         resetCombat();
         setMessage("Бой окончен. Можно продолжать путь.");
@@ -197,11 +200,15 @@ export default function GamePage() {
     };
 
     const handleCombatAction = async (request: CombatActionRequest) => {
+        if (combatActionPending.current) return;
+        combatActionPending.current = true;
+        setCombatError(null);
         try {
             await executeCombatAction(request);
-            await refreshPlayer();
         } catch (error) {
-            setMessage(requestErrorMessage(error, "Не удалось выполнить боевое действие."));
+            setCombatError(requestErrorMessage(error, "Не удалось выполнить боевое действие."));
+        } finally {
+            combatActionPending.current = false;
         }
     };
 
@@ -227,6 +234,8 @@ export default function GamePage() {
     return (
         <main className="game-dashboard" style={{ backgroundImage: `url("${locationBackground}")` }}>
             <div className="game-dashboard__veil" aria-hidden="true" />
+
+            <div inert={combatOpen}>
 
             <section className="game-player" aria-label="Профиль персонажа">
                 <img src="/assets/game/player-panel.png" alt="" aria-hidden="true" />
@@ -331,20 +340,22 @@ export default function GamePage() {
                 </div>
             )}
 
+            </div>
+
             {combatOpen && (
-                <section className="game-combat" aria-label="Бой">
+                <section aria-label="Бой">
                     {combatState ? (
                         <CombatPanel
                             state={combatState}
                             monsterName={enemyName}
                             isLoading={combatLoading}
                             onAction={handleCombatAction}
+                            onFinish={finishCombat}
+                            background={locationBackground}
+                            error={combatError}
                         />
                     ) : (
-                        <div><Loading text="Загрузка боя..." /></div>
-                    )}
-                    {combatState && combatState.status !== "ACTIVE" && (
-                        <button type="button" onClick={finishCombat}>Вернуться к действиям</button>
+                        <div className="game-combat"><Loading text="Загрузка боя..." /></div>
                     )}
                 </section>
             )}

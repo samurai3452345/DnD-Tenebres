@@ -35,6 +35,7 @@ public class InventoryService {
     private final PotionService potionService;
     private final RandomSource randomSource;
     private final ApplicationEventPublisher eventPublisher;
+    private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
     private static final int MAX_RESOURCE_STACK = 100;
     private static final int MAX_CONSUMABLE_STACK = 16;
@@ -188,7 +189,7 @@ public class InventoryService {
 
     private PlayerItem requireOwnedItem(Long playerId, Long itemId) {
         return playerItemRepository.findByIdAndPlayerId(itemId, playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден или не принадлежит игроку"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Предмет не найден или не принадлежит игроку"));
     }
 
     private com.java_dragons.dnd_tenebres.domain.item.dto.InventoryItemResponse toResponse(PlayerItem item) {
@@ -210,17 +211,17 @@ public class InventoryService {
     @Transactional
     public void equipItem(Long playerId, Long itemId, EquipmentSlot slot) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
 
         PlayerItem itemToEquip = player.getInventory().stream()
                 .filter(item -> Objects.equals(item.getId(), itemId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Предмет не найден или не принадлежит игроку"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Предмет не найден или не принадлежит игроку"));
 
         if (player.getLevel() < itemToEquip.getTemplate().getRequiredLevel())
             throw new IllegalStateException("Требуется уровень " + itemToEquip.getTemplate().getRequiredLevel());
         if (itemToEquip.getDurability() <= 0) throw new IllegalStateException("Предмет сломан");
-        if (player.isInCombat()) throw new IllegalStateException("Нельзя менять экипировку во время боя");
+        combatStateService.requireOutOfCombat(player.getId(), "Нельзя менять экипировку во время боя");
 
         player.getInventory().stream()
                 .filter(PlayerItem::isEquipped)
@@ -238,9 +239,9 @@ public class InventoryService {
     @Transactional
     public void unequipItem(Long playerId, EquipmentSlot slot) {
         Player player = playerRepository.findByIdForUpdate(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
 
-        if (player.isInCombat()) throw new IllegalStateException("Нельзя менять экипировку во время боя");
+        combatStateService.requireOutOfCombat(player.getId(), "Нельзя менять экипировку во время боя");
         player.unequipItem(slot);
         player.normalizeResources();
     }
@@ -248,8 +249,8 @@ public class InventoryService {
     @Transactional
     public UseItemResponse useItem(Long playerId, Long itemId) {
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Игрок не найден"));
-        if (player.isInCombat()) throw new IllegalStateException("В бою используйте действие USE_POTION");
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Игрок не найден"));
+        combatStateService.requireOutOfCombat(player.getId(), "В бою используйте действие USE_POTION");
         PlayerItem item = requireOwnedItem(playerId, itemId);
         if (item.getTemplate().getType() != ItemType.CONSUMABLE || item.getAmount() <= 0)
             throw new IllegalArgumentException("Предмет нельзя использовать");

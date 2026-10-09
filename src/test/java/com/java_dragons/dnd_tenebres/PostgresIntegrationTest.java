@@ -29,12 +29,28 @@ class PostgresIntegrationTest {
         assertThat(constraintExists("uq_active_encounter_key")).isTrue();
         assertThat(constraintExists("uq_active_quest_key")).isTrue();
         assertThat(constraintExists("uq_equipped_slot_key")).isTrue();
+        assertThat(columnExists("players", "active_combat_monster_id")).isFalse();
+        assertThat(tableExists("items")).isFalse();
     }
 
     private boolean constraintExists(String name) {
         Integer count = jdbcTemplate.queryForObject(
                 "select count(*) from information_schema.table_constraints where constraint_name = ?",
                 Integer.class, name);
+        return count != null && count == 1;
+    }
+
+    private boolean columnExists(String table, String column) {
+        Integer count = jdbcTemplate.queryForObject(
+                "select count(*) from information_schema.columns where table_name = ? and column_name = ?",
+                Integer.class, table, column);
+        return count != null && count == 1;
+    }
+
+    private boolean tableExists(String table) {
+        Integer count = jdbcTemplate.queryForObject(
+                "select count(*) from information_schema.tables where table_schema = 'public' and table_name = ?",
+                Integer.class, table);
         return count != null && count == 1;
     }
 }
