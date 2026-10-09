@@ -24,17 +24,23 @@ class PostgresUpgradeIntegrationTest {
     void обновляетСхему043ДоТекущей() throws Exception {
         try (Connection connection = DriverManager.getConnection(
                 POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())) {
-            update(connection, "db/changelog/pre-044.xml");
+            update("db/changelog/pre-044.xml");
+            assertThat(connection.isClosed()).isFalse();
             assertThat(exists(connection, "select count(*) from information_schema.columns " +
                     "where table_name='players' and column_name='active_combat_monster_id'" )).isTrue();
-            update(connection, "db/changelog/db.changelog-master.xml");
+            update("db/changelog/db.changelog-master.xml");
+            assertThat(connection.isClosed()).isFalse();
             assertThat(exists(connection, "select count(*) from information_schema.columns " +
                     "where table_name='players' and column_name='active_combat_monster_id'" )).isFalse();
         }
     }
 
-    private void update(Connection connection, String changelog) throws Exception {
-        try (Liquibase liquibase = new Liquibase(changelog, new ClassLoaderResourceAccessor(),
+    private void update(String changelog) throws Exception {
+        // Liquibase.close() closes its JDBC connection. Keep the verification
+        // connection separate so it survives both migration phases.
+        try (Connection connection = DriverManager.getConnection(
+                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+             Liquibase liquibase = new Liquibase(changelog, new ClassLoaderResourceAccessor(),
                 new JdbcConnection(connection))) {
             liquibase.update(new Contexts(), new LabelExpression());
         }
