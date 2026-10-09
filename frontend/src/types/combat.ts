@@ -83,6 +83,7 @@ export interface CombatPotionState {
 }
 
 export interface CombatState {
+    rewards?: CombatReward[];
     encounterId: number;
     status: EncounterStatus;
     reason: EncounterReason;
@@ -96,4 +97,10 @@ export interface CombatState {
     events: CombatEvent[];
     journal: CombatEvent[];
     startedAt: string;
+}
+
+export interface CombatReward {
+    name: string;
+    amount: number;
+    iconKey: string;
 }

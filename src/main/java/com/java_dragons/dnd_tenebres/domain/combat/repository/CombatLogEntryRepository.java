@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface CombatLogEntryRepository extends JpaRepository<CombatLogEntry, Long> {
     List<CombatLogEntry> findTop100ByEncounterIdOrderByIdDesc(Long encounterId);
+    List<CombatLogEntry> findByEncounterIdAndActionTypeInOrderByIdAsc(Long encounterId, List<String> actionTypes);
     Page<CombatLogEntry> findByEncounterIdOrderByIdDesc(Long encounterId, Pageable pageable);
 }

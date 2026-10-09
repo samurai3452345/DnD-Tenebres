@@ -1,0 +1,17 @@
+/* Only enemy artwork: these settings do not move the combat panels. */
+.combat-stage__enemy .combat-enemy-artwork {
+    /* Size relative to the reserved central area. */
+    --enemy-art-width: 100%;
+    --enemy-art-height: 100%;
+    /* Offset from the center (positive X = right, positive Y = down). */
+    --enemy-art-offset-x: 0%;
+    --enemy-art-offset-y: 0%;
+    position: absolute;
+    left: 50%; top: 65%;
+    width: var(--enemy-art-width); height: var(--enemy-art-height);
+    transform: translate(calc(-50% + var(--enemy-art-offset-x)), calc(-50% + var(--enemy-art-offset-y)));
+    object-fit: contain;
+    object-position: center bottom;
+    pointer-events: none; user-select: none;
+    filter: drop-shadow(0 8px 8px #0009);
+}

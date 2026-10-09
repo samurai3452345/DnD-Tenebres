@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CombatActionRequest, CombatState, CombatAbilityState, CombatPotionState } from "../../types/combat";
-import { CombatBar, CombatEffects, CombatSymbol, PotionSymbol, elementNames } from "./CombatSymbols";
+import { CombatBar, CombatEffects, CombatSymbol, elementNames } from "./CombatSymbols";
+import CombatPotionArtwork from "./CombatPotionArtwork";
 
 type Selection = { kind: "spell"; item: CombatAbilityState } | { kind: "potion"; item: CombatPotionState };
 function unavailableReason(reason: string | null) {
@@ -63,7 +64,7 @@ export default function CombatActions({ state, onAction, disabled }: {
                 {state.availablePotions.map(potion => <button key={potion.itemId} type="button" className="combat-card"
                     disabled={!allows("USE_POTION") || !potion.available || potion.amount <= 0}
                     onClick={() => setSelection({ kind: "potion", item: potion })}>
-                    <span className="combat-card__icon combat-card__icon--potion"><PotionSymbol kind={potion.action} /></span>
+                    <CombatPotionArtwork name={potion.name} action={potion.action} />
                     <strong>{potion.name}</strong><span>×{potion.amount}</span>
                 </button>)}
                 {!state.availablePotions.length && <p className="combat-empty">Нет зелий</p>}
@@ -77,7 +78,8 @@ export default function CombatActions({ state, onAction, disabled }: {
         </div>
         {selection && <div className="combat-confirm-backdrop" onMouseDown={() => setSelection(null)}>
             <section className="combat-confirm" role="dialog" aria-modal="true" aria-labelledby="combat-confirm-title" onMouseDown={event => event.stopPropagation()}>
-                <CombatSymbol kind={selection.kind === "spell" ? selection.item.element : selection.item.action} />
+                {selection.kind === "spell" ? <CombatSymbol kind={selection.item.element} />
+                    : <CombatPotionArtwork name={selection.item.name} action={selection.item.action} />}
                 <h2 id="combat-confirm-title">{selection.item.name}</h2>
                 <p>{selection.kind === "spell" ? `Использовать заклинание? Расход маны: ${selection.item.manaCost}.` : `Использовать зелье? В наличии: ${selection.item.amount}.`}</p>
                 <div><button ref={confirmRef} type="button" disabled={!selectedAvailable} onClick={() => selection.kind === "spell"
