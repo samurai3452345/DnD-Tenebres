@@ -2,7 +2,12 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
  <changeSet id="030-add-supplies-loot" author="codex">
-  <sql>INSERT INTO location_loot_tables (location_id, item_template_id, min_amount, max_amount, find_chance)
-       VALUES ('forest_edge', (SELECT id FROM item_templates WHERE name = 'Припасы'), 1, 2, 25)</sql>
+        <insert tableName="location_loot_tables">
+            <column name="location_id" value="forest_edge"/>
+            <column name="item_template_id" valueComputed="(SELECT id FROM item_templates WHERE name = 'Припасы')"/>
+            <column name="min_amount" valueNumeric="1"/>
+            <column name="max_amount" valueNumeric="2"/>
+            <column name="find_chance" valueNumeric="25"/>
+        </insert>
  </changeSet>
 </databaseChangeLog>

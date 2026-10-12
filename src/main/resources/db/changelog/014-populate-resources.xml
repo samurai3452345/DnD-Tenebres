@@ -90,5 +90,54 @@
             <column name="stat_budget" value="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Железная руда"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="UNCOMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" valueComputed="NULL"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Мифриловая руда"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" valueComputed="NULL"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Орихалковая руда"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="damage_dice" valueComputed="NULL"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+        <insert tableName="item_templates">
+            <column name="name" value="Припасы"/>
+            <column name="type" value="RESOURCE"/>
+            <column name="slot" value="NONE"/>
+            <column name="rarity" value="COMMON"/>
+            <column name="armor_type" value="NONE"/>
+            <column name="armor_class" valueNumeric="0"/>
+            <column name="required_strength" valueNumeric="0"/>
+            <column name="dice_count" valueNumeric="0"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+            <column name="consumable_action" value="NONE"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
