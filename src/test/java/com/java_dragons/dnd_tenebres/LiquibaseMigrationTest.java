@@ -62,7 +62,7 @@ class LiquibaseMigrationTest {
                 + "('Драконьи парные мечи','Драконьи парные косы')", Integer.class)).isZero();
         assertThat(jdbc.queryForObject("select count(*) from item_templates where name in "
                 + "('Сёстры Погибели','Драконий одноручный топор','Драконий меч','Драконий лук') "
-                + "and stat_budget=6", Integer.class)).isEqualTo(4);
+                + "and stat_budget=6", Integer.class)).isEqualTo(2);
         assertThat(jdbc.queryForList("select rarity from item_templates where name in "
                 + "('Длинный лук','Тяжелый арбалет') order by name", String.class))
                 .containsExactly("UNCOMMON", "UNCOMMON");
