@@ -3,12 +3,21 @@ name: PostgreSQL migrations
 on:
   pull_request:
   push:
-    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-tests-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   migrations:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    env:
+      SPRING_PROFILES_ACTIVE: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -18,5 +27,18 @@ jobs:
           cache: maven
       - name: Verify Docker runtime
         run: docker info
-      - name: Apply all migrations and validate mappings
-        run: mvn -B -Dtest=PostgresIntegrationTest,PostgresUpgradeIntegrationTest test
+      - name: Run all backend tests and verify the build
+        run: bash ./mvnw --batch-mode --no-transfer-progress clean verify
+      - name: Verify that tests were not skipped
+        if: always()
+        run: python3 .github/scripts/verify_test_reports.py
+      - name: Upload backend test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+          if-no-files-found: warn
+          retention-days: 14
