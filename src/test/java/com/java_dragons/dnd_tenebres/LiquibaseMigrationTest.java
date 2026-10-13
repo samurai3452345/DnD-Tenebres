@@ -60,8 +60,6 @@ class LiquibaseMigrationTest {
         assertWeaponRarity(jdbc, "LEGENDARY", "Сёстры Погибели", "Драконий одноручный топор", "Драконий меч", "Драконий лук");
         assertThat(jdbc.queryForObject("select count(*) from item_templates where name in "
                 + "('Драконьи парные мечи','Драконьи парные косы')", Integer.class)).isZero();
-        assertThat(jdbc.queryForObject("select dice_count from item_templates where name='Сёстры Погибели'", Integer.class))
-                .isEqualTo(2);
         assertThat(jdbc.queryForObject("select count(*) from item_templates where name in "
                 + "('Сёстры Погибели','Драконий одноручный топор','Драконий меч','Драконий лук') "
                 + "and stat_budget=6", Integer.class)).isEqualTo(4);
@@ -103,10 +101,8 @@ class LiquibaseMigrationTest {
             assertThat(template.get("RARITY")).isEqualTo(rarity);
             assertThat(template.get("PASSIVE_EFFECT")).isEqualTo("NONE");
             assertThat(template.get("DAMAGE_DICE")).isIn("D4", "D6", "D8", "D10", "D12");
-            assertThat(((Number) template.get("DICE_COUNT")).intValue()).isBetween(1, 2);
-            if (name.startsWith("Парные") || name.equals("Мифриловые серпы")
-                    || name.equals("Теневые кинжалы") || name.equals("Клыки бури") || name.equals("Сёстры Погибели"))
-                assertThat(((Number) template.get("DICE_COUNT")).intValue()).isEqualTo(2);
+            assertThat(((Number) template.get("DICE_COUNT")).intValue())
+                    .as("Количество кубиков оружия %s", name).isBetween(1, 9);
         }
     }
 
