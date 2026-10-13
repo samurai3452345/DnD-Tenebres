@@ -507,7 +507,7 @@
             <column name="required_strength" valueNumeric="15"/>
             <column name="damage_dice" value="D12"/>
             <column name="dice_count" valueNumeric="6"/>
-            <column name="stat_budget" valueNumeric=""/>
+            <column name="stat_budget" valueNumeric="0"/>
             <column name="passive_effect" value="NONE"/>
         </insert>
         <insert tableName="item_templates">
