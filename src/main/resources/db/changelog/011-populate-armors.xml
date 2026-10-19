@@ -511,5 +511,149 @@
             <column name="passive_effect" value="DARK_PACT"/>
         </insert>
 
+        <!-- Medium and heavy variants; the existing light sets are unchanged. -->
+        <insert tableName="item_templates">
+            <column name="name" value="Средний мифриловый шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" valueNumeric="3"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Средний мифриловый нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Средние мифриловые поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" valueNumeric="4"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелый мифриловый шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" valueNumeric="4"/>
+            <column name="required_strength" valueNumeric="15"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелый мифриловый нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="15"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелые мифриловые поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="RARE"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="15"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="NONE"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Средний орихалковый шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" valueNumeric="4"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Средний орихалковый нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Средние орихалковые поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="MEDIUM"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="10"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелый орихалковый шлем"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="HEAD"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="15"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелый орихалковый нагрудник"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="CHEST"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" valueNumeric="6"/>
+            <column name="required_strength" valueNumeric="15"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
+
+        <insert tableName="item_templates">
+            <column name="name" value="Тяжелые орихалковые поножи"/>
+            <column name="type" value="ARMOR"/>
+            <column name="slot" value="LEGS"/>
+            <column name="rarity" value="EPIC"/>
+            <column name="armor_type" value="HEAVY"/>
+            <column name="armor_class" valueNumeric="5"/>
+            <column name="required_strength" valueNumeric="15"/>
+            <column name="stat_budget" valueNumeric="0"/>
+            <column name="passive_effect" value="ORICHALCUM"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
