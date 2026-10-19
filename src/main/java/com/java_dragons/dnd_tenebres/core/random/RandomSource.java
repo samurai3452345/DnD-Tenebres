@@ -14,4 +14,5 @@ public interface RandomSource {
         if (percent < 0 || percent > 100) throw new IllegalArgumentException("Chance must be 0..100");
         return nextInt(1, 101) <= percent;
     }
+
 }
