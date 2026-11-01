@@ -34,7 +34,7 @@ jobs:
         run: python3 .github/scripts/verify_test_reports.py
       - name: Upload backend test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-test-reports
           path: |
