@@ -40,10 +40,7 @@ class LiquibaseMigrationTest {
         dataSource.setURL("jdbc:h2:mem:liquibase_test;MODE=PostgreSQL;NON_KEYWORDS=VALUE;DB_CLOSE_DELAY=-1");
         dataSource.setUser("sa");
 
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:/db/changelog/db.changelog-master.xml");
-        liquibase.afterPropertiesSet();
+        migrate(dataSource, "db.changelog-master.xml");
 
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         assertThat(jdbc.queryForList("select rarity from item_templates where name in "
@@ -90,6 +87,39 @@ class LiquibaseMigrationTest {
         assertThat(jdbc.queryForObject("select count(*) from information_schema.columns "
                 + "where lower(table_name)='location_random_encounters' "
                 + "and lower(column_name)='monster_template_name'", Integer.class)).isZero();
+    }
+
+    @Test
+    void migratesPreviouslyAcceptedLocationQuestsAndAddsArmor() throws Exception {
+        JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setURL("jdbc:h2:mem:upgrade_quests;MODE=PostgreSQL;NON_KEYWORDS=VALUE;DB_CLOSE_DELAY=-1");
+        dataSource.setUser("sa");
+        migrate(dataSource, "pre-044.xml");
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        String armorName = "Средний мифриловый шлем";
+        assertThat(jdbc.queryForObject("select count(*) from item_templates where name=?", Integer.class, armorName)).isZero();
+        jdbc.update("insert into user_accounts (id, username, password) values (101, 'upgrade', 'test-password-hash')");
+        jdbc.update("insert into players (id, account_id, name, current_hp, max_hp) values "
+                + "(101, 101, 'Cleared', 20, 20), (102, 101, 'Not cleared', 20, 20)");
+        jdbc.update("insert into player_quests (player_id, quest_template_id, status, active_quest_key) "
+                + "select p.id, q.id, 'ACTIVE', true from players p cross join quest_templates q "
+                + "where p.id in (101, 102) and q.quest_type='CLEAR_LOCATION' and q.target_identifier='forest_goblin_camp'");
+        jdbc.update("insert into player_cleared_locations (player_id, location_id) values (101, 'forest_goblin_camp')");
+
+        migrate(dataSource, "db.changelog-master.xml");
+
+        assertThat(jdbc.queryForObject("select count(*) from item_templates where name=?", Integer.class, armorName)).isEqualTo(1);
+        assertThat(jdbc.queryForList("select status from player_quests order by player_id", String.class))
+                .containsExactly("COMPLETED", "ACTIVE");
+        assertThat(jdbc.queryForList("select current_progress from player_quests order by player_id", Integer.class))
+                .containsExactly(1, 0);
+    }
+
+    private void migrate(JdbcDataSource dataSource, String changelog) throws Exception {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:/db/changelog/" + changelog);
+        liquibase.afterPropertiesSet();
     }
 
     private void assertWeaponRarity(JdbcTemplate jdbc, String rarity, String... names) {

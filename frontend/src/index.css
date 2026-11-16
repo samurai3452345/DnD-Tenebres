@@ -1226,7 +1226,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-modal__destinations { display: grid; gap: .65rem; }
 .game-modal__destination,
 .game-modal__close,
-.game-combat > button {
+.game-combat__retry {
     padding: .7rem 1rem;
     color: #f4dfba;
     cursor: pointer;
@@ -1237,7 +1237,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-modal__destination small { color: #df8b79; }
 .game-modal__close { width: 100%; margin-top: 1rem; }
 .game-combat { z-index: 19; }
-.game-combat > button { margin-top: 1rem; }
+.game-combat__retry { margin-top: 1rem; }
 
 .game-modal__dialog--travel {
     position: relative;

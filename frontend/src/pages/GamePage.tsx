@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { explorationApi } from "../api/explorationApi";
@@ -97,6 +97,7 @@ export default function GamePage() {
     );
     const [combatOpen, setCombatOpen] = useState(false);
     const [combatError, setCombatError] = useState<string | null>(null);
+    const combatLoadPending = useRef(false);
     const combatActionPending = useRef(false);
     const [travelOpen, setTravelOpen] = useState(false);
     const [busyAction, setBusyAction] = useState<string | null>(null);
@@ -134,14 +135,27 @@ export default function GamePage() {
         return () => window.clearTimeout(timeoutId);
     }, [message]);
 
-    useEffect(() => {
-        if (!player?.activeCombatMonsterId) return;
+    const loadCombat = useCallback(async () => {
+        if (combatLoadPending.current) return;
+        combatLoadPending.current = true;
         setCombatOpen(true);
-        void loadCurrentCombat().catch((error) => {
-            setCombatOpen(false);
-            setMessage(requestErrorMessage(error, "Не удалось восстановить активный бой."));
-        });
-    }, [player?.activeCombatMonsterId, loadCurrentCombat]);
+        setCombatError(null);
+        try {
+            await loadCurrentCombat();
+        } catch (error) {
+            setCombatError(requestErrorMessage(error, "Не удалось загрузить бой."));
+        } finally {
+            combatLoadPending.current = false;
+        }
+    }, [loadCurrentCombat]);
+
+    const resumeCombat = useEffectEvent(() => {
+        if (!combatOpen) void loadCombat();
+    });
+
+    useEffect(() => {
+        if (player?.activeCombatMonsterId) resumeCombat();
+    }, [player?.activeCombatMonsterId]);
 
     const runAction = async (key: string, action: () => Promise<{ message: string; encounterMonsterId?: number | null }>) => {
         setBusyAction(key);
@@ -150,8 +164,7 @@ export default function GamePage() {
             setMessage(response.message);
             if (response.encounterMonsterId) {
                 resetCombat();
-                setCombatOpen(true);
-                await loadCurrentCombat();
+                await loadCombat();
             }
             await Promise.all([refreshPlayer(), refreshWorld()]);
         } catch (error) {
@@ -168,11 +181,11 @@ export default function GamePage() {
             setMessage(response.message);
             if (response.encounter) {
                 adoptCombatState(response.encounter);
+                setCombatError(null);
                 setCombatOpen(true);
             } else if (response.isAmbushed) {
                 resetCombat();
-                setCombatOpen(true);
-                await loadCurrentCombat();
+                await loadCombat();
             }
             await Promise.all([refreshPlayer(), refreshWorld()]);
         } catch (error) {
@@ -355,7 +368,16 @@ export default function GamePage() {
                             error={combatError}
                         />
                     ) : (
-                        <div className="game-combat"><Loading text="Загрузка боя..." /></div>
+                        <div className="game-combat">
+                            {combatError ? (
+                                <div>
+                                    <p role="alert">{combatError}</p>
+                                    <button type="button" className="game-combat__retry" onClick={() => void loadCombat()}>
+                                        Повторить загрузку боя
+                                    </button>
+                                </div>
+                            ) : <Loading text="Загрузка боя..." />}
+                        </div>
                     )}
                 </section>
             )}

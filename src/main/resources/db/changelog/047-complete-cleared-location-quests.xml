@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="047-complete-cleared-location-quests" author="codex">
+        <sql>
+            UPDATE player_quests
+            SET status = 'COMPLETED',
+                current_progress = (
+                    SELECT target_count FROM quest_templates WHERE id = player_quests.quest_template_id
+                ),
+                version = COALESCE(version, 0) + 1
+            WHERE status = 'ACTIVE'
+              AND EXISTS (
+                  SELECT 1
+                  FROM quest_templates quest
+                  JOIN player_cleared_locations cleared ON cleared.location_id = quest.target_identifier
+                  WHERE quest.id = player_quests.quest_template_id
+                    AND quest.quest_type = 'CLEAR_LOCATION'
+                    AND cleared.player_id = player_quests.player_id
+              );
+        </sql>
+    </changeSet>
+</databaseChangeLog>
