@@ -1,0 +1,139 @@
+.game-world {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.game-world__map {
+    position: absolute;
+    transform-origin: top left;
+    pointer-events: none;
+    user-select: none;
+}
+
+.game-world__art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.game-world__pickup {
+    position: absolute;
+    width: 112px;
+    height: 104px;
+    padding: 0;
+    border: 0;
+    transform: translate(-50%, -90%);
+    background: transparent;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.game-world__pickup::before {
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    width: 160px;
+    aspect-ratio: 1;
+    transform: translate(-50%, -79.4%);
+    background: url("/assets/game/loot-orb.png") center / contain no-repeat;
+    pointer-events: none;
+    content: "";
+}
+
+.game-world__pickup:disabled {
+    cursor: default;
+}
+
+.game-world__hero {
+    --hero-idle-atlas: url("/assets/game/knight-idle-sprites.png");
+    position: absolute;
+    width: 128px;
+    height: 160px;
+    transform: translate(-50%, -87.5%);
+    background: var(--hero-idle-atlas) no-repeat 0 0 / 300% 400%;
+}
+
+.game-world__hero[data-facing="up"] {
+    background-position-y: calc(100% / 3);
+}
+
+.game-world__hero[data-facing="right"] {
+    background-position-y: calc(200% / 3);
+}
+
+.game-world__hero[data-facing="left"] {
+    background-position-y: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .game-world__hero[data-moving="false"] {
+        animation: game-world-hero-breathe 2.5s step-end infinite;
+    }
+
+    .game-world__hero[data-moving="true"] {
+        background-image: url("/assets/game/knight-walk-sprites.png");
+        background-size: 600% 400%;
+        animation: game-world-hero-walk 864ms step-end infinite;
+    }
+
+    .game-world__hero[data-paused="true"][data-picking-up="false"] {
+        animation-play-state: paused;
+    }
+
+    .game-world__hero[data-picking-up="true"] {
+        animation: game-world-hero-pickup step-end both;
+    }
+}
+
+@keyframes game-world-hero-breathe {
+    0%, 79%, 100% { background-position-x: 0%; }
+    17%, 52% { background-position-x: 50%; }
+    31% { background-position-x: 100%; }
+}
+
+@keyframes game-world-hero-walk {
+    0%, 100% { background-position-x: 0%; }
+    18.75% { background-position-x: 20%; }
+    31.83% { background-position-x: 40%; }
+    50% { background-position-x: 60%; }
+    68.75% { background-position-x: 80%; }
+    81.83% { background-position-x: 100%; }
+}
+
+@keyframes game-world-hero-pickup {
+    0%, 91%, 100% {
+        width: 128px;
+        background-image: var(--hero-idle-atlas);
+        background-size: 300% 400%;
+        background-position-x: 0%;
+    }
+    5%, 15.5%, 27%, 38.5%, 50.5%, 58.5%, 75.5% {
+        width: 144px;
+        background-image: url("/assets/game/knight-pickup-sprites.png");
+        background-size: 600% 400%;
+    }
+    5% { background-position-x: 0%; }
+    15.5% { background-position-x: 20%; }
+    27%, 50.5% { background-position-x: 40%; }
+    38.5% { background-position-x: 60%; }
+    58.5% { background-position-x: 80%; }
+    75.5% { background-position-x: 100%; }
+}
+
+.game-world__collision-overlay {
+    --world-collision-edge: rgb(238 73 45 / 65%);
+    position: absolute;
+    inset: 0;
+}
+
+.game-world__collision-overlay > div {
+    position: absolute;
+    inset: 0;
+    background: rgb(228 57 37 / 38%);
+}

@@ -103,19 +103,18 @@ public class CombatEncounterService {
                 encounter.getRound(), request.action(), selectedName);
         appendEvents(encounter, report.events());
 
+        if (report.isEnemyDead()) current.markDead();
         boolean fled = report.events().stream().anyMatch(e -> "FLEE_SUCCESS".equals(e.actionType()));
         if (report.isPlayerDead()) finish(encounter, EncounterStatus.DEFEAT);
+        else if (report.isEnemyDead() && alive == 1) finish(encounter, EncounterStatus.VICTORY);
         else if (fled) {
-            current.markFled();
+            if (!report.isEnemyDead()) current.markFled();
             finish(encounter, EncounterStatus.FLED);
         } else if (report.isEnemyDead()) {
-            current.markDead();
-            Optional<CombatParticipant> next = encounter.getParticipants().stream()
-                    .filter(p -> p.getStatus() == ParticipantStatus.WAITING).findFirst();
-            if (next.isPresent()) {
-                next.get().activate();
-                encounter.advanceRound();
-            } else finish(encounter, EncounterStatus.VICTORY);
+            encounter.getParticipants().stream()
+                    .filter(p -> p.getStatus() == ParticipantStatus.WAITING)
+                    .findFirst().orElseThrow().activate();
+            encounter.advanceRound();
         } else encounter.advanceRound();
         return toState(encounter, report.events());
     }
@@ -133,7 +132,9 @@ public class CombatEncounterService {
             throw new IllegalStateException("Encounter is not a rest ambush");
         CombatReport report = combatService.executeAmbushTurn(playerId, monster);
         appendEvents(encounter, report.events());
+        if (report.isEnemyDead()) encounter.currentParticipant().orElseThrow().markDead();
         if (report.isPlayerDead()) finish(encounter, EncounterStatus.DEFEAT);
+        else if (report.isEnemyDead()) finish(encounter, EncounterStatus.VICTORY);
         return toState(encounter, report.events());
     }
 

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface LocationRandomEncounterRepository extends JpaRepository<LocationRandomEncounter, Long> {
     List<LocationRandomEncounter> findByLocationId(String locationId);
+    boolean existsByLocationId(String locationId);
 }

@@ -134,16 +134,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     static String normalizedRoute(String requestUri) {
-        String[] segments = requestUri.split("/");
+        String[] segments = requestUri.split("/", 5);
         if (segments.length < 4) {
-            return "/api/v1";
+            return "/api/v1/other";
         }
-        String resource = segments[3].replaceAll("[^A-Za-z0-9_-]", "_");
-        if ("auth".equals(resource) && segments.length >= 5) {
-            String action = segments[4].replaceAll("[^A-Za-z0-9_-]", "_");
-            return "/api/v1/auth/" + action;
-        }
-        return "/api/v1/" + resource;
+        return switch (segments[3]) {
+            case "auth" -> switch (requestUri) {
+                case "/api/v1/auth/login", "/api/v1/auth/register" -> requestUri;
+                default -> "/api/v1/auth/other";
+            };
+            case "account", "combat", "exploration", "forge", "inventory", "merchants",
+                    "players", "quests", "rest", "wallet", "world" -> "/api/v1/" + segments[3];
+            default -> "/api/v1/other";
+        };
     }
 
     int trackedWindowCount() {

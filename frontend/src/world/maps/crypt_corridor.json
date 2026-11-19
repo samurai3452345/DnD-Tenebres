@@ -1,0 +1,133 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 8,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-crypt-corridor-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-crypt-corridor-foreground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Северная стена и границы верхней арки",
+          "x": 0,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 3072, "y": 0 },
+            { "x": 3072, "y": 608 },
+            { "x": 2046, "y": 608 },
+            { "x": 1844, "y": 353 },
+            { "x": 1651, "y": 353 },
+            { "x": 1651, "y": 234 },
+            { "x": 1416, "y": 237 },
+            { "x": 1416, "y": 330 },
+            { "x": 1151, "y": 330 },
+            { "x": 997, "y": 500 },
+            { "x": 0, "y": 500 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Западная стена",
+          "x": 0,
+          "y": 490,
+          "width": 998,
+          "height": 1430,
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Восточная стена",
+          "x": 2044,
+          "y": 597,
+          "width": 1028,
+          "height": 1323,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Южная стена слева",
+          "x": 0,
+          "y": 1915,
+          "width": 1341,
+          "height": 133,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Южная стена справа",
+          "x": 1730,
+          "y": 1902,
+          "width": 1342,
+          "height": 146,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "Нижняя лестница",
+          "x": 1337,
+          "y": 1925,
+          "width": 398,
+          "height": 123,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 7,
+          "name": "entry",
+          "x": 1536,
+          "y": 1750,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

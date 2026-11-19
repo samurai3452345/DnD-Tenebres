@@ -115,17 +115,9 @@ public class CombatServiceImpl implements CombatService {
                     events.add(new CombatEvent(player.getName(), "FLEE_SUCCESS", monster.getName(), fleeRoll, "Вы бросаетесь наутек, открываясь для удара вдогонку!"));
 
                     handleEnemyTurn(player, monster, round, events);
-
-
-                    boolean isPlayerDead = player.getCurrentHp() <= 0;
-                    if (isPlayerDead) {
-                        playerDeathService.handleDeath(player);
-                        events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), 0,
-                                "Вы погибли. Очнувшись в таверне 'Очаг Севера', вы обнаружили пропажу части золота..."));
-                    }
-
                     combatEffectService.onRoundEnd(player, monster);
-                    return new CombatReport(round, events, false, isPlayerDead);
+                    return resolveEnemyTurn(player, monster, aliveEnemyCount, round, events,
+                            "Вы погибли при отступлении и возродились в таверне");
                 } else {
                     events.add(new CombatEvent(player.getName(), "FLEE_FAIL", monster.getName(), fleeRoll, "Путь к отступлению отрезан! Враг атакует!"));
                 }
@@ -140,14 +132,8 @@ public class CombatServiceImpl implements CombatService {
         handleEnemyTurn(player, monster, round, events);
         combatEffectService.onRoundEnd(player, monster);
 
-        boolean isPlayerDead = player.getCurrentHp() <= 0;
-        if (isPlayerDead) {
-            var death = playerDeathService.handleDeath(player);
-            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), (int) death.goldLost(),
-                    "Вы погибли и возродились в таверне"));
-        }
-
-        return new CombatReport(round, events, false, isPlayerDead);
+        return resolveEnemyTurn(player, monster, aliveEnemyCount, round, events,
+                "Вы погибли и возродились в таверне");
     }
 
     private void handlePlayerCastSpell(Player player, Monster monster, String spellName, List<CombatEvent> events) {
@@ -461,13 +447,26 @@ public class CombatServiceImpl implements CombatService {
 
         handleEnemyTurn(player, monster, 0, events);
 
-        boolean isPlayerDead = player.getCurrentHp() <= 0;
-        if (isPlayerDead) {
-            var death = playerDeathService.handleDeath(player);
-            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), (int) death.goldLost(), "Вы погибли во сне и возродились в таверне"));
-        }
+        return resolveEnemyTurn(player, monster, 1, 0, events,
+                "Вы погибли во сне и возродились в таверне");
+    }
 
-        return new CombatReport(0, events, false, isPlayerDead);
+    private CombatReport resolveEnemyTurn(Player player, Monster monster, int aliveEnemyCount, int round,
+                                          List<CombatEvent> events, String playerDeathMessage) {
+        String reflectedDeathMessage = "Враг погиб от отражённого урона!";
+        if (player.getCurrentHp() <= 0) {
+            var death = playerDeathService.handleDeath(player);
+            events.add(new CombatEvent(player.getName(), "DEATH", player.getName(), (int) death.goldLost(),
+                    playerDeathMessage));
+            if (monster.isDead()) {
+                events.add(new CombatEvent(monster.getName(), "DEATH", monster.getName(), 0, reflectedDeathMessage));
+            }
+            return new CombatReport(round, events, monster.isDead(), true);
+        }
+        if (monster.isDead()) {
+            return handleMonsterDeath(player, monster, aliveEnemyCount, round, events, reflectedDeathMessage);
+        }
+        return new CombatReport(round, events, false, false);
     }
 
     private CombatReport handleMonsterDeath(Player player, Monster monster, int aliveEnemyCount, int round, List<CombatEvent> events, String deathMessage) {

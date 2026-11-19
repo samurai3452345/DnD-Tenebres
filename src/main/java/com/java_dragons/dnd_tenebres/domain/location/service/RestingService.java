@@ -46,6 +46,7 @@ public class RestingService {
         }
 
         if (player.getCurrentLocation() == null) throw new IllegalStateException("У игрока нет текущей локации");
+        String locationId = player.getCurrentLocation().getId();
         LocationType locType = player.getCurrentLocation().getType();
         LocationEffect locationEffect = player.getCurrentLocation().getEffect();
 
@@ -60,13 +61,11 @@ public class RestingService {
         int chance = locType == LocationType.DANGEROUS ? balance.shortRestDangerousAmbushPercent()
                 : locType == LocationType.NEUTRAL ? balance.shortRestNeutralAmbushPercent() : 0;
         chance = Math.min(100, chance + locationEffectService.ambushBonus(player));
-        boolean isAmbushed = randomSource.chance(chance);
+        boolean isAmbushed = chance > 0 && monsterSpawnerService.hasRandomEncounters(locationId)
+                && randomSource.chance(chance);
 
         if (isAmbushed) {
             log.warn("Отдых прерван! Засада!");
-
-            // Берем ID локации вместо биома и уровня
-            String locationId = player.getCurrentLocation().getId();
 
             var monster = monsterSpawnerService.spawnRandomMonster(locationId);
             encounterService.startEncounter(playerId, java.util.List.of(monster), EncounterReason.REST_AMBUSH);
@@ -79,8 +78,7 @@ public class RestingService {
         player.removeEffect(EffectType.POISON);
         player.removeEffect(EffectType.BLEEDING);
         player.removeEffect(EffectType.BURN);
-        int searchAttempts = searchAttemptService.restore(
-                playerId, player.getCurrentLocation().getId(), 4);
+        int searchAttempts = searchAttemptService.restore(playerId, locationId, 4);
 
         String message = locationEffect == LocationEffect.TOXIC_FUMES
                 ? "Ядовитые испарения не дали восстановить здоровье. Попыток поиска: " + searchAttempts + "."

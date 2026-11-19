@@ -4,6 +4,7 @@ import com.java_dragons.dnd_tenebres.core.config.GameBalanceProperties;
 import com.java_dragons.dnd_tenebres.core.event.*;
 import com.java_dragons.dnd_tenebres.domain.item.repository.ItemTemplateRepository;
 import com.java_dragons.dnd_tenebres.domain.item.service.InventoryService;
+import com.java_dragons.dnd_tenebres.domain.location.service.LocationClearService;
 import com.java_dragons.dnd_tenebres.domain.player.entity.Player;
 import com.java_dragons.dnd_tenebres.domain.player.repository.PlayerRepository;
 import com.java_dragons.dnd_tenebres.domain.player.service.PlayerProgressionService;
@@ -30,6 +31,7 @@ public class QuestService {
     private final ItemTemplateRepository itemTemplateRepository;
     private final GameBalanceProperties balance;
     private final WalletService walletService;
+    private final LocationClearService locationClearService;
     private final com.java_dragons.dnd_tenebres.infrastructure.audit.AuditService auditService;
     private final com.java_dragons.dnd_tenebres.domain.combat.service.CombatStateService combatStateService;
 
@@ -40,7 +42,12 @@ public class QuestService {
         QuestTemplate template = questTemplateRepository.findById(questTemplateId)
                 .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Шаблон квеста не найден"));
         validateAcceptance(player, template);
-        return map(playerQuestRepository.save(PlayerQuest.create(player, template)));
+        PlayerQuest quest = PlayerQuest.create(player, template);
+        if (template.getQuestType() == QuestType.CLEAR_LOCATION
+                && locationClearService.isLocationCleared(playerId, template.getTargetIdentifier())) {
+            quest.incrementProgress(template.getTargetCount());
+        }
+        return map(playerQuestRepository.save(quest));
     }
 
     private void validateAcceptance(Player player, QuestTemplate template) {

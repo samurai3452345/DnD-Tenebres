@@ -1,0 +1,156 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 7,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-crypt-central-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-crypt-central-foreground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Верхние стены и границы северной арки",
+          "x": 0,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 3072, "y": 0 },
+            { "x": 3072, "y": 882 },
+            { "x": 2565, "y": 904 },
+            { "x": 2559, "y": 922 },
+            { "x": 2139, "y": 590 },
+            { "x": 2038, "y": 561 },
+            { "x": 2040, "y": 511 },
+            { "x": 1819, "y": 517 },
+            { "x": 1691, "y": 465 },
+            { "x": 1695, "y": 195 },
+            { "x": 1389, "y": 190 },
+            { "x": 1394, "y": 464 },
+            { "x": 1043, "y": 519 },
+            { "x": 507, "y": 914 },
+            { "x": 0, "y": 886 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Саркофаг",
+          "x": 1341,
+          "y": 899,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 438, "y": 9 },
+            { "x": 577, "y": 118 },
+            { "x": 581, "y": 206 },
+            { "x": 576, "y": 225 },
+            { "x": 482, "y": 299 },
+            { "x": -66, "y": 302 },
+            { "x": -189, "y": 207 },
+            { "x": -181, "y": 115 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Юго-западная стена",
+          "x": 0,
+          "y": 1110,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 450, "y": 5 },
+            { "x": 795, "y": 530 },
+            { "x": 796, "y": 691 },
+            { "x": 1348, "y": 604 },
+            { "x": 1356, "y": 938 },
+            { "x": 0, "y": 938 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Юго-восточная стена",
+          "x": 1722,
+          "y": 1658,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 296, "y": 136 },
+            { "x": 585, "y": 116 },
+            { "x": 724, "y": -348 },
+            { "x": 914, "y": -572 },
+            { "x": 1350, "y": -572 },
+            { "x": 1350, "y": 390 },
+            { "x": 0, "y": 390 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Нижняя лестница",
+          "x": 1341,
+          "y": 1728,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 391, "y": 0 },
+            { "x": 411, "y": 320 },
+            { "x": -21, "y": 320 }
+          ],
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 6,
+          "name": "entry",
+          "x": 1536,
+          "y": 1530,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

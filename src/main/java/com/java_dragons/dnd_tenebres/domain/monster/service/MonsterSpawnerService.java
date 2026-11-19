@@ -26,6 +26,10 @@ public class MonsterSpawnerService {
     private final LocationRandomEncounterRepository randomEncounterRepository;
     private final RandomSource randomSource;
 
+    public boolean hasRandomEncounters(String locationId) {
+        return randomEncounterRepository.existsByLocationId(locationId);
+    }
+
     @Transactional
     public Monster spawnRandomMonster(String locationId) {
         List<LocationRandomEncounter> encounters = randomEncounterRepository.findByLocationId(locationId);

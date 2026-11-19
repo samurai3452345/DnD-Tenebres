@@ -1,0 +1,150 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 7,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-city-forge-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-city-forge-foreground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Задняя и левая стены, прилавок",
+          "x": 0,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 3072, "y": 0 },
+            { "x": 3072, "y": 640 },
+            { "x": 1960, "y": 642 },
+            { "x": 1137, "y": 558 },
+            { "x": 1137, "y": 701 },
+            { "x": 927, "y": 701 },
+            { "x": 962, "y": 1018 },
+            { "x": 661, "y": 968 },
+            { "x": 494, "y": 1050 },
+            { "x": 314, "y": 903 },
+            { "x": 314, "y": 1012 },
+            { "x": 0, "y": 1012 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Горн, инструменты и правая стена",
+          "x": 1955,
+          "y": 642,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 1117, "y": -52 },
+            { "x": 1117, "y": 938 },
+            { "x": 892, "y": 938 },
+            { "x": 892, "y": 708 },
+            { "x": 841, "y": 708 },
+            { "x": 812, "y": 476 },
+            { "x": 589, "y": 538 },
+            { "x": 580, "y": 253 },
+            { "x": -2, "y": 130 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Верстак и бочка с водой",
+          "x": 2219,
+          "y": 1267,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 548, "y": -151 },
+            { "x": 580, "y": 88 },
+            { "x": 39, "y": 147 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Наковальня и ноги кузнеца",
+          "x": 1720,
+          "y": 993,
+          "width": 399,
+          "height": 340,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Нижняя стена, ящики и мешки",
+          "x": 0,
+          "y": 1393,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 252, "y": 0 },
+            { "x": 252, "y": 225 },
+            { "x": 983, "y": 225 },
+            { "x": 983, "y": 322 },
+            { "x": 1944, "y": 322 },
+            { "x": 1944, "y": 175 },
+            { "x": 3072, "y": 175 },
+            { "x": 3072, "y": 655 },
+            { "x": 0, "y": 655 }
+          ],
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 6,
+          "name": "entry",
+          "x": 114,
+          "y": 1170,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

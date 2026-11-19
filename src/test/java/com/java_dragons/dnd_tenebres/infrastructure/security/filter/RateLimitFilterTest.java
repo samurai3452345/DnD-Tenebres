@@ -37,6 +37,22 @@ class RateLimitFilterTest {
     }
 
     @Test
+    void unknownAuthPathsDoNotExhaustWindowsForLoginAndRegistration() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter(clock, false, 3, 2, 100, 100, 100);
+        String ip = "198.51.100.1";
+
+        assertThat(perform(filter, "/api/v1/auth/unknown-1", ip).getStatus()).isEqualTo(200);
+        assertThat(perform(filter, "/api/v1/auth/unknown-2", ip).getStatus()).isEqualTo(200);
+        for (int i = 3; i <= 50; i++) {
+            assertThat(perform(filter, "/api/v1/auth/unknown-" + i, ip).getStatus()).isEqualTo(429);
+        }
+
+        assertThat(filter.trackedWindowCount()).isEqualTo(1);
+        assertThat(perform(filter, "/api/v1/auth/login", ip).getStatus()).isEqualTo(200);
+        assertThat(perform(filter, "/api/v1/auth/register", ip).getStatus()).isEqualTo(200);
+    }
+
+    @Test
     void limitsAuthenticatedAccountIndependentlyFromIp() throws Exception {
         RateLimitFilter filter = new RateLimitFilter(clock, false, 50, 10, 100, 2, 100);
         SecurityContextHolder.getContext().setAuthentication(
