@@ -13,6 +13,7 @@ import { usePlayer } from "../hooks/usePlayer";
 import type { CombatActionRequest } from "../types/combat";
 import type { Location, LocationConnection } from "../types/location";
 import type { PlayerQuest, QuestSource } from "../types/quest";
+import GameWorld, { pickupDurationMs } from "../world/GameWorld";
 
 const locationFrames: Record<Location["type"], string> = {
     SAFE_ZONE: "/assets/game/location-safe.png",
@@ -101,6 +102,8 @@ export default function GamePage() {
     const combatActionPending = useRef(false);
     const [travelOpen, setTravelOpen] = useState(false);
     const [busyAction, setBusyAction] = useState<string | null>(null);
+    const [collectedPickups, setCollectedPickups] = useState<ReadonlySet<string>>(() => new Set());
+    const pendingPickup = useRef<string | undefined>(undefined);
 
     const refreshWorld = useCallback(async () => {
         setWorldError(null);
@@ -174,6 +177,24 @@ export default function GamePage() {
         }
     };
 
+    const finishSearchAnimation = useEffectEvent(() => {
+        const pickupKey = pendingPickup.current;
+        pendingPickup.current = undefined;
+        void runAction("search", async () => {
+            const response = await explorationApi.search();
+            if (pickupKey !== undefined && response.eventType === "FOUND_LOOT") {
+                setCollectedPickups((previous) => new Set(previous).add(pickupKey));
+            }
+            return response;
+        });
+    });
+
+    useEffect(() => {
+        if (busyAction !== "search-animation") return;
+        const timeout = window.setTimeout(finishSearchAnimation, pickupDurationMs);
+        return () => window.clearTimeout(timeout);
+    }, [busyAction]);
+
     const handleRest = async (kind: "short" | "long") => {
         setBusyAction(kind);
         try {
@@ -227,7 +248,7 @@ export default function GamePage() {
 
     const displayedQuests = useMemo(() => quests.slice(0, 5), [quests]);
 
-    if (playerLoading || worldLoading) {
+    if ((playerLoading && !player) || worldLoading) {
         return <main className="game-dashboard game-dashboard--centered"><Loading text="Загрузка мира..." /></main>;
     }
 
@@ -244,11 +265,27 @@ export default function GamePage() {
     const locationBackground = locationBackgrounds[location.id] ?? "/assets/game/main-background.png";
     const zoneName = zoneNameOverrides[location.zoneName] ?? location.zoneName;
 
+    const startSearch = (pickupKey?: string) => {
+        if (actionsDisabled || travelOpen || !allows("SEARCH")) return;
+        pendingPickup.current = pickupKey;
+        setBusyAction("search-animation");
+    };
+
     return (
         <main className="game-dashboard" style={{ backgroundImage: `url("${locationBackground}")` }}>
             <div className="game-dashboard__veil" aria-hidden="true" />
 
             <div inert={combatOpen}>
+            <GameWorld
+                key={location.id}
+                locationId={location.id}
+                background={locationBackground}
+                paused={actionsDisabled || travelOpen}
+                pickingUp={busyAction === "search-animation"}
+                showCollisions={new URLSearchParams(routeLocation.search).has("collisions")}
+                collectedPickups={collectedPickups}
+                onPickup={allows("SEARCH") ? startSearch : undefined}
+            />
 
             <section className="game-player" aria-label="Профиль персонажа">
                 <img src="/assets/game/player-panel.png" alt="" aria-hidden="true" />
@@ -313,7 +350,7 @@ export default function GamePage() {
             <section className="game-actions" aria-label="Действия в локации">
                 <img src="/assets/game/actions.png" alt="" aria-hidden="true" />
                 <button type="button" aria-label="Путешествие" disabled={actionsDisabled || !allows("TRAVEL")} onClick={() => setTravelOpen(true)} />
-                <button type="button" aria-label="Поиск" disabled={actionsDisabled || !allows("SEARCH")} onClick={() => runAction("search", explorationApi.search)} />
+                <button type="button" aria-label="Поиск" disabled={actionsDisabled || !allows("SEARCH")} onClick={() => startSearch()} />
                 <button type="button" aria-label="Охота" disabled={actionsDisabled || !allows("HUNT")} onClick={() => runAction("hunt", explorationApi.hunt)} />
             </section>
 

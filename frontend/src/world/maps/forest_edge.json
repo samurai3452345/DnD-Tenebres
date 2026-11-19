@@ -1,0 +1,897 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 6,
+  "nextobjectid": 84,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-forest-edge-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-forest-edge-trees.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Отмеченные деревья 1",
+          "x": 105,
+          "y": 89,
+          "width": 93,
+          "height": 78,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Отмеченные деревья 2",
+          "x": 255,
+          "y": 106,
+          "width": 254,
+          "height": 109,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Отмеченные деревья 3",
+          "x": 612,
+          "y": 93,
+          "width": 57,
+          "height": 56,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Отмеченные деревья 4",
+          "x": 695,
+          "y": 130,
+          "width": 82,
+          "height": 79,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Отмеченные деревья 5",
+          "x": 506,
+          "y": 253,
+          "width": 91,
+          "height": 85,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "Отмеченные деревья 6",
+          "x": 0,
+          "y": 254,
+          "width": 98,
+          "height": 137,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "Отмеченные деревья 7",
+          "x": 0,
+          "y": 359,
+          "width": 435,
+          "height": 103,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "Отмеченные деревья 8",
+          "x": 91,
+          "y": 505,
+          "width": 108,
+          "height": 66,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 9,
+          "name": "Отмеченные деревья 9",
+          "x": 0,
+          "y": 585,
+          "width": 91,
+          "height": 141,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 10,
+          "name": "Отмеченные деревья 10",
+          "x": 14,
+          "y": 659,
+          "width": 374,
+          "height": 101,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 11,
+          "name": "Отмеченные деревья 11",
+          "x": 16,
+          "y": 815,
+          "width": 59,
+          "height": 61,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 12,
+          "name": "Отмеченные деревья 12",
+          "x": 132,
+          "y": 836,
+          "width": 60,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 13,
+          "name": "Отмеченные деревья 13",
+          "x": 305,
+          "y": 830,
+          "width": 150,
+          "height": 97,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 14,
+          "name": "Отмеченные деревья 14",
+          "x": 483,
+          "y": 693,
+          "width": 58,
+          "height": 58,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 15,
+          "name": "Отмеченные деревья 15",
+          "x": 579,
+          "y": 747,
+          "width": 54,
+          "height": 56,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 16,
+          "name": "Отмеченные деревья 16",
+          "x": 676,
+          "y": 906,
+          "width": 59,
+          "height": 59,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 17,
+          "name": "Отмеченные деревья 17",
+          "x": 856,
+          "y": 392,
+          "width": 60,
+          "height": 60,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 18,
+          "name": "Отмеченные деревья 18",
+          "x": 922,
+          "y": 539,
+          "width": 59,
+          "height": 60,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 19,
+          "name": "Отмеченные деревья 19",
+          "x": 1024,
+          "y": 598,
+          "width": 53,
+          "height": 55,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 20,
+          "name": "Отмеченные деревья 20",
+          "x": 855,
+          "y": 200,
+          "width": 301,
+          "height": 120,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 21,
+          "name": "Отмеченные деревья 21",
+          "x": 1034,
+          "y": 164,
+          "width": 74,
+          "height": 119,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 22,
+          "name": "Отмеченные деревья 22",
+          "x": 1144,
+          "y": 91,
+          "width": 60,
+          "height": 60,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 23,
+          "name": "Отмеченные деревья 23",
+          "x": 1280,
+          "y": 48,
+          "width": 198,
+          "height": 83,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 24,
+          "name": "Отмеченные деревья 24",
+          "x": 1521,
+          "y": 127,
+          "width": 73,
+          "height": 64,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 25,
+          "name": "Отмеченные деревья 25",
+          "x": 1425,
+          "y": 311,
+          "width": 186,
+          "height": 134,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 26,
+          "name": "Отмеченные деревья 26",
+          "x": 1087,
+          "y": 428,
+          "width": 401,
+          "height": 162,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 27,
+          "name": "Отмеченные деревья 27",
+          "x": 1685,
+          "y": 16,
+          "width": 56,
+          "height": 83,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 28,
+          "name": "Отмеченные деревья 28",
+          "x": 1702,
+          "y": 250,
+          "width": 263,
+          "height": 121,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 29,
+          "name": "Отмеченные деревья 29",
+          "x": 1587,
+          "y": 421,
+          "width": 323,
+          "height": 110,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 30,
+          "name": "Отмеченные деревья 30",
+          "x": 1987,
+          "y": 134,
+          "width": 135,
+          "height": 115,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 31,
+          "name": "Отмеченные деревья 31",
+          "x": 2233,
+          "y": 72,
+          "width": 58,
+          "height": 59,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 32,
+          "name": "Отмеченные деревья 32",
+          "x": 2329,
+          "y": 117,
+          "width": 59,
+          "height": 60,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 33,
+          "name": "Отмеченные деревья 33",
+          "x": 2629,
+          "y": 21,
+          "width": 245,
+          "height": 208,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 34,
+          "name": "Отмеченные деревья 34",
+          "x": 2932,
+          "y": 113,
+          "width": 73,
+          "height": 84,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 35,
+          "name": "Отмеченные деревья 35",
+          "x": 2961,
+          "y": 185,
+          "width": 111,
+          "height": 160,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 36,
+          "name": "Отмеченные деревья 36",
+          "x": 2886,
+          "y": 365,
+          "width": 56,
+          "height": 86,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 37,
+          "name": "Отмеченные деревья 37",
+          "x": 2814,
+          "y": 416,
+          "width": 54,
+          "height": 55,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 38,
+          "name": "Отмеченные деревья 38",
+          "x": 2918,
+          "y": 489,
+          "width": 154,
+          "height": 94,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 39,
+          "name": "Отмеченные деревья 39",
+          "x": 2883,
+          "y": 694,
+          "width": 189,
+          "height": 111,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 40,
+          "name": "Отмеченные деревья 40",
+          "x": 2469,
+          "y": 340,
+          "width": 247,
+          "height": 170,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 41,
+          "name": "Отмеченные деревья 41",
+          "x": 2286,
+          "y": 516,
+          "width": 277,
+          "height": 126,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 42,
+          "name": "Отмеченные деревья 42",
+          "x": 2040,
+          "y": 684,
+          "width": 231,
+          "height": 123,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 43,
+          "name": "Отмеченные деревья 43",
+          "x": 1968,
+          "y": 838,
+          "width": 85,
+          "height": 72,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 44,
+          "name": "Отмеченные деревья 44",
+          "x": 2179,
+          "y": 854,
+          "width": 63,
+          "height": 65,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 45,
+          "name": "Отмеченные деревья 45",
+          "x": 2327,
+          "y": 918,
+          "width": 67,
+          "height": 81,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 46,
+          "name": "Отмеченные деревья 46",
+          "x": 2223,
+          "y": 1089,
+          "width": 92,
+          "height": 68,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 47,
+          "name": "Отмеченные деревья 47",
+          "x": 2438,
+          "y": 1088,
+          "width": 260,
+          "height": 116,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 48,
+          "name": "Отмеченные деревья 48",
+          "x": 2656,
+          "y": 860,
+          "width": 384,
+          "height": 158,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 49,
+          "name": "Отмеченные деревья 49",
+          "x": 2905,
+          "y": 1188,
+          "width": 54,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 50,
+          "name": "Отмеченные деревья 50",
+          "x": 2930,
+          "y": 1459,
+          "width": 142,
+          "height": 143,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 51,
+          "name": "Отмеченные деревья 51",
+          "x": 3023,
+          "y": 1214,
+          "width": 49,
+          "height": 305,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 52,
+          "name": "Отмеченные деревья 52",
+          "x": 2861,
+          "y": 1388,
+          "width": 61,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 53,
+          "name": "Отмеченные деревья 53",
+          "x": 2543,
+          "y": 1407,
+          "width": 56,
+          "height": 54,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 54,
+          "name": "Отмеченные деревья 54",
+          "x": 2179,
+          "y": 1328,
+          "width": 347,
+          "height": 149,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 55,
+          "name": "Отмеченные деревья 55",
+          "x": 2547,
+          "y": 1539,
+          "width": 60,
+          "height": 61,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 56,
+          "name": "Отмеченные деревья 56",
+          "x": 2658,
+          "y": 1581,
+          "width": 65,
+          "height": 68,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 57,
+          "name": "Отмеченные деревья 57",
+          "x": 2763,
+          "y": 1686,
+          "width": 191,
+          "height": 109,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 58,
+          "name": "Отмеченные деревья 58",
+          "x": 2270,
+          "y": 1768,
+          "width": 75,
+          "height": 75,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 59,
+          "name": "Отмеченные деревья 59",
+          "x": 2390,
+          "y": 1881,
+          "width": 70,
+          "height": 63,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 60,
+          "name": "Отмеченные деревья 60",
+          "x": 2933,
+          "y": 1890,
+          "width": 89,
+          "height": 91,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 61,
+          "name": "Отмеченные деревья 61",
+          "x": 2721,
+          "y": 1914,
+          "width": 175,
+          "height": 115,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 62,
+          "name": "Отмеченные деревья 62",
+          "x": 2595,
+          "y": 1940,
+          "width": 76,
+          "height": 58,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 63,
+          "name": "Отмеченные деревья 63",
+          "x": 1908,
+          "y": 1577,
+          "width": 385,
+          "height": 138,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 64,
+          "name": "Отмеченные деревья 64",
+          "x": 1814,
+          "y": 1875,
+          "width": 373,
+          "height": 148,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 65,
+          "name": "Отмеченные деревья 65",
+          "x": 1681,
+          "y": 1794,
+          "width": 63,
+          "height": 63,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 66,
+          "name": "Отмеченные деревья 66",
+          "x": 1597,
+          "y": 1957,
+          "width": 61,
+          "height": 61,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 67,
+          "name": "Отмеченные деревья 67",
+          "x": 25,
+          "y": 1098,
+          "width": 251,
+          "height": 109,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 68,
+          "name": "Отмеченные деревья 68",
+          "x": 438,
+          "y": 1140,
+          "width": 259,
+          "height": 112,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 69,
+          "name": "Отмеченные деревья 69",
+          "x": 0,
+          "y": 1222,
+          "width": 62,
+          "height": 77,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 70,
+          "name": "Отмеченные деревья 70",
+          "x": 107,
+          "y": 1333,
+          "width": 60,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 71,
+          "name": "Отмеченные деревья 71",
+          "x": 173,
+          "y": 1334,
+          "width": 342,
+          "height": 131,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 72,
+          "name": "Отмеченные деревья 72",
+          "x": 624,
+          "y": 1448,
+          "width": 71,
+          "height": 58,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 73,
+          "name": "Отмеченные деревья 73",
+          "x": 666,
+          "y": 1467,
+          "width": 386,
+          "height": 120,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 74,
+          "name": "Отмеченные деревья 74",
+          "x": 0,
+          "y": 1525,
+          "width": 209,
+          "height": 104,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 75,
+          "name": "Отмеченные деревья 75",
+          "x": 1119,
+          "y": 1674,
+          "width": 207,
+          "height": 113,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 76,
+          "name": "Отмеченные деревья 76",
+          "x": 7,
+          "y": 1767,
+          "width": 339,
+          "height": 227,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 77,
+          "name": "Отмеченные деревья 77",
+          "x": 417,
+          "y": 1888,
+          "width": 105,
+          "height": 67,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 78,
+          "name": "Отмеченные деревья 78",
+          "x": 664,
+          "y": 1838,
+          "width": 59,
+          "height": 77,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 79,
+          "name": "Отмеченные деревья 79",
+          "x": 784,
+          "y": 1881,
+          "width": 262,
+          "height": 126,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 80,
+          "name": "Отмеченные деревья 80",
+          "x": 1137,
+          "y": 1904,
+          "width": 252,
+          "height": 109,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 81,
+          "name": "Отмеченные деревья 81",
+          "x": 491,
+          "y": 1996,
+          "width": 59,
+          "height": 52,
+          "ellipse": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 82,
+          "name": "entry",
+          "x": 1488,
+          "y": 1845,
+          "point": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "pickups",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 83,
+          "name": "trail-search",
+          "x": 1490,
+          "y": 1640,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

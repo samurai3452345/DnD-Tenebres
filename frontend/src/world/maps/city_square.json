@@ -1,0 +1,321 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 24,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-city-square-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-city-square-foreground-v2.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Таверна и северо-западная стена",
+          "x": 0,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 1040, "y": 0 },
+            { "x": 1040, "y": 495 },
+            { "x": 1000, "y": 521 },
+            { "x": 273, "y": 823 },
+            { "x": 346, "y": 981 },
+            { "x": 0, "y": 981 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Гильдия авантюристов и лестница",
+          "x": 1018,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 1325, "y": 0 },
+            { "x": 1325, "y": 453 },
+            { "x": 1011, "y": 565 },
+            { "x": 390, "y": 570 },
+            { "x": -28, "y": 508 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Гильдия торговцев и прилавки",
+          "x": 2320,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 752, "y": 0 },
+            { "x": 752, "y": 1464 },
+            { "x": 707, "y": 1454 },
+            { "x": 666, "y": 1141 },
+            { "x": 372, "y": 1039 },
+            { "x": 423, "y": 956 },
+            { "x": 208, "y": 887 },
+            { "x": -17, "y": 1010 },
+            { "x": -112, "y": 933 },
+            { "x": 0, "y": 447 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Кузница",
+          "x": 1968,
+          "y": 1825,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 286, "y": -375 },
+            { "x": 725, "y": -444 },
+            { "x": 1101, "y": -370 },
+            { "x": 1104, "y": 106 },
+            { "x": 505, "y": 106 },
+            { "x": 505, "y": 43 },
+            { "x": 261, "y": -6 },
+            { "x": 164, "y": 92 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Юго-западная стена и деревья",
+          "x": 0,
+          "y": 1202,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 318, "y": 25 },
+            { "x": 417, "y": 438 },
+            { "x": 706, "y": 704 },
+            { "x": 441, "y": 846 },
+            { "x": 0, "y": 846 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "Клумба и подножие памятника",
+          "x": 1298,
+          "y": 956,
+          "width": 436,
+          "height": 311,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "Бочки у таверны",
+          "x": 774,
+          "y": 515,
+          "width": 203,
+          "height": 160,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "Объект у входа в таверну",
+          "x": 627,
+          "y": 665,
+          "width": 64,
+          "height": 64,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 9,
+          "name": "Тележка",
+          "x": 2490,
+          "y": 997,
+          "width": 181,
+          "height": 91,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 10,
+          "name": "Прохожий 1",
+          "x": 473,
+          "y": 871,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 11,
+          "name": "Прохожий 2",
+          "x": 541,
+          "y": 893,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 12,
+          "name": "Прохожий 3",
+          "x": 614,
+          "y": 876,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 13,
+          "name": "Прохожий 4",
+          "x": 1111,
+          "y": 693,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 14,
+          "name": "Прохожий 5",
+          "x": 1952,
+          "y": 647,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 15,
+          "name": "Прохожий 6",
+          "x": 2044,
+          "y": 643,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 16,
+          "name": "Прохожий 7",
+          "x": 2084,
+          "y": 1063,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 17,
+          "name": "Прохожий 8",
+          "x": 1035,
+          "y": 1213,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 18,
+          "name": "Прохожий 9",
+          "x": 1132,
+          "y": 1225,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 19,
+          "name": "Прохожий 10",
+          "x": 1729,
+          "y": 1318,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 20,
+          "name": "Прохожий 11",
+          "x": 1821,
+          "y": 1289,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 21,
+          "name": "Прохожий 12",
+          "x": 723,
+          "y": 1520,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 22,
+          "name": "Прохожий 13",
+          "x": 1835,
+          "y": 1524,
+          "width": 62,
+          "height": 62,
+          "ellipse": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 23,
+          "name": "entry",
+          "x": 1530,
+          "y": 1852,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

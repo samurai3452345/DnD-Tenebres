@@ -1,0 +1,223 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 13,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-crypt-training-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-crypt-training-foreground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Северная стена, арка и стеллаж со щитами",
+          "x": 0,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 3072, "y": 0 },
+            { "x": 3072, "y": 1874 },
+            { "x": 2557, "y": 1870 },
+            { "x": 2544, "y": 1619 },
+            { "x": 2761, "y": 1368 },
+            { "x": 2755, "y": 953 },
+            { "x": 2752, "y": 786 },
+            { "x": 2328, "y": 633 },
+            { "x": 2329, "y": 570 },
+            { "x": 2311, "y": 541 },
+            { "x": 1712, "y": 535 },
+            { "x": 1716, "y": 433 },
+            { "x": 1387, "y": 451 },
+            { "x": 1388, "y": 534 },
+            { "x": 1056, "y": 582 },
+            { "x": 799, "y": 579 },
+            { "x": 810, "y": 801 },
+            { "x": 568, "y": 906 },
+            { "x": 555, "y": 866 },
+            { "x": 344, "y": 942 },
+            { "x": 0, "y": 935 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Юго-западная стена",
+          "x": 0,
+          "y": 1153,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 366, "y": 14 },
+            { "x": 365, "y": 309 },
+            { "x": 485, "y": 415 },
+            { "x": 475, "y": 720 },
+            { "x": 0, "y": 720 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Граница западного прохода",
+          "x": 201,
+          "y": 934,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 26, "y": 0 },
+            { "x": 26, "y": 160 },
+            { "x": 12, "y": 241 },
+            { "x": -12, "y": 231 },
+            { "x": 0, "y": 159 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Южная стена",
+          "x": 0,
+          "y": 1872,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 3072, "y": -15 },
+            { "x": 3072, "y": 176 },
+            { "x": 0, "y": 176 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Основание верхнего манекена",
+          "x": 2017,
+          "y": 844,
+          "width": 188,
+          "height": 99,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "Основание верхнего тренировочного столба",
+          "x": 2364,
+          "y": 782,
+          "width": 192,
+          "height": 113,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "Основание верхней мишени у стены",
+          "x": 2594,
+          "y": 765,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 53, "y": -20 },
+            { "x": 120, "y": -21 },
+            { "x": 164, "y": 13 },
+            { "x": 172, "y": 79 },
+            { "x": 185, "y": 152 },
+            { "x": 174, "y": 198 },
+            { "x": 129, "y": 207 },
+            { "x": 88, "y": 187 },
+            { "x": 14, "y": 187 },
+            { "x": -7, "y": 152 },
+            { "x": -4, "y": 112 },
+            { "x": 17, "y": 65 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "Отмеченное препятствие у восточной стены",
+          "x": 2679,
+          "y": 1023,
+          "width": 88,
+          "height": 122,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 9,
+          "name": "Основание среднего манекена",
+          "x": 2221,
+          "y": 1127,
+          "width": 181,
+          "height": 120,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 10,
+          "name": "Основание нижнего манекена",
+          "x": 2073,
+          "y": 1521,
+          "width": 165,
+          "height": 121,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 11,
+          "name": "Основание нижнего тренировочного столба",
+          "x": 2387,
+          "y": 1440,
+          "width": 205,
+          "height": 98,
+          "ellipse": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 12,
+          "name": "entry",
+          "x": 535,
+          "y": 1045,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

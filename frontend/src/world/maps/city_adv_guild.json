@@ -1,0 +1,160 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 10,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-adventurers-guild-ground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-adventurers-guild-foreground.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Задняя стена, камин, лестница и стойка",
+          "x": 0,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 3072, "y": 0 },
+            { "x": 3072, "y": 1220 },
+            { "x": 2785, "y": 1180 },
+            { "x": 2075, "y": 930 },
+            { "x": 2170, "y": 800 },
+            { "x": 1754, "y": 681 },
+            { "x": 1759, "y": 556 },
+            { "x": 1158, "y": 574 },
+            { "x": 1143, "y": 738 },
+            { "x": 686, "y": 837 },
+            { "x": 640, "y": 695 },
+            { "x": 466, "y": 654 },
+            { "x": 546, "y": 926 },
+            { "x": 225, "y": 1220 },
+            { "x": 346, "y": 1597 },
+            { "x": 0, "y": 1810 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Правая стена",
+          "x": 2785,
+          "y": 1180,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 287, "y": 0 },
+            { "x": 287, "y": 630 },
+            { "x": 45, "y": 630 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Нижняя стена слева",
+          "x": 0,
+          "y": 1600,
+          "width": 1287,
+          "height": 448,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Левый косяк",
+          "x": 1287,
+          "y": 1557,
+          "width": 68,
+          "height": 391,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Открытая створка",
+          "x": 1570,
+          "y": 1545,
+          "width": 172,
+          "height": 403,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "Нижняя стена справа",
+          "x": 1742,
+          "y": 1600,
+          "width": 1330,
+          "height": 448,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "Левый стол",
+          "x": 575,
+          "y": 1169,
+          "width": 488,
+          "height": 265,
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "Правый стол",
+          "x": 1969,
+          "y": 1178,
+          "width": 448,
+          "height": 266,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 9,
+          "name": "entry",
+          "x": 1460,
+          "y": 1415,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}

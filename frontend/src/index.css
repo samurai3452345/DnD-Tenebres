@@ -875,7 +875,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .game-dashboard__veil {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 1;
     background:
         radial-gradient(circle at 52% 48%, transparent 18%, rgba(1, 4, 7, .12) 66%, rgba(0, 0, 0, .6) 100%),
         linear-gradient(180deg, rgba(0, 0, 0, .16), transparent 26%, transparent 66%, rgba(0, 0, 0, .36));

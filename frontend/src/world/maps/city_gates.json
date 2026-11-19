@@ -1,0 +1,460 @@
+{
+  "type": "map",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 96,
+  "height": 64,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 41,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-main-gates-ground-v2.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "foreground",
+      "type": "imagelayer",
+      "image": "../../../public/assets/game/location-main-gates-foreground-v3.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 0.55,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Мост и городская сторона",
+          "x": 1154,
+          "y": 0,
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 1918, "y": 0 },
+            { "x": 1918, "y": 2048 },
+            { "x": -16, "y": 2048 }
+          ],
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "Отмеченное препятствие 1",
+          "x": 97,
+          "y": 85,
+          "width": 49,
+          "height": 77,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "Отмеченное препятствие 2",
+          "x": 388,
+          "y": 86,
+          "width": 233,
+          "height": 118,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "Отмеченное препятствие 3",
+          "x": 424,
+          "y": 197,
+          "width": 162,
+          "height": 143,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "Отмеченное препятствие 4",
+          "x": 70,
+          "y": 239,
+          "width": 307,
+          "height": 142,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "Отмеченное препятствие 5",
+          "x": 298,
+          "y": 355,
+          "width": 246,
+          "height": 154,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "Отмеченное препятствие 6",
+          "x": 111,
+          "y": 449,
+          "width": 140,
+          "height": 109,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "Отмеченное препятствие 7",
+          "x": 872,
+          "y": 87,
+          "width": 83,
+          "height": 85,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 9,
+          "name": "Отмеченное препятствие 8",
+          "x": 880,
+          "y": 196,
+          "width": 87,
+          "height": 95,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 10,
+          "name": "Отмеченное препятствие 9",
+          "x": 1024,
+          "y": 134,
+          "width": 83,
+          "height": 98,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 11,
+          "name": "Отмеченное препятствие 10",
+          "x": 975,
+          "y": 250,
+          "width": 125,
+          "height": 65,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 12,
+          "name": "Отмеченное препятствие 11",
+          "x": 742,
+          "y": 353,
+          "width": 171,
+          "height": 95,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 13,
+          "name": "Отмеченное препятствие 12",
+          "x": 1002,
+          "y": 398,
+          "width": 149,
+          "height": 87,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 14,
+          "name": "Отмеченное препятствие 13",
+          "x": 777,
+          "y": 541,
+          "width": 214,
+          "height": 128,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 15,
+          "name": "Отмеченное препятствие 14",
+          "x": 983,
+          "y": 658,
+          "width": 128,
+          "height": 83,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 16,
+          "name": "Отмеченное препятствие 15",
+          "x": 198,
+          "y": 624,
+          "width": 302,
+          "height": 152,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 17,
+          "name": "Отмеченное препятствие 16",
+          "x": 276,
+          "y": 783,
+          "width": 201,
+          "height": 125,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 18,
+          "name": "Отмеченное препятствие 17",
+          "x": 64,
+          "y": 791,
+          "width": 140,
+          "height": 105,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 19,
+          "name": "Отмеченное препятствие 18",
+          "x": 354,
+          "y": 990,
+          "width": 160,
+          "height": 117,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 20,
+          "name": "Отмеченное препятствие 19",
+          "x": 53,
+          "y": 1027,
+          "width": 92,
+          "height": 87,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 21,
+          "name": "Отмеченное препятствие 20",
+          "x": 179,
+          "y": 1082,
+          "width": 130,
+          "height": 103,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 22,
+          "name": "Отмеченное препятствие 21",
+          "x": 42,
+          "y": 1190,
+          "width": 307,
+          "height": 167,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 23,
+          "name": "Отмеченное препятствие 22",
+          "x": 536,
+          "y": 1138,
+          "width": 92,
+          "height": 107,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 24,
+          "name": "Отмеченное препятствие 23",
+          "x": 472,
+          "y": 1373,
+          "width": 99,
+          "height": 116,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 25,
+          "name": "Отмеченное препятствие 24",
+          "x": 143,
+          "y": 1411,
+          "width": 227,
+          "height": 105,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 26,
+          "name": "Отмеченное препятствие 25",
+          "x": 650,
+          "y": 1414,
+          "width": 126,
+          "height": 124,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 27,
+          "name": "Отмеченное препятствие 26",
+          "x": 789,
+          "y": 1380,
+          "width": 135,
+          "height": 116,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 28,
+          "name": "Отмеченное препятствие 27",
+          "x": 29,
+          "y": 1544,
+          "width": 227,
+          "height": 91,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 29,
+          "name": "Отмеченное препятствие 28",
+          "x": 379,
+          "y": 1499,
+          "width": 146,
+          "height": 108,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 30,
+          "name": "Отмеченное препятствие 29",
+          "x": 216,
+          "y": 1602,
+          "width": 215,
+          "height": 135,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 31,
+          "name": "Отмеченное препятствие 30",
+          "x": 614,
+          "y": 1591,
+          "width": 210,
+          "height": 137,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 32,
+          "name": "Отмеченное препятствие 31",
+          "x": 883,
+          "y": 1595,
+          "width": 242,
+          "height": 146,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 33,
+          "name": "Отмеченное препятствие 32",
+          "x": 917,
+          "y": 1681,
+          "width": 181,
+          "height": 122,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 34,
+          "name": "Отмеченное препятствие 33",
+          "x": 517,
+          "y": 1759,
+          "width": 68,
+          "height": 63,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 35,
+          "name": "Отмеченное препятствие 34",
+          "x": 706,
+          "y": 1781,
+          "width": 100,
+          "height": 105,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 36,
+          "name": "Отмеченное препятствие 35",
+          "x": 88,
+          "y": 1790,
+          "width": 288,
+          "height": 226,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 37,
+          "name": "Отмеченное препятствие 36",
+          "x": 445,
+          "y": 1878,
+          "width": 301,
+          "height": 120,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 38,
+          "name": "Отмеченное препятствие 37",
+          "x": 760,
+          "y": 1890,
+          "width": 165,
+          "height": 118,
+          "ellipse": true,
+          "visible": true
+        },
+        {
+          "id": 39,
+          "name": "Отмеченное препятствие 38",
+          "x": 935,
+          "y": 1872,
+          "width": 144,
+          "height": 90,
+          "ellipse": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "spawns",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 40,
+          "name": "entry",
+          "x": 620,
+          "y": 780,
+          "point": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "tilesets": []
+}
